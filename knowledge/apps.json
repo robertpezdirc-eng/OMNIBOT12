@@ -1,0 +1,41 @@
+{
+  "title": "List of Applications",
+  "source": "Internal Knowledge Base v1.0",
+  "applications": [
+    {
+      "name": "WhatsApp",
+      "platform": ["iOS", "Android", "Web", "Desktop"],
+      "free": true,
+      "description": "A popular cross-platform messaging application that allows users to send text messages and voice messages, make voice and video calls, and share images, documents, and other media.",
+      "alternatives": ["Telegram", "Signal", "Viber"]
+    },
+    {
+      "name": "Photoshop",
+      "platform": ["Windows", "Mac"],
+      "free": false,
+      "description": "A powerful and industry-standard raster graphics editor for image editing, graphic design, and digital art.",
+      "alternatives": ["GIMP", "Affinity Photo", "Krita"]
+    },
+    {
+      "name": "Visual Studio Code",
+      "platform": ["Windows", "Mac", "Linux"],
+      "free": true,
+      "description": "A free and open-source code editor developed by Microsoft, with support for debugging, syntax highlighting, intelligent code completion, snippets, and Git control.",
+      "alternatives": ["Sublime Text", "Atom", "JetBrains IDEs"]
+    },
+    {
+      "name": "Slack",
+      "platform": ["iOS", "Android", "Web", "Desktop"],
+      "free": false,
+      "description": "A channel-based messaging platform for team collaboration, offering features like chat rooms (channels) organized by topic, private groups, and direct messaging.",
+      "alternatives": ["Microsoft Teams", "Discord", "Mattermost"]
+    },
+    {
+      "name": "Spotify",
+      "platform": ["iOS", "Android", "Web", "Desktop"],
+      "free": true,
+      "description": "A digital music, podcast, and video streaming service that gives you access to millions of songs and other content from creators all over the world.",
+      "alternatives": ["Apple Music", "YouTube Music", "Tidal"]
+    }
+  ]
+}

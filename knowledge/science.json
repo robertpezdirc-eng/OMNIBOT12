@@ -1,0 +1,31 @@
+
+{
+  "title": "Solar System Facts",
+  "source": "Internal Knowledge Base v1.0",
+  "planets": [
+    {
+      "name": "Mercury",
+      "details": "The smallest planet in our solar system and nearest to the Sun. It has a cratered surface, similar to Earth's Moon.",
+      "moons": 0,
+      "location": null
+    },
+    {
+      "name": "Venus",
+      "details": "Venus is the second planet from the Sun and is Earth’s closest planetary neighbor. It’s one of the four inner, terrestrial (or rocky) planets, and it’s often called Earth’s twin because it’s similar in size and density.",
+      "moons": 0,
+      "location": null
+    },
+    {
+      "name": "Earth",
+      "details": "Our home planet is the only place we know of so far that’s inhabited by living things. It's also the only planet in our solar system with liquid water on the surface.",
+      "moons": 1,
+      "location": { "lat": 46.05, "lng": 14.50, "label": "Ljubljana, Earth"}
+    },
+    {
+      "name": "Mars",
+      "details": "Known as the Red Planet, it's the second-smallest planet in the Solar System. It has a thin atmosphere and features such as polar ice caps, canyons, and volcanoes.",
+      "moons": 2,
+      "location": { "lat": -1.47, "lng": -50.47, "label": "Gale Crater, Mars"}
+    }
+  ]
+}
