@@ -1,0 +1,35 @@
+
+{
+  "title": "Popular Programming Languages",
+  "source": "Internal Knowledge Base v1.0",
+  "languages": [
+    {
+      "name": "JavaScript",
+      "year_created": 1995,
+      "paradigm": "Multi-paradigm (scripting, object-oriented, functional)",
+      "use_case": "The primary language for web development (front-end and back-end with Node.js), mobile apps, and desktop apps.",
+      "creator_company": "Netscape"
+    },
+    {
+      "name": "Python",
+      "year_created": 1991,
+      "paradigm": "Multi-paradigm (object-oriented, imperative, functional)",
+      "use_case": "Web development (Django, Flask), data science, machine learning, scripting, and automation. Known for its readability.",
+      "creator_company": "Python Software Foundation"
+    },
+    {
+      "name": "Rust",
+      "year_created": 2010,
+      "paradigm": "Multi-paradigm (imperative, functional, concurrent)",
+      "use_case": "Systems programming, game engines, and performance-critical applications where safety and concurrency are key.",
+      "creator_company": "Mozilla Research"
+    },
+    {
+      "name": "Go",
+      "year_created": 2009,
+      "paradigm": "Concurrent, imperative",
+      "use_case": "Backend services, networking tools, and cloud-based applications. Designed for simplicity and efficiency in concurrent systems.",
+      "creator_company": "Google"
+    }
+  ]
+}

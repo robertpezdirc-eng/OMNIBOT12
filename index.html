@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="sl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniAI Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body class="loading">
+    <div id="grid-background"></div>
+
+    <main class="main-container">
+        <div class="chat-container">
+            <div id="chat-log" class="chat-log">
+                <!-- Sporočila se dodajajo dinamično -->
+            </div>
+            <div class="chat-input-area">
+                <div id="image-preview-container">
+                    <img id="image-preview" src="#" alt="Image preview">
+                    <button id="remove-image-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                 <div class="input-wrapper">
+                    <button id="mic-btn" class="chat-btn">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
+                    </button>
+                    <textarea id="chat-input" placeholder="Vprašajte OmniAI Pro..." rows="1"></textarea>
+                    <label for="image-upload" class="chat-btn">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    </label>
+                    <input type="file" id="image-upload" accept="image/*" style="display: none;">
+                    <button id="send-btn" class="chat-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </div>
+                <div id="transcription-status" class="transcription-status"></div>
+            </div>
+        </div>
+
+        <aside class="toolkit">
+            <h2>Orodjarna</h2>
+            <div id="dynamic-widgets-container" class="widgets-container">
+                <!-- Dinamični pripomočki se dodajajo tukaj -->
+            </div>
+            <div class="card">
+                <h3>Generator Slik</h3>
+                <div class="input-group">
+                    <input type="text" id="image-prompt" placeholder="Opis slike...">
+                    <button id="generate-image-btn">Generiraj</button>
+                </div>
+                <div id="image-loader" class="loader" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Generiram sliko...</p>
+                </div>
+                <div id="generated-image-container" class="generated-item-container"></div>
+            </div>
+            <div class="card">
+                <h3>Video Generator</h3>
+                 <div class="input-group">
+                    <input type="text" id="video-prompt" placeholder="Opis videa...">
+                    <button id="generate-video-btn">Generiraj</button>
+                </div>
+                <div id="video-loader" class="loader" style="display: none;">
+                    <div class="spinner"></div>
+                    <p id="video-status-text">Začenjam proces...</p>
+                </div>
+                 <div id="generated-video-container" class="generated-item-container"></div>
+            </div>
+             <div class="card settings">
+                <h3>Nastavitve</h3>
+                <div class="setting-item">
+                    <label for="theme-switch">Tema</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="theme-switch">
+                        <label for="theme-switch"></label>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <label for="ai-persona">AI Osebnost</label>
+                    <select id="ai-persona">
+                        <option value="assistant">Profesionalni Asistent</option>
+                        <option value="creative">Kreativna Muza</option>
+                        <option value="sarcastic">Sarkastični Robot</option>
+                    </select>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <div id="toast-container"></div>
+
+    <template id="chat-message-template">
+        <div class="chat-message">
+            <div class="avatar"></div>
+            <div class="message-content"></div>
+        </div>
+    </template>
+    
+    <template id="recipe-widget-template">
+        <div class="widget recipe-widget">
+             <button class="close-widget-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            <h3 class="recipe-title"></h3>
+            <p class="recipe-description"></p>
+            <h4>Sestavine</h4>
+            <ul class="recipe-ingredients"></ul>
+            <h4>Navodila</h4>
+            <ol class="recipe-instructions"></ol>
+        </div>
+    </template>
+
+    <script src="script.js"></script>
+</body>
+</html>
