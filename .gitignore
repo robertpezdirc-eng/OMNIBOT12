@@ -22,3 +22,38 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment files with sensitive data
+.env
+.env.local
+.env.production
+.env.secure
+.env.real_data
+.env.ai
+.env.docker
+
+# Integration reports that may contain API keys
+integration-report-*.json
+ssl-integration-report-*.json
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Cache and temporary files
+cache/
+temp/
+__pycache__/
+*.pyc
+*.pyo
+
+# SSL certificates and keys
+certs/
+*.pem
+*.key
+*.crt
+
+# Backup files
+backups/
+*.backup
