@@ -2,7 +2,7 @@
 # Multi-stage build za optimalno velikost slike
 
 # Stage 1: Build stage
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 # Nastavi delovni direktorij
 WORKDIR /app
@@ -23,7 +23,7 @@ COPY package*.json ./
 RUN npm ci --only=production && npm cache clean --force
 
 # Stage 2: Production stage
-FROM node:18-alpine AS production
+FROM node:20-alpine AS production
 
 # Ustvari non-root uporabnika za varnost
 RUN addgroup -g 1001 -S omni && \
@@ -33,7 +33,8 @@ RUN addgroup -g 1001 -S omni && \
 RUN apk add --no-cache \
     curl \
     openssl \
-    dumb-init
+    dumb-init \
+    tini
 
 # Nastavi delovni direktorij
 WORKDIR /app
@@ -41,16 +42,19 @@ WORKDIR /app
 # Kopiraj odvisnosti iz build stage
 COPY --from=builder /app/node_modules ./node_modules
 
-# Kopiraj aplikacijske datoteke
-COPY --chown=omni:omni . .
-
-# Copy Docker utility scripts
-COPY --chown=omni:omni docker-env-validator.js ./
-COPY --chown=omni:omni docker-ssl-setup.js ./
-COPY --chown=omni:omni docker-health-check.js ./
-
-# Make scripts executable
-RUN chmod +x docker-env-validator.js docker-ssl-setup.js docker-health-check.js
+# Kopiraj aplikacijske datoteke (z .dockerignore optimizacijo)
+COPY --chown=omni:omni package*.json ./
+COPY --chown=omni:omni *.js ./
+COPY --chown=omni:omni *.json ./
+COPY --chown=omni:omni *.html ./
+COPY --chown=omni:omni *.css ./
+COPY --chown=omni:omni api/ ./api/
+COPY --chown=omni:omni config/ ./config/
+COPY --chown=omni:omni middleware/ ./middleware/
+COPY --chown=omni:omni models/ ./models/
+COPY --chown=omni:omni routes/ ./routes/
+COPY --chown=omni:omni public/ ./public/
+COPY --chown=omni:omni utils/ ./utils/
 
 # Ustvari potrebne direktorije
 RUN mkdir -p /app/logs /app/uploads /app/temp /app/certs && \
@@ -60,7 +64,7 @@ RUN mkdir -p /app/logs /app/uploads /app/temp /app/certs && \
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV LOG_LEVEL=info
-ENV OMNI_VERSION=1.0.0
+ENV OMNI_VERSION=2.0.0
 
 # Izpostavi porte
 EXPOSE 3000 3001
@@ -72,8 +76,8 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 # Preklopi na non-root uporabnika
 USER omni
 
-# Uporabi dumb-init za pravilno signal handling
-ENTRYPOINT ["dumb-init", "--"]
+# Uporabi tini za pravilno signal handling
+ENTRYPOINT ["tini", "--"]
 
-# Startup script with validation and SSL setup
-CMD ["sh", "-c", "node docker-env-validator.js && node docker-ssl-setup.js && node server-modular.js"]
+# Startup command
+CMD ["node", "omni-ultra-main.js"]

@@ -1,11 +1,10 @@
-# 🔹 Omni Ultimate Turbo Flow System
+# 🚀 Omni Ultimate Turbo Flow System v2.0.0
 
-**Kompleten Ready-to-Run Licenčni Sistem z Real-time Funkcionalnostjo**
+[![CI/CD Pipeline](https://github.com/robertpezdirc-eng/OMNIBOT12/actions/workflows/blank.yml/badge.svg)](https://github.com/robertpezdirc-eng/OMNIBOT12/actions/workflows/blank.yml)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-6.0+-blue.svg)](https://www.mongodb.com/)
-[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+**Popolnoma avtomatiziran licenčni sistem z real-time funkcionalnostjo in naprednimi varnostnimi funkcijami.**
 
 ## 📋 Kazalo
 
