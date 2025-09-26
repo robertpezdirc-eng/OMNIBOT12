@@ -22,7 +22,7 @@ const PORT = process.env.DEBUG_PORT || 3333;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static('.'));  // Servira vse datoteke iz trenutnega direktorija
 
 // 🔐 Varnostni ključ za dostop
 const DEBUG_ACCESS_KEY = process.env.DEBUG_ACCESS_KEY || 'omni_debug_2024';
