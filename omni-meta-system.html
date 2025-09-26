@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMNI - Kralj AI Sistemov</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .omni-container {
+            text-align: center;
+            max-width: 800px;
+            padding: 2rem;
+        }
+
+        .omni-title {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .omni-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+        }
+
+        .omni-brain-button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border: none;
+            padding: 1.5rem 3rem;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .omni-brain-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, #ee5a24, #ff6b6b);
+        }
+
+        .omni-interface {
+            display: none;
+            background: rgba(255,255,255,0.95);
+            color: #333;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .omni-input-container {
+            margin-bottom: 2rem;
+        }
+
+        .omni-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .omni-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .omni-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .omni-btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .omni-btn-secondary {
+            background: #f1f2f6;
+            color: #333;
+        }
+
+        .omni-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .omni-results {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            text-align: left;
+            display: none;
+        }
+
+        .omni-result-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .omni-status {
+            text-align: center;
+            margin: 1rem 0;
+            font-weight: bold;
+        }
+
+        .omni-license-info {
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .voice-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .voice-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .voice-btn:hover {
+            background: #c0392b;
+            transform: scale(1.1);
+        }
+
+        .voice-btn.recording {
+            background: #27ae60;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="omni-container">
+        <div id="omni-welcome">
+            <h1 class="omni-title">OMNI</h1>
+            <p class="omni-subtitle">Meta-sistem • Kralj AI-jev • Neskončne možnosti</p>
+            <button class="omni-brain-button" onclick="omniSystem.activateBrain()">
+                🧠 To so možgani Omni – kralj, bog, odtadaj
+            </button>
+            <div class="omni-license-info">
+                <div id="license-status">Preverjam licenco...</div>
+            </div>
+        </div>
+
+        <div id="omni-interface" class="omni-interface">
+            <div class="omni-input-container">
+                <textarea id="omni-input" class="omni-input" placeholder="Povej mi, kaj potrebuješ... Omni bo ustvaril, rešil, zgradil ali pomagal pri čemerkoli."></textarea>
+                
+                <div class="voice-controls">
+                    <button class="voice-btn" id="voice-record" onclick="omniSystem.toggleVoiceInput()" title="Govori z Omni">
+                        🎤
+                    </button>
+                    <button class="voice-btn" id="voice-play" onclick="omniSystem.playResponse()" title="Poslušaj odgovor">
+                        🔊
+                    </button>
+                </div>
+            </div>
+
+            <div class="omni-controls">
+                <button class="omni-btn omni-btn-primary" onclick="omniSystem.processRequest()">
+                    Aktiviraj Omni Možgane
+                </button>
+                <button class="omni-btn omni-btn-secondary" onclick="omniSystem.clearInput()">
+                    Počisti
+                </button>
+                <button class="omni-btn omni-btn-secondary" onclick="omniSystem.showHistory()">
+                    Zgodovina
+                </button>
+            </div>
+
+            <div class="omni-status" id="omni-status"></div>
+
+            <div id="omni-results" class="omni-results">
+                <div id="result-content"></div>
+                <div class="omni-result-actions">
+                    <button class="omni-btn omni-btn-primary" onclick="omniSystem.printResult()">
+                        🖨️ Natisni
+                    </button>
+                    <button class="omni-btn omni-btn-primary" onclick="omniSystem.downloadResult()">
+                        💾 Shrani
+                    </button>
+                    <button class="omni-btn omni-btn-primary" onclick="omniSystem.shareResult()">
+                        📤 Pošlji
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="omni-core-system.js"></script>
+    <script src="omni-license-system.js"></script>
+    <script src="omni-security-system.js"></script>
+    <script src="omni-multimedia-system.js"></script>
+    <script src="omni-business-modules.js"></script>
+    <script src="omni-cloud-storage.js"></script>
+    <script src="omni-voice-system.js"></script>
+    <script src="omni-meta-orchestrator.js"></script>
+
+    <script>
+        // Inicializacija OMNI sistema
+        document.addEventListener('DOMContentLoaded', function() {
+            omniSystem.initialize();
+        });
+
+        // Globalni OMNI sistem
+        window.omniSystem = {
+            currentUser: null,
+            currentLicense: null,
+            currentResult: null,
+            isRecording: false,
+            
+            initialize() {
+                console.log('🧠 OMNI Meta-sistem se inicializira...');
+                this.checkLicense();
+                this.loadUserSession();
+                this.setupEventListeners();
+            },
+
+            activateBrain() {
+                document.getElementById('omni-welcome').style.display = 'none';
+                document.getElementById('omni-interface').style.display = 'block';
+                document.getElementById('omni-input').focus();
+                this.setStatus('OMNI možgani so aktivni. Kaj lahko ustvarim zate?');
+            },
+
+            async processRequest() {
+                const input = document.getElementById('omni-input').value.trim();
+                if (!input) {
+                    this.setStatus('Prosim, povej mi, kaj potrebuješ.');
+                    return;
+                }
+
+                this.setStatus('🧠 OMNI analizira in ustvarja rešitev...', true);
+                
+                try {
+                    // Meta-orchestrator določi, kateri moduli so potrebni
+                    const requiredModules = await omniOrchestrator.analyzeRequest(input);
+                    
+                    // Procesiranje z ustreznimi moduli
+                    const result = await omniOrchestrator.processWithModules(input, requiredModules);
+                    
+                    // Prikaz rezultata
+                    this.displayResult(result);
+                    
+                    // Shranjevanje v oblak
+                    await omniCloud.saveResult(result);
+                    
+                    // Učenje iz interakcije
+                    await omniLearning.recordInteraction(input, result);
+                    
+                } catch (error) {
+                    console.error('Napaka pri procesiranju:', error);
+                    this.setStatus('Prišlo je do napake. Poskusi znova.');
+                }
+            },
+
+            displayResult(result) {
+                const resultDiv = document.getElementById('omni-results');
+                const contentDiv = document.getElementById('result-content');
+                
+                contentDiv.innerHTML = this.formatResult(result);
+                resultDiv.style.display = 'block';
+                
+                this.currentResult = result;
+                this.setStatus('Rezultat je pripravljen!');
+            },
+
+            formatResult(result) {
+                let html = `<h3>${result.title || 'OMNI Rezultat'}</h3>`;
+                
+                if (result.type === 'multimedia') {
+                    html += this.formatMultimediaResult(result);
+                } else if (result.type === 'business') {
+                    html += this.formatBusinessResult(result);
+                } else if (result.type === 'code') {
+                    html += this.formatCodeResult(result);
+                } else {
+                    html += `<div>${result.content}</div>`;
+                }
+                
+                return html;
+            },
+
+            formatMultimediaResult(result) {
+                let html = '<div class="multimedia-result">';
+                
+                if (result.audio) {
+                    html += `<audio controls><source src="${result.audio}" type="audio/mpeg"></audio>`;
+                }
+                
+                if (result.video) {
+                    html += `<video controls width="100%"><source src="${result.video}" type="video/mp4"></video>`;
+                }
+                
+                if (result.image) {
+                    html += `<img src="${result.image}" alt="Generirano" style="max-width: 100%; height: auto;">`;
+                }
+                
+                html += `<p>${result.description}</p></div>`;
+                return html;
+            },
+
+            formatBusinessResult(result) {
+                let html = '<div class="business-result">';
+                html += `<p><strong>Področje:</strong> ${result.domain}</p>`;
+                html += `<div>${result.content}</div>`;
+                
+                if (result.calculations) {
+                    html += '<h4>Kalkulacije:</h4>';
+                    html += `<pre>${JSON.stringify(result.calculations, null, 2)}</pre>`;
+                }
+                
+                html += '</div>';
+                return html;
+            },
+
+            formatCodeResult(result) {
+                return `
+                    <div class="code-result">
+                        <h4>Generirana koda:</h4>
+                        <pre><code>${result.code}</code></pre>
+                        <p><strong>Jezik:</strong> ${result.language}</p>
+                        <p>${result.description}</p>
+                    </div>
+                `;
+            },
+
+            async printResult() {
+                if (!this.currentResult) return;
+                
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                        <head><title>OMNI Rezultat</title></head>
+                        <body>
+                            <h1>OMNI - ${this.currentResult.title}</h1>
+                            ${document.getElementById('result-content').innerHTML}
+                        </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                printWindow.print();
+            },
+
+            async downloadResult() {
+                if (!this.currentResult) return;
+                
+                const format = this.currentResult.preferredFormat || 'txt';
+                const content = await omniExporter.exportResult(this.currentResult, format);
+                
+                const blob = new Blob([content], { type: this.getMimeType(format) });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `omni-result-${Date.now()}.${format}`;
+                a.click();
+                
+                URL.revokeObjectURL(url);
+            },
+
+            async shareResult() {
+                if (!this.currentResult) return;
+                
+                if (navigator.share) {
+                    await navigator.share({
+                        title: 'OMNI Rezultat',
+                        text: this.currentResult.title,
+                        url: await omniCloud.getShareableLink(this.currentResult)
+                    });
+                } else {
+                    // Fallback - kopiraj v clipboard
+                    const shareText = `OMNI Rezultat: ${this.currentResult.title}\n\n${this.currentResult.content}`;
+                    await navigator.clipboard.writeText(shareText);
+                    this.setStatus('Rezultat kopiran v clipboard!');
+                }
+            },
+
+            toggleVoiceInput() {
+                if (this.isRecording) {
+                    omniVoice.stopRecording();
+                    this.isRecording = false;
+                    document.getElementById('voice-record').classList.remove('recording');
+                } else {
+                    omniVoice.startRecording();
+                    this.isRecording = true;
+                    document.getElementById('voice-record').classList.add('recording');
+                }
+            },
+
+            async playResponse() {
+                if (this.currentResult && this.currentResult.content) {
+                    await omniVoice.speak(this.currentResult.content);
+                }
+            },
+
+            clearInput() {
+                document.getElementById('omni-input').value = '';
+                document.getElementById('omni-results').style.display = 'none';
+                this.currentResult = null;
+                this.setStatus('');
+            },
+
+            showHistory() {
+                // Implementacija prikaza zgodovine
+                omniCloud.showHistory();
+            },
+
+            checkLicense() {
+                const licenseStatus = omniLicense.getCurrentStatus();
+                document.getElementById('license-status').textContent = 
+                    `Licenca: ${licenseStatus.type} (${licenseStatus.status})`;
+            },
+
+            loadUserSession() {
+                const session = omniSecurity.getCurrentSession();
+                if (session) {
+                    this.currentUser = session.user;
+                }
+            },
+
+            setupEventListeners() {
+                // Enter za pošiljanje
+                document.getElementById('omni-input').addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && e.ctrlKey) {
+                        this.processRequest();
+                    }
+                });
+            },
+
+            setStatus(message, loading = false) {
+                const statusDiv = document.getElementById('omni-status');
+                statusDiv.innerHTML = loading ? 
+                    `<span class="loading"></span> ${message}` : 
+                    message;
+            },
+
+            getMimeType(format) {
+                const mimeTypes = {
+                    'txt': 'text/plain',
+                    'pdf': 'application/pdf',
+                    'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'mp3': 'audio/mpeg',
+                    'wav': 'audio/wav',
+                    'mp4': 'video/mp4'
+                };
+                return mimeTypes[format] || 'text/plain';
+            }
+        };
+    </script>
+</body>
+</html>

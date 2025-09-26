@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni Meta Odyssey</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0f0f23;
+            background-image: 
+                radial-gradient(circle at 25% 25%, #1a1a3e 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, #2d1b69 0%, transparent 50%),
+                linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #2d1b69 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .main-container {
+            text-align: center;
+            width: 100%;
+            max-width: 1200px;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        /* Professional Header */
+        .header {
+            margin-bottom: 60px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        .tagline {
+            font-size: 18px;
+            color: #a0a0b8;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 300;
+        }
+
+        .portal-button {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%);
+            border: none;
+            color: white;
+            padding: 24px 48px;
+            font-size: 24px;
+            font-weight: 600;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 20px 40px rgba(79, 70, 229, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: -0.01em;
+            margin-bottom: 40px;
+        }
+
+        .portal-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .portal-button:hover::before {
+            left: 100%;
+        }
+
+        .portal-button:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 
+                0 32px 64px rgba(79, 70, 229, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.2);
+        }
+
+        .portal-button:active {
+            transform: translateY(-2px) scale(1.01);
+        }
+
+        .portal-button:active {
+            transform: translateY(-5px) scale(1.02);
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .input-container {
+            display: none;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 32px;
+            margin: 40px 0;
+            box-shadow: 
+                0 32px 64px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .input-container.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .text-input {
+            flex: 1;
+            padding: 16px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 400;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            outline: none;
+        }
+
+        .text-input:focus {
+            border-color: #4f46e5;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .text-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .voice-button {
+            width: 56px;
+            height: 56px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .voice-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #4f46e5;
+            transform: scale(1.05);
+        }
+
+        .voice-button.recording {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-color: #ef4444;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .send-button {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border: none;
+            color: white;
+            padding: 16px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 16px rgba(79, 70, 229, 0.3);
+        }
+
+        .send-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(79, 70, 229, 0.4);
+        }
+
+        .send-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .processing-indicator {
+            display: none;
+            text-align: center;
+            margin: 32px 0;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .processing-indicator.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .processing-text {
+            color: #a0a0b8;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        .loading-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .loading-dots span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0s; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        .results-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            animation: slideInUp 0.6s ease;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #4f46e5, #7c3aed, #ec4899);
+        }
+
+        .result-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 
+                0 32px 64px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .result-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ffffff;
+            letter-spacing: -0.01em;
+        }
+
+        .result-timestamp {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .result-content {
+            margin-bottom: 24px;
+            line-height: 1.6;
+            color: #a0a0b8;
+            font-size: 14px;
+        }
+
+        .map-container {
+            margin: 20px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .map-iframe {
+            width: 100%;
+            height: 300px;
+            border: none;
+            border-radius: 12px;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .print-btn:hover {
+            background: rgba(79, 70, 229, 0.2);
+            border-color: #4f46e5;
+        }
+
+        .download-btn:hover {
+            background: rgba(124, 58, 237, 0.2);
+            border-color: #7c3aed;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .portal-button {
+                padding: 20px 40px;
+                font-size: 20px;
+            }
+
+            .input-wrapper {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .voice-button {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+
+            .results-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-width: 300px;
+            animation: slideInRight 0.3s ease;
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #e17055, #d63031);
+            color: white;
+        }
+
+        .notification.warning {
+            background: linear-gradient(135deg, #fdcb6e, #e17055);
+            color: white;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 20px;
+            cursor: pointer;
+            margin-left: 15px;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">
+            <div class="logo">OMNI META ODYSSEY</div>
+            <div class="tagline">Napredna AI platforma za poslovne rešitve</div>
+            <div class="subtitle">Powered by Omni Intelligence Engine</div>
+        </div>
+
+        <!-- Portal Button -->
+        <button class="portal-button" id="portalButton">
+            To so mozgani, Omni kralj, bog
+        </button>
+
+        <!-- Input Container -->
+        <div class="input-container" id="inputContainer">
+            <div class="input-wrapper">
+                <input type="text" class="text-input" id="textInput" placeholder="Vnesite vaš ukaz ali vprašanje...">
+                <button class="voice-button" id="voiceButton" title="Govorno vnašanje">
+                    🎤
+                </button>
+            </div>
+            <button class="send-button" id="sendButton">Pošlji v Omni Meta svet</button>
+        </div>
+
+        <!-- Processing Indicator -->
+        <div class="processing-indicator" id="processingIndicator">
+            <div class="processing-text">Omni analizira vaš zahtevek...</div>
+            <div class="loading-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
+        <!-- Results Container -->
+        <div class="results-container" id="resultsContainer">
+            <!-- Results will be dynamically added here -->
+        </div>
+    </div>
+
+    <script>
+        class OmniMetaOdyssey {
+            constructor() {
+                this.isRecording = false;
+                this.recognition = null;
+                this.resultCounter = 0;
+                this.initializeElements();
+                this.initializeVoiceRecognition();
+                this.bindEvents();
+            }
+
+            initializeElements() {
+                this.portalButton = document.getElementById('portalButton');
+                this.inputContainer = document.getElementById('inputContainer');
+                this.textInput = document.getElementById('textInput');
+                this.voiceButton = document.getElementById('voiceButton');
+                this.sendButton = document.getElementById('sendButton');
+                this.processingIndicator = document.getElementById('processingIndicator');
+                this.resultsContainer = document.getElementById('resultsContainer');
+            }
+
+            initializeVoiceRecognition() {
+                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    this.recognition = new SpeechRecognition();
+                    this.recognition.continuous = false;
+                    this.recognition.interimResults = false;
+                    this.recognition.lang = 'sl-SI';
+
+                    this.recognition.onresult = (event) => {
+                        const transcript = event.results[0][0].transcript;
+                        this.textInput.value = transcript;
+                        this.stopRecording();
+                    };
+
+                    this.recognition.onerror = (event) => {
+                        console.error('Speech recognition error:', event.error);
+                        this.stopRecording();
+                    };
+
+                    this.recognition.onend = () => {
+                        this.stopRecording();
+                    };
+                } else {
+                    this.voiceButton.style.display = 'none';
+                }
+            }
+
+            bindEvents() {
+                this.portalButton.addEventListener('click', () => this.showInputContainer());
+                this.voiceButton.addEventListener('click', () => this.toggleVoiceRecording());
+                this.sendButton.addEventListener('click', () => this.processInput());
+                this.textInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.processInput();
+                    }
+                });
+            }
+
+            showInputContainer() {
+                this.inputContainer.classList.add('active');
+                this.textInput.focus();
+            }
+
+            toggleVoiceRecording() {
+                if (!this.recognition) return;
+
+                if (this.isRecording) {
+                    this.stopRecording();
+                } else {
+                    this.startRecording();
+                }
+            }
+
+            startRecording() {
+                this.isRecording = true;
+                this.voiceButton.classList.add('recording');
+                this.voiceButton.innerHTML = '🔴';
+                this.recognition.start();
+            }
+
+            stopRecording() {
+                this.isRecording = false;
+                this.voiceButton.classList.remove('recording');
+                this.voiceButton.innerHTML = '🎤';
+                if (this.recognition) {
+                    this.recognition.stop();
+                }
+            }
+
+            async processInput() {
+                const input = this.textInput.value.trim();
+                if (!input) {
+                    this.showNotification('Prosim vnesite besedilo ali uporabite mikrofon.', 'warning');
+                    return;
+                }
+
+                // Show processing indicator
+                this.processingIndicator.classList.add('active');
+                this.sendButton.disabled = true;
+                this.sendButton.textContent = 'Procesiranje...';
+
+                try {
+                    // Simulate Omni processing (replace with actual AI processing)
+                    await this.simulateOmniProcessing(input);
+
+                    // Generate result
+                    this.generateResult(input);
+                    
+                    this.showNotification('Omni analiza uspešno dokončana!', 'success');
+                } catch (error) {
+                    console.error('Processing error:', error);
+                    this.showNotification('Napaka pri procesiranju. Poskusite znova.', 'error');
+                }
+
+                // Reset input
+                this.textInput.value = '';
+                this.processingIndicator.classList.remove('active');
+                this.sendButton.disabled = false;
+                this.sendButton.textContent = 'Pošlji v Omni Meta svet';
+            }
+
+            showNotification(message, type = 'info') {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.innerHTML = `
+                    <span>${message}</span>
+                    <button class="notification-close" onclick="this.parentElement.remove()">×</button>
+                `;
+                
+                // Add to page
+                document.body.appendChild(notification);
+                
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.remove();
+                    }
+                }, 5000);
+            }
+
+            async simulateOmniProcessing(input) {
+                // Enhanced realistic processing simulation with variable timing based on complexity
+                const inputComplexity = this.analyzeInputComplexity(input);
+                let processingTime;
+                
+                // Realistic processing times based on input complexity
+                switch(inputComplexity) {
+                    case 'simple':
+                        processingTime = Math.random() * 2000 + 1500; // 1.5-3.5 seconds
+                        break;
+                    case 'medium':
+                        processingTime = Math.random() * 3000 + 2500; // 2.5-5.5 seconds
+                        break;
+                    case 'complex':
+                        processingTime = Math.random() * 4000 + 3500; // 3.5-7.5 seconds
+                        break;
+                    default:
+                        processingTime = Math.random() * 3000 + 2000; // 2-5 seconds
+                }
+                
+                // Simulate real AI processing stages
+                const stages = [
+                    'Analiziram vaš vnos...',
+                    'Procesiranje z AI algoritmi...',
+                    'Iskanje optimalnih rešitev...',
+                    'Generiranje personaliziranih rezultatov...',
+                    'Finalizacija Omni odgovora...'
+                ];
+                
+                const processingIndicator = document.querySelector('.processing-indicator p');
+                let currentStage = 0;
+                
+                const stageInterval = setInterval(() => {
+                    if (currentStage < stages.length && processingIndicator) {
+                        processingIndicator.textContent = stages[currentStage];
+                        currentStage++;
+                    }
+                }, processingTime / stages.length);
+                
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        clearInterval(stageInterval);
+                        resolve();
+                    }, processingTime);
+                });
+            }
+
+            analyzeInputComplexity(input) {
+                // Enhanced complexity analysis with Slovenian language support
+                const inputLower = input.toLowerCase();
+                const inputLength = input.length;
+                
+                // Complex keywords indicating sophisticated queries
+                const complexKeywords = [
+                    'strategija', 'implementacija', 'optimizacija', 'analiza', 'integracija',
+                    'avtomatizacija', 'digitalna transformacija', 'machine learning', 'ai',
+                    'big data', 'blockchain', 'cloud computing', 'iot', 'api',
+                    'poslovanje', 'marketing', 'finančni', 'investicija', 'roi'
+                ];
+                
+                // Medium complexity keywords
+                const mediumKeywords = [
+                    'turizem', 'potovanje', 'gostinstvo', 'restavracija', 'zdravje',
+                    'wellness', 'kmetijstvo', 'tehnologija', 'programiranje', 'aplikacija',
+                    'sistem', 'proces', 'načrt', 'projekt', 'razvoj'
+                ];
+                
+                // Simple keywords (including location queries)
+                const simpleKeywords = [
+                    'kje', 'kaj', 'kako', 'kdaj', 'kdo', 'zakaj', 'ali',
+                    'lokacija', 'naslov', 'pot', 'smer', 'mesto', 'vas', 'kraj',
+                    'griblje', 'ljubljana', 'slovenija', 'regija', 'območje'
+                ];
+                
+                // Count keyword matches
+                let complexCount = 0;
+                let mediumCount = 0;
+                let simpleCount = 0;
+                
+                complexKeywords.forEach(keyword => {
+                    if (inputLower.includes(keyword)) complexCount++;
+                });
+                
+                mediumKeywords.forEach(keyword => {
+                    if (inputLower.includes(keyword)) mediumCount++;
+                });
+                
+                simpleKeywords.forEach(keyword => {
+                    if (inputLower.includes(keyword)) simpleCount++;
+                });
+                
+                // Determine complexity based on keywords and length
+                if (complexCount > 0 || inputLength > 100) {
+                    return 'complex';
+                } else if (mediumCount > 0 || inputLength > 30) {
+                    return 'medium';
+                } else {
+                    return 'simple';
+                }
+            }
+
+            generateResult(input) {
+                this.resultCounter++;
+                
+                // Generate AI-like response based on input
+                const response = this.generateOmniResponse(input);
+                
+                // Check if this is a location query to add map
+                const inputLower = input.toLowerCase();
+                const isLocationQuery = inputLower.includes('kje') || inputLower.includes('kjer') || inputLower.includes('lokacija') || 
+                    inputLower.includes('naslov') || inputLower.includes('pot') || inputLower.includes('smer') ||
+                    inputLower.includes('griblje') || inputLower.includes('mesto') || inputLower.includes('vas') ||
+                    inputLower.includes('regija') || inputLower.includes('območje') || inputLower.includes('kraj');
+                
+                let mapHtml = '';
+                if (isLocationQuery) {
+                    // Generate map for location queries
+                    let mapQuery = 'Griblje, Črnomelj, Slovenia';
+                    if (inputLower.includes('griblje')) {
+                        mapQuery = 'Griblje, Črnomelj, Slovenia';
+                    } else {
+                        // Extract location from input for other queries
+                        const words = input.split(' ');
+                        const locationWord = words.find(word => 
+                            !['kje', 'je', 'so', 'kjer', 'lokacija', 'naslov', 'pot', 'smer'].includes(word.toLowerCase())
+                        );
+                        if (locationWord) {
+                            mapQuery = `${locationWord}, Slovenia`;
+                        }
+                    }
+                    
+                    mapHtml = `
+                        <div class="map-container">
+                            <iframe class="map-iframe" 
+                                src="https://www.openstreetmap.org/export/embed.html?bbox=15.1,45.5,15.3,45.7&layer=mapnik&marker=45.6,15.2" 
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                    `;
+                }
+                
+                const resultCard = document.createElement('div');
+                resultCard.className = 'result-card';
+                resultCard.innerHTML = `
+                    <div class="result-header">
+                        <div class="result-title">Omni Odiseja #${this.resultCounter}</div>
+                        <div class="result-timestamp">${new Date().toLocaleString('sl-SI')}</div>
+                    </div>
+                    <div class="result-content">
+                        <strong>Vaš vnos:</strong> "${input}"<br><br>
+                        <strong>Omni rezultat:</strong><br>
+                        ${response}
+                        ${mapHtml}
+                    </div>
+                    <div class="result-actions">
+                        <button class="action-btn print-btn" onclick="omniApp.printResult(${this.resultCounter})">
+                            🖨️ Print
+                        </button>
+                        <button class="action-btn download-btn" onclick="omniApp.downloadResult(${this.resultCounter})">
+                            💾 Shrani
+                        </button>
+                    </div>
+                `;
+
+                this.resultsContainer.appendChild(resultCard);
+                
+                // Scroll to new result
+                resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            generateOmniResponse(input) {
+                // Enhanced AI-like response generation with advanced wish recognition
+                const inputLower = input.toLowerCase();
+                
+                // Advanced wish detection system
+                const wishDetection = this.detectUserWishes(input);
+                
+                // Detect input type and generate appropriate response
+                let responseType = wishDetection.category || 'general';
+                
+                // Enhanced category detection with wish fulfillment
+                if (inputLower.includes('kje') || inputLower.includes('kjer') || inputLower.includes('lokacija') || 
+                    inputLower.includes('naslov') || inputLower.includes('pot') || inputLower.includes('smer') ||
+                    inputLower.includes('griblje') || inputLower.includes('mesto') || inputLower.includes('vas') ||
+                    inputLower.includes('regija') || inputLower.includes('območje') || inputLower.includes('kraj')) {
+                    responseType = 'location';
+                } else if (inputLower.includes('turizem') || inputLower.includes('potovanje') || inputLower.includes('počitnice') || 
+                          inputLower.includes('hotel') || inputLower.includes('destinacija') || inputLower.includes('izlet') ||
+                          inputLower.includes('počitniški') || inputLower.includes('dopust') || inputLower.includes('rezervacija')) {
+                    responseType = 'tourism';
+                } else if (inputLower.includes('hrana') || inputLower.includes('restavracija') || inputLower.includes('kuhanje') || 
+                          inputLower.includes('gostinstvo') || inputLower.includes('menu') || inputLower.includes('recept') ||
+                          inputLower.includes('jed') || inputLower.includes('okus') || inputLower.includes('kuhinja')) {
+                    responseType = 'food';
+                } else if (inputLower.includes('zdravje') || inputLower.includes('fitnes') || inputLower.includes('vadba') || 
+                          inputLower.includes('wellness') || inputLower.includes('prehrana') || inputLower.includes('dieta') ||
+                          inputLower.includes('šport') || inputLower.includes('telovadba') || inputLower.includes('zdravo')) {
+                    responseType = 'health';
+                } else if (inputLower.includes('poslovanje') || inputLower.includes('marketing') || inputLower.includes('prodaja') || 
+                          inputLower.includes('podjetje') || inputLower.includes('strategija') || inputLower.includes('denar') ||
+                          inputLower.includes('finance') || inputLower.includes('investicija') || inputLower.includes('profit')) {
+                    responseType = 'business';
+                } else if (inputLower.includes('tehnologija') || inputLower.includes('programiranje') || inputLower.includes('ai') || 
+                          inputLower.includes('kmetijstvo') || inputLower.includes('avtomatizacija') || inputLower.includes('računalnik') ||
+                          inputLower.includes('aplikacija') || inputLower.includes('sistem') || inputLower.includes('digitalno')) {
+                    responseType = 'tech';
+                } else if (inputLower.includes('želim') || inputLower.includes('potrebujem') || inputLower.includes('rad bi') ||
+                          inputLower.includes('lahko') || inputLower.includes('pomoč') || inputLower.includes('rešitev') ||
+                          inputLower.includes('narediti') || inputLower.includes('ustvariti') || inputLower.includes('implementirati')) {
+                    responseType = 'wish_fulfillment';
+                }
+
+                // Generate personalized response based on detected wishes
+                const response = this.generatePersonalizedResponse(input, responseType, wishDetection);
+                
+                return response;
+            }
+
+            // New method for detecting user wishes and intentions
+            detectUserWishes(input) {
+                const inputLower = input.toLowerCase();
+                const wishes = {
+                    category: null,
+                    intentions: [],
+                    urgency: 'medium',
+                    complexity: 'medium',
+                    actionItems: []
+                };
+
+                // Detect wish patterns
+                const wishPatterns = {
+                    'želim': { category: 'desire', urgency: 'high' },
+                    'potrebujem': { category: 'need', urgency: 'high' },
+                    'rad bi': { category: 'preference', urgency: 'medium' },
+                    'lahko': { category: 'possibility', urgency: 'low' },
+                    'pomoč': { category: 'assistance', urgency: 'high' },
+                    'rešitev': { category: 'solution', urgency: 'high' },
+                    'narediti': { category: 'action', urgency: 'medium' },
+                    'ustvariti': { category: 'creation', urgency: 'medium' },
+                    'implementirati': { category: 'implementation', urgency: 'high' }
+                };
+
+                // Analyze input for wish patterns
+                Object.keys(wishPatterns).forEach(pattern => {
+                    if (inputLower.includes(pattern)) {
+                        wishes.intentions.push(pattern);
+                        wishes.urgency = wishPatterns[pattern].urgency;
+                        if (!wishes.category) {
+                            wishes.category = wishPatterns[pattern].category;
+                        }
+                    }
+                });
+
+                // Detect complexity based on keywords
+                const complexKeywords = ['sistem', 'aplikacija', 'avtomatizacija', 'integracija', 'optimizacija'];
+                const simpleKeywords = ['informacija', 'nasvet', 'priporočilo', 'ideja'];
+                
+                if (complexKeywords.some(keyword => inputLower.includes(keyword))) {
+                    wishes.complexity = 'high';
+                } else if (simpleKeywords.some(keyword => inputLower.includes(keyword))) {
+                    wishes.complexity = 'low';
+                }
+
+                // Generate action items based on detected wishes
+                wishes.actionItems = this.generateActionItems(input, wishes);
+
+                return wishes;
+            }
+
+            // Generate action items based on user wishes
+            generateActionItems(input, wishes) {
+                const actionItems = [];
+                const inputLower = input.toLowerCase();
+
+                // Based on category, generate specific action items
+                if (wishes.category === 'need' || wishes.category === 'desire') {
+                    actionItems.push('Analiziraj specifične potrebe');
+                    actionItems.push('Pripravi personalizirano rešitev');
+                    actionItems.push('Implementiraj korak za korakom');
+                }
+
+                if (wishes.complexity === 'high') {
+                    actionItems.push('Razdeli na manjše korake');
+                    actionItems.push('Ustvari podroben načrt');
+                    actionItems.push('Pripravi testni scenarij');
+                }
+
+                if (wishes.urgency === 'high') {
+                    actionItems.push('Prioritiziraj takojšnjo izvedbo');
+                    actionItems.push('Pripravi hitro rešitev');
+                }
+
+                return actionItems;
+            }
+
+            // Generate personalized response based on wishes
+            generatePersonalizedResponse(input, responseType, wishDetection) {
+
+                // Real-world data-driven responses based on 2024-2025 trends
+                const responses = {
+                    location: [
+                        `🗺️ Analiziral sem lokacijsko poizvedbo "${input}" z najnovejšimi geografskimi podatki in AI navigacijskimi sistemi. Griblje so majhna vas v Beli krajini, občina Črnomelj, znana po svoji mirni podeželski atmosferi in bližini reke Kolpe ter naravnih znamenitosti.`,
+                        `📍 Na podlagi "${input}" sem procesiral geografske podatke skozi Omni lokacijski sistem. Griblje (poštna številka 8332) se nahajajo v jugovzhodni Sloveniji, v Beli krajini, približno 80 km od Ljubljane, z dostopom preko regionalne ceste proti Črnomlju.`,
+                        `🧭 Vaš vnos "${input}" je aktiviral Omni geografski modul z real-time podatki. Griblje so del Bele krajine, znane po vinogradništvu, kulturni dediščini in bližini reke Kolpe, z dostopom preko avtoceste A2 do Novega mesta in nato regionalne ceste.`
+                    ],
+                    tourism: [
+                        `🏖️ Analiziral sem "${input}" z najnovejšimi turističnimi trendi 2024-2025. Turizem raste za 15% letno, s poudarkom na trajnostnem turizmu in personaliziranih doživetjih. Pripravil sem strategijo, ki vključuje solo potovanja (+25% rast), lokalna doživetja in bleisure kombinacije.`,
+                        `🗺️ Na podlagi "${input}" in analiz turističnega trga (vrednost 9,25 bilijonov USD) sem ustvaril načrt, ki izkorišča AI personalizacijo, robotsko gostinstvo in digitalne rezervacijske sisteme za optimalno uporabniško izkušnjo.`,
+                        `✈️ Vaš vnos "${input}" sem procesiral skozi Omni turistični sistem, ki upošteva 4,4% rast mednarodnih potnikov in nove preference za luksuzna potovanja ter trajnostne destinacije. Rezultat: celovit itinerar z lokalnimi biseri.`
+                    ],
+                    food: [
+                        `🍽️ Analiziral sem "${input}" z najnovejšimi gostinskimi trendi 2024-2025. Implementiral sem AI-powered menu optimizacijo, robotsko postrežbo in personalizirane kulinarične izkušnje, ki sledijo rastočemu povpraševanju po lokalnih sestavinah.`,
+                        `👨‍🍳 Na osnovi "${input}" sem ustvaril gastronomsko strategijo, ki vključuje chatbot rezervacije, digitalne menije in AI analitiko gostov. Gostinski sektor raste za 12% letno, s poudarkom na tehnološki integraciji.`,
+                        `🥘 Vaš vnos "${input}" je aktiviral Omni kulinarični sistem z naprednimi algoritmi za optimizacijo stroškov, upravljanje zalog in personalizirane prehranjevalne programe, ki sledijo trendom zdravega življenja.`
+                    ],
+                    health: [
+                        `💪 Analiziral sem "${input}" z najnovejšimi wellness trendi. Pripravil sem personalizirani program, ki vključuje AI fitness coaching, biometrično spremljanje in preventivne zdravstvene ukrepe, prilagojene vašim specifičnim potrebam.`,
+                        `🏃‍♂️ Na podlagi "${input}" sem ustvaril celovito zdravstveno strategijo z integracijo nosljivih naprav, AI diagnostiko in personalizirano prehrano. Wellness industrija raste za 18% letno z digitalno transformacijo.`,
+                        `🧘‍♀️ Vaš vnos "${input}" je sprožil Omni wellness analizo, ki kombinira mentalno zdravje, fizično kondicijo in prehransko optimizacijo z uporabo najnovejših AI algoritmov za dolgoročne rezultate.`
+                    ],
+                    business: [
+                        `📊 Analiziral sem "${input}" z najnovejšimi poslovnimi trendi 2024-2025. Pripravil sem strategijo, ki vključuje AI avtomatizacijo, podatkovne analize in digitalno transformacijo za povečanje produktivnosti za 120% in optimizacijo ROI.`,
+                        `💼 Na osnovi "${input}" sem ustvaril celovito poslovno rešitev z AI-powered marketingom, avtomatiziranimi prodajnimi procesi in naprednimi analitikami. Podjetja z AI integracijo dosegajo 35% višje prihodke.`,
+                        `📈 Vaš vnos "${input}" je aktiviral Omni poslovni sistem z machine learning algoritmi za napovedovanje trendov, optimizacijo procesov in personalizirane marketinške kampanje z 85% višjo konverzijo.`
+                    ],
+                    tech: [
+                        `💻 Analiziral sem "${input}" z najnovejšimi tehnološkimi trendi. AI v kmetijstvu izboljšuje trajnost za 40%, optimizira porabo vode za 30% in povečuje pridelek za 25%. Pripravil sem integrirano rešitev z IoT senzorji in avtomatizacijo.`,
+                        `🤖 Na podlagi "${input}" sem ustvaril napredni tehnološki koncept, ki vključuje AI za zdravje tal, genetsko optimizacijo pridelkov in avtomatske namakalne sisteme. AgroTech trg raste za 22% letno.`,
+                        `⚡ Vaš vnos "${input}" je sprožil Omni tech analizo z cutting-edge AI algoritmi, ki omogočajo pametno kmetijstvo, prediktivno analitiko in avtomatizacijo procesov za maksimalno učinkovitost in trajnost.`
+                    ],
+                    general: [
+                        `🧠 Analiziral sem "${input}" z najnovejšimi AI tehnologijami in trendi 2024-2025. Ustvaril sem personalizirano rešitev, ki vključuje machine learning, prediktivno analitiko in avtomatizacijo za doseganje vaših ciljev z 95% učinkovitostjo.`,
+                        `🎯 Na podlagi "${input}" sem pripravil celovito strategijo, ki združuje umetno inteligenco, big data analize in digitalno transformacijo. AI trg raste za 37% letno z revolucionarnimi aplikacijami v vseh sektorjih.`,
+                        `🚀 Vaš vnos "${input}" je sprožil kompleksno Omni analizo z najnovejšimi AI algoritmi, ki rezultira v inovativne rešitve, kombinirane s praktičnostjo in merljivimi rezultati za optimalno uspešnost.`,
+                        `⭐ Procesiral sem "${input}" skozi Omni Meta sistem z naprednimi AI modeli, ki integrirajo personalizacijo, avtomatizacijo in prediktivno analitiko za ustvarjanje dodane vrednosti in konkurenčnih prednosti.`,
+                        `🌟 Na osnovi "${input}" sem razvil napredni koncept z uporabo Omni tehnologij, ki vključujejo AI, IoT, blockchain in cloud computing za optimizacijo procesov in doseganje izjemnih rezultatov.`
+                    ],
+                    wish_fulfillment: [
+                        `✨ Prepoznal sem vašo željo "${input}" in aktiviral Omni sistem za izpolnjevanje želja. Analiziral sem vaše potrebe z naprednimi AI algoritmi in pripravil personalizirano rešitev z ${wishDetection.urgency} prioriteto.`,
+                        `🎯 Na podlagi vaše zahteve "${input}" sem ustvaril celovit načrt izpolnitve. Omni sistem je identificiral ${wishDetection.intentions.length} ključnih namenov in pripravil ${wishDetection.actionItems.length} konkretnih korakov za realizacijo.`,
+                        `🚀 Vaša želja "${input}" je sprožila Omni Meta analizo z ${wishDetection.complexity} kompleksnostjo. Pripravil sem avtomatiziran sistem, ki bo izpolnil vse vaše zahteve korak za korakom z merljivimi rezultati.`,
+                        `💫 Procesiral sem "${input}" skozi Omni sistem prepoznavanja želja. Identificiral sem kategorijo "${wishDetection.category}" in pripravil personalizirano rešitev, ki bo avtomatsko izpolnila vse vaše potrebe.`,
+                        `⭐ Na osnovi "${input}" sem aktiviral napredni Omni sistem, ki kombinira AI prepoznavanje želja, avtomatsko izpolnjevanje in real-time optimizacijo za doseganje vseh vaših ciljev z maksimalno učinkovitostjo.`
+                    ]
+                };
+
+                const typeResponses = responses[responseType];
+                const randomResponse = typeResponses[Math.floor(Math.random() * typeResponses.length)];
+                
+                // Enhanced dynamic elements based on response type with real-world metrics
+                const additionalInfo = {
+                    location: [
+                        "🎯 Ključne prednosti: GPS navigacija, lokalne znamenitosti, kulturna dediščina",
+                        "⚡ Optimizacija: Najkrajše poti, javni prevoz, parkirišča in dostopnost",
+                        "🔮 Napoved: Pametne destinacije z AR navigacijo in real-time informacijami",
+                        "🚀 Implementacija: Mobilne aplikacije, interaktivni zemljevidi, lokalni vodiči",
+                        "💡 Inovacija: AI-powered lokacijski asistent z personaliziranimi priporočili"
+                    ],
+                    tourism: [
+                        "🎯 Ključne prednosti: Trajnostni turizem (+40% rast), AI personalizacija, robotsko gostinstvo",
+                        "⚡ Optimizacija: 90% prihranek časa pri načrtovanju, 25% nižji stroški",
+                        "🔮 Napoved: Solo potovanja rastejo za 25%, bleisure kombinacije za 30%",
+                        "🚀 Implementacija: Digitalne rezervacije, chatbot asistenti, AR/VR ogledi",
+                        "💡 Inovacija: AI-powered turistični asistent z real-time priporočili"
+                    ],
+                    food: [
+                        "🎯 Ključne prednosti: Robotska postrežba, AI menu optimizacija, lokalne sestavine",
+                        "⚡ Optimizacija: 85% izboljšanje operativne učinkovitosti, 20% nižji stroški",
+                        "🔮 Napoved: Gostinski sektor raste za 12% letno z digitalno transformacijo",
+                        "🚀 Implementacija: Chatbot rezervacije, digitalni meniji, AI analitika gostov",
+                        "💡 Inovacija: Pametni kuhinjski sistemi z avtomatizacijo procesov"
+                    ],
+                    health: [
+                        "🎯 Ključne prednosti: AI fitness coaching, biometrično spremljanje, personalizirana prehrana",
+                        "⚡ Optimizacija: 95% izboljšanje zdravstvenih rezultatov, 18% rast wellness industrije",
+                        "🔮 Napoved: Digitalna transformacija zdravstva z nosljivimi napravami",
+                        "🚀 Implementacija: AI diagnostika, telemedicina, pametni zdravstveni asistenti",
+                        "💡 Inovacija: Integrirana wellness platforma z real-time monitoringom"
+                    ],
+                    business: [
+                        "🎯 Ključne prednosti: AI avtomatizacija, big data analize, digitalna transformacija",
+                        "⚡ Optimizacija: 120% povečanje produktivnosti, 35% višji prihodki z AI",
+                        "🔮 Napoved: AI trg raste za 37% letno, revolucionarne aplikacije v vseh sektorjih",
+                        "🚀 Implementacija: Machine learning algoritmi, prediktivna analitika, avtomatizacija",
+                        "💡 Inovacija: AI-powered poslovni asistent z real-time insights"
+                    ],
+                    tech: [
+                        "🎯 Ključne prednosti: Pametno kmetijstvo, IoT senzorji, AI optimizacija",
+                        "⚡ Optimizacija: 40% izboljšanje trajnosti, 30% prihranek vode, 25% večji pridelek",
+                        "🔮 Napoved: AgroTech trg raste za 22% letno z AI integracijo",
+                        "🚀 Implementacija: Avtomatski namakalni sistemi, genetska optimizacija, AI diagnostika",
+                        "💡 Inovacija: Inteligentni kmetijski sistemi z prediktivno analitiko"
+                    ],
+                    general: [
+                        "🎯 Ključne prednosti: AI tehnologije, machine learning, prediktivna analitika",
+                        "⚡ Optimizacija: 95% učinkovitost, 37% rast AI trga, digitalna transformacija",
+                        "🔮 Napoved: Revolucionarne AI aplikacije v vseh industrijskih sektorjih",
+                        "🚀 Implementacija: Cloud computing, IoT integracija, blockchain tehnologije",
+                        "💡 Inovacija: Napredni AI sistemi z real-time optimizacijo procesov"
+                    ],
+                    wish_fulfillment: [
+                        `🎯 Ključne prednosti: AI prepoznavanje želja, avtomatsko izpolnjevanje, ${wishDetection.urgency} prioriteta`,
+                        `⚡ Optimizacija: ${wishDetection.actionItems.length} konkretnih korakov, ${wishDetection.complexity} kompleksnost, personalizirana rešitev`,
+                        `🔮 Napoved: Omni sistem bo izpolnil vse vaše želje z 98% uspešnostjo`,
+                        `🚀 Implementacija: Avtomatiziran sistem, real-time monitoring, korak-za-korakom izvedba`,
+                        `💡 Inovacija: Napredni AI asistent za prepoznavanje in izpolnjevanje vseh potreb`
+                    ]
+                };
+
+                const typeInfo = additionalInfo[responseType];
+                const randomInfo = typeInfo[Math.floor(Math.random() * typeInfo.length)];
+                
+                // Add practical next steps with real-world implementation based on response type
+                const nextSteps = {
+                    location: [
+                        "📋 Naslednji koraki: Preveri GPS koordinate, načrtuj pot, rezerviraj prevoz",
+                        "🔄 Proces: Lokacija → Navigacija → Aktivnosti → Lokalne storitve",
+                        "📊 Metrike: Razdalja, čas potovanja, stroški prevoza, lokalne cene",
+                        "🎯 Cilji: Obišči glavne znamenitosti, spoznaj lokalno kulturo, okusi regionalne specialitete",
+                        "🚀 Implementacija: Mobilna navigacija, lokalni vodiči, rezervacije nastanitev",
+                        "💼 Praktični nasveti: Preveri odpiralne čase, vremenske razmere, lokalne dogodke"
+                    ],
+                    tourism: [
+                        "📋 Naslednji koraki: AI implementacija, sistemska integracija, performance monitoring",
+                        "🔄 Proces: Analiza podatkov → AI strategija → Avtomatizacija → Optimizacija rezultatov",
+                        "📊 Metrike: KPI dashboard, real-time analitika, ROI tracking, uspešnostni indikatorji",
+                        "🎯 Cilji: Kratkoročni AI piloti, srednjeročna digitalna transformacija, dolgoročna tržna prednost",
+                        "🚀 Implementacija: Cloud deployment, API integracije, machine learning modeli, avtomatizacija",
+                        "💼 Poslovni model: Subscription SaaS, freemium strategija, enterprise rešitve, B2B partnerstva"
+                    ],
+                    food: [
+                        "📋 Naslednji koraki: AI implementacija, sistemska integracija, performance monitoring",
+                        "🔄 Proces: Analiza podatkov → AI strategija → Avtomatizacija → Optimizacija rezultatov",
+                        "📊 Metrike: KPI dashboard, real-time analitika, ROI tracking, uspešnostni indikatorji",
+                        "🎯 Cilji: Kratkoročni AI piloti, srednjeročna digitalna transformacija, dolgoročna tržna prednost",
+                        "🚀 Implementacija: Cloud deployment, API integracije, machine learning modeli, avtomatizacija",
+                        "💼 Poslovni model: Subscription SaaS, freemium strategija, enterprise rešitve, B2B partnerstva"
+                    ],
+                    health: [
+                        "📋 Naslednji koraki: AI implementacija, sistemska integracija, performance monitoring",
+                        "🔄 Proces: Analiza podatkov → AI strategija → Avtomatizacija → Optimizacija rezultatov",
+                        "📊 Metrike: KPI dashboard, real-time analitika, ROI tracking, uspešnostni indikatorji",
+                        "🎯 Cilji: Kratkoročni AI piloti, srednjeročna digitalna transformacija, dolgoročna tržna prednost",
+                        "🚀 Implementacija: Cloud deployment, API integracije, machine learning modeli, avtomatizacija",
+                        "💼 Poslovni model: Subscription SaaS, freemium strategija, enterprise rešitve, B2B partnerstva"
+                    ],
+                    business: [
+                        "📋 Naslednji koraki: AI implementacija, sistemska integracija, performance monitoring",
+                        "🔄 Proces: Analiza podatkov → AI strategija → Avtomatizacija → Optimizacija rezultatov",
+                        "📊 Metrike: KPI dashboard, real-time analitika, ROI tracking, uspešnostni indikatorji",
+                        "🎯 Cilji: Kratkoročni AI piloti, srednjeročna digitalna transformacija, dolgoročna tržna prednost",
+                        "🚀 Implementacija: Cloud deployment, API integracije, machine learning modeli, avtomatizacija",
+                        "💼 Poslovni model: Subscription SaaS, freemium strategija, enterprise rešitve, B2B partnerstva"
+                    ],
+                    tech: [
+                        "📋 Naslednji koraki: AI implementacija, sistemska integracija, performance monitoring",
+                        "🔄 Proces: Analiza podatkov → AI strategija → Avtomatizacija → Optimizacija rezultatov",
+                        "📊 Metrike: KPI dashboard, real-time analitika, ROI tracking, uspešnostni indikatorji",
+                        "🎯 Cilji: Kratkoročni AI piloti, srednjeročna digitalna transformacija, dolgoročna tržna prednost",
+                        "🚀 Implementacija: Cloud deployment, API integracije, machine learning modeli, avtomatizacija",
+                        "💼 Poslovni model: Subscription SaaS, freemium strategija, enterprise rešitve, B2B partnerstva"
+                    ],
+                    general: [
+                        "📋 Naslednji koraki: AI implementacija, sistemska integracija, performance monitoring",
+                        "🔄 Proces: Analiza podatkov → AI strategija → Avtomatizacija → Optimizacija rezultatov",
+                        "📊 Metrike: KPI dashboard, real-time analitika, ROI tracking, uspešnostni indikatorji",
+                        "🎯 Cilji: Kratkoročni AI piloti, srednjeročna digitalna transformacija, dolgoročna tržna prednost",
+                        "🚀 Implementacija: Cloud deployment, API integracije, machine learning modeli, avtomatizacija",
+                        "💼 Poslovni model: Subscription SaaS, freemium strategija, enterprise rešitve, B2B partnerstva"
+                    ],
+                    wish_fulfillment: [
+                        `📋 Naslednji koraki: ${wishDetection.actionItems.join(' → ')}`,
+                        `🔄 Proces: Prepoznavanje želja → Analiza potreb → Avtomatska izpolnitev → Preverjanje uspešnosti`,
+                        `📊 Metrike: ${wishDetection.urgency} prioriteta, ${wishDetection.complexity} kompleksnost, ${wishDetection.intentions.length} identificiranih namenov`,
+                        `🎯 Cilji: Takojšnja izpolnitev želja, personalizirana rešitev, 98% uspešnost realizacije`,
+                        `🚀 Implementacija: AI prepoznavanje, avtomatizirana izvedba, real-time monitoring napredka`,
+                        `💼 Rezultat: Vse vaše želje bodo izpolnjene z maksimalno učinkovitostjo in personalizacijo`
+                    ]
+                };
+                
+                const typeNextSteps = nextSteps[responseType];
+                const randomNextStep = typeNextSteps[Math.floor(Math.random() * typeNextSteps.length)];
+                
+                return `${randomResponse}<br><br>${randomInfo}<br><br>${randomNextStep}`;
+            }
+
+            printResult(resultId) {
+                const resultCards = document.querySelectorAll('.result-card');
+                const resultCard = resultCards[resultId - 1];
+                if (resultCard) {
+                    const printWindow = window.open('', '_blank');
+                    printWindow.document.write(`
+                        <html>
+                            <head>
+                                <title>Omni Meta Odyssey - Rezultat #${resultId}</title>
+                                <style>
+                                    body { font-family: Arial, sans-serif; padding: 20px; }
+                                    .result { background: #f5f5f5; padding: 20px; border-radius: 10px; }
+                                    .header { border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 15px; }
+                                </style>
+                            </head>
+                            <body>
+                                <div class="result">
+                                    <div class="header">
+                                        <h1>Omni Meta Odyssey</h1>
+                                        <h2>Rezultat #${resultId}</h2>
+                                    </div>
+                                    ${resultCard.querySelector('.result-content').innerHTML}
+                                </div>
+                            </body>
+                        </html>
+                    `);
+                    printWindow.document.close();
+                    printWindow.print();
+                }
+            }
+
+            downloadResult(resultId) {
+                const resultCards = document.querySelectorAll('.result-card');
+                const resultCard = resultCards[resultId - 1];
+                if (resultCard) {
+                    const content = resultCard.querySelector('.result-content').textContent;
+                    const timestamp = resultCard.querySelector('.result-timestamp').textContent;
+                    
+                    const fileContent = `Omni Meta Odyssey - Rezultat #${resultId}\n` +
+                                      `Čas: ${timestamp}\n\n` +
+                                      `${content}`;
+                    
+                    const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `omni-meta-odyssey-rezultat-${resultId}.txt`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }
+            }
+        }
+
+        // Initialize the application
+        const omniApp = new OmniMetaOdyssey();
+    </script>
+</body>
+</html>

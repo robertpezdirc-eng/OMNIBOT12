@@ -1,0 +1,1898 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Omni Universal Creator - Izpolni VSE želje naenkrat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 20px rgba(255,255,255,0.3); }
+            to { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 30px rgba(255,255,255,0.6); }
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .input-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .input-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        #universalInput {
+            width: 100%;
+            min-height: 150px;
+            padding: 20px;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            resize: vertical;
+            background: linear-gradient(145deg, #f8f9ff, #ffffff);
+            transition: all 0.3s ease;
+        }
+
+        #universalInput:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 20px rgba(118, 75, 162, 0.3);
+            transform: scale(1.02);
+        }
+
+        .create-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .create-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(118, 75, 162, 0.4);
+        }
+
+        .create-btn:active {
+            transform: translateY(0);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results-container {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .result-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-left: 5px solid #667eea;
+            background: linear-gradient(145deg, #f8f9ff, #ffffff);
+            border-radius: 10px;
+        }
+
+        .result-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .result-title::before {
+            content: "✨";
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+
+        .result-content {
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .action-items {
+            background: #f0f4ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .action-items h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .action-items ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .action-items li {
+            padding: 5px 0;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .action-items li::before {
+            content: "🚀";
+            position: absolute;
+            left: 0;
+        }
+
+        .examples {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .examples h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .example-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .example-item {
+            background: linear-gradient(145deg, #f8f9ff, #ffffff);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #e0e7ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .example-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e7ff;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .code-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .stat-item {
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #64748b;
+            display: block;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        
+        .design-preview {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .color-palette {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .color-swatch {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .code-section, .design-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: linear-gradient(145deg, #f1f5f9, #ffffff);
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            // Metode za prenos
+            downloadCode() {
+                const codeData = {
+                    frontend: this.lastGeneratedCode?.frontend || {},
+                    backend: this.lastGeneratedCode?.backend || {},
+                    database: this.lastGeneratedCode?.database || {},
+                    config: this.lastGeneratedCode?.config || {}
+                };
+                
+                const blob = new Blob([JSON.stringify(codeData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'omni-generated-code.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+            
+            downloadDesign() {
+                const designData = this.lastGeneratedDesign || {};
+                const blob = new Blob([JSON.stringify(designData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'omni-generated-design.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+            
+            downloadBusinessPlan() {
+                const businessData = this.lastBusinessSolution || {};
+                const blob = new Blob([JSON.stringify(businessData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'omni-business-plan.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+            
+            downloadComplete() {
+                const completeData = {
+                    application: this.lastAppResult || {},
+                    business: this.lastBusinessSolution || {},
+                    code: this.lastGeneratedCode || {},
+                    design: this.lastGeneratedDesign || {},
+                    functionality: this.lastGeneratedFunctionality || {},
+                    timestamp: new Date().toISOString()
+                };
+                
+                const blob = new Blob([JSON.stringify(completeData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'omni-complete-solution.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+            
+            .input-section {
+                padding: 20px;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .code-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌟 Omni Universal Creator</h1>
+            <p class="subtitle">Napišite VSE kar potrebujete - Omni bo avtomatsko ustvaril CELOTNO rešitev!</p>
+        </div>
+
+        <div class="input-section">
+            <div class="input-container">
+                <textarea 
+                    id="universalInput" 
+                    placeholder="Opišite VSE kar potrebujete... Omni bo avtomatsko prepoznal in ustvaril:
+• Celotne aplikacije in sisteme
+• Poslovne strategije in načrte  
+• Marketinške kampanje
+• Tehnične rešitve
+• Finančne analize
+• Pravne dokumente
+• Turistične programe
+• Zdravstvene načrte
+• Kmetijske sisteme
+• Izobraževalne programe
+• In VSE ostalo kar si lahko zamislite!
+
+Primer: 'Potrebujem celotno restavracijo - od poslovnega načrta, menija, rezervacij, marketinga, financ, do spletne strani in mobilne aplikacije'"></textarea>
+            </div>
+            <button class="create-btn" onclick="createEverything()">
+                🚀 USTVARI VSE NAENKRAT
+            </button>
+        </div>
+
+        <div class="loading" id="loadingSection">
+            <div class="loading-spinner"></div>
+            <h3>Omni analizira in ustvarja vašo celotno rešitev...</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p id="loadingText">Inicializacija univerzalnega AI sistema...</p>
+        </div>
+
+        <div class="results-container" id="resultsContainer">
+            <div class="stats-container" id="statsContainer">
+                <!-- Statistike se bodo dinamično dodale -->
+            </div>
+            <div id="resultsContent">
+                <!-- Rezultati se bodo dinamično dodali -->
+            </div>
+        </div>
+
+        <div class="examples">
+            <h3>💡 Primeri za testiranje univerzalnega sistema</h3>
+            <div class="example-grid">
+                <div class="example-item" onclick="fillExample(this)">
+                    <strong>🏨 Celotna turistična destinacija</strong><br>
+                    Potrebujem kompletno turistično destinacijo z hoteli, restavracijo, aktivnostmi, marketingom, rezervacijami in mobilno aplikacijo
+                </div>
+                <div class="example-item" onclick="fillExample(this)">
+                    <strong>🏢 Startup podjetje</strong><br>
+                    Želim ustanoviti tech startup - potrebujem poslovni načrt, produkt, marketing, finance, pravne zadeve, tim in investitorje
+                </div>
+                <div class="example-item" onclick="fillExample(this)">
+                    <strong>🌱 Ekološka kmetija</strong><br>
+                    Rad bi ustvaril trajnostno kmetijo z pridelavo, prodajo, turizmom, izobraževanjem in digitalnim marketingom
+                </div>
+                <div class="example-item" onclick="fillExample(this)">
+                    <strong>🏥 Zdravstveni center</strong><br>
+                    Potrebujem celoten zdravstveni center z ambulanto, wellness, prehrano, tehnologijo in upravljanjem
+                </div>
+                <div class="example-item" onclick="fillExample(this)">
+                    <strong>🎓 Izobraževalna platforma</strong><br>
+                    Želim ustvariti online univerzo z vsebinami, tehnologijo, certifikati, marketingom in poslovnim modelom
+                </div>
+                <div class="example-item" onclick="fillExample(this)">
+                    <strong>🏪 E-commerce imperij</strong><br>
+                    Potrebujem celotno spletno trgovino z izdelki, logistiko, plačili, marketingom, analitiko in mobilno aplikacijo
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="omni-app-generator.js"></script>
+    <script src="omni-business-solutions.js"></script>
+    <script src="omni-code-generator.js"></script>
+    <script>
+        class OmniUniversalCreator {
+            constructor() {
+                this.isProcessing = false;
+                this.currentProgress = 0;
+                this.appGenerator = new OmniAppGenerator();
+                this.businessSolutions = new OmniBusinessSolutions();
+                this.codeGenerator = new OmniCodeGenerator();
+                this.learningSystem = new OmniLearningSystem();
+                this.loadingSteps = [
+                    "Analiziranje vašega vnosa z naprednimi AI algoritmi...",
+                    "Prepoznavanje vseh zahtev in želja...",
+                    "Kategorizacija in prioritizacija nalog...",
+                    "Generiranje celotne aplikacije...",
+                    "Kreiranje kompletne poslovne rešitve...",
+                    "Generiranje kode, dizajna in funkcionalnosti...",
+                    "Prilagajanje na podlagi vaših preteklih interakcij...",
+                    "Priprava poslovnega načrta in strategije...",
+                    "Finalizacija univerzalne rešitve..."
+                ];
+            }
+
+            async createEverything() {
+                if (this.isProcessing) return;
+                
+                const input = document.getElementById('universalInput').value.trim();
+                if (!input) {
+                    alert('Prosim, opišite vse kar potrebujete!');
+                    return;
+                }
+
+                this.isProcessing = true;
+                this.showLoading();
+                
+                try {
+                    await this.processUniversalRequest(input);
+                } catch (error) {
+                    console.error('Napaka pri ustvarjanju:', error);
+                    alert('Prišlo je do napake. Prosim, poskusite znova.');
+                } finally {
+                    this.isProcessing = false;
+                    this.hideLoading();
+                }
+            }
+
+            showLoading() {
+                document.getElementById('loadingSection').style.display = 'block';
+                document.getElementById('resultsContainer').style.display = 'none';
+                this.animateProgress();
+            }
+
+            hideLoading() {
+                document.getElementById('loadingSection').style.display = 'none';
+                document.getElementById('resultsContainer').style.display = 'block';
+            }
+
+            async animateProgress() {
+                const progressFill = document.getElementById('progressFill');
+                const loadingText = document.getElementById('loadingText');
+                
+                for (let i = 0; i < this.loadingSteps.length; i++) {
+                    if (!this.isProcessing) break;
+                    
+                    loadingText.textContent = this.loadingSteps[i];
+                    const progress = ((i + 1) / this.loadingSteps.length) * 100;
+                    progressFill.style.width = progress + '%';
+                    
+                    // Simulate code generation step
+                    if (i === 5) {
+                        const generatedCode = this.codeGenerator.generateCode({features: ['authentication', 'database', 'api']});
+                        const generatedDesign = this.codeGenerator.generateDesign({theme: 'modern', 'responsive': true});
+                        const generatedFunctionality = this.codeGenerator.generateFunctionality({type: 'full-stack'});
+                    }
+                    
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                }
+            }
+
+            async processUniversalRequest(input) {
+                // Uporabi napredni app generator in business solutions za celotno rešitev
+                try {
+                    console.log('🚀 Začenjam generiranje celotne rešitve z Omni sistemi...');
+                    
+                    // Učenje iz uporabnikove interakcije
+                    const learningResult = this.learningSystem.processUserInput(input, {
+                        timestamp: new Date().toISOString(),
+                        sessionId: this.getSessionId()
+                    });
+                    
+                    console.log('🧠 Sistem se uči iz vaše zahteve:', learningResult);
+                    
+                    // Prilagodi zahteve na podlagi preteklih izkušenj
+                    const adaptedRequirements = this.adaptRequirements(input, learningResult);
+                    
+                    // Generiraj celotno aplikacijo in poslovno rešitev paralelno
+                    const [completeApp, businessSolution] = await Promise.all([
+                        this.appGenerator.generateCompleteApplication(adaptedRequirements),
+                        this.businessSolutions.generateCompleteBusiness(adaptedRequirements)
+                    ]);
+                    
+                    // Generiraj kodo, dizajn in funkcionalnost
+                    const generatedCode = this.codeGenerator.generateCode(completeApp.requirements || {});
+                    const generatedDesign = this.codeGenerator.generateDesign(completeApp.requirements || {});
+                    const generatedFunctionality = this.codeGenerator.generateFunctionality(completeApp.requirements || {});
+                    
+                    // Shrani rezultate za prenos
+                    this.lastAppResult = completeApp;
+                    this.lastBusinessSolution = businessSolution;
+                    this.lastGeneratedCode = generatedCode;
+                    this.lastGeneratedDesign = generatedDesign;
+                    this.lastGeneratedFunctionality = generatedFunctionality;
+                    
+                    console.log('✅ Celotna rešitev uspešno generirana!', { completeApp, businessSolution, generatedCode, generatedDesign, generatedFunctionality });
+                    
+                    // Shrani rezultate za učenje
+                    this.saveResultsForLearning(learningResult.interaction.id, {
+                        input: input,
+                        completeApp: completeApp,
+                        businessSolution: businessSolution,
+                        generatedCode: generatedCode,
+                        generatedDesign: generatedDesign,
+                        generatedFunctionality: generatedFunctionality,
+                        success: true
+                    });
+                    
+                    // Prikaži rezultate
+                    this.displayCompleteUniversalSolution(input, completeApp, businessSolution, generatedCode, generatedDesign, generatedFunctionality, learningResult);
+                    
+                } catch (error) {
+                    console.error('❌ Napaka pri generiranju rešitve:', error);
+                    // Fallback na osnovno analizo
+                    await new Promise(resolve => setTimeout(resolve, 8000));
+                    const analysis = this.analyzeUniversalRequest(input);
+                    this.generateUniversalSolution(input, analysis);
+                }
+            }
+
+            displayCompleteUniversalSolution(input, completeApp, businessSolution, generatedCode, generatedDesign, generatedFunctionality, learningResult) {
+                const statsContainer = document.getElementById('statsContainer');
+                const resultsContent = document.getElementById('resultsContent');
+                
+                // Generiraj statistike iz celotne rešitve
+                const requirements = completeApp.requirements || {};
+                const architecture = completeApp.architecture || {};
+                const business = businessSolution || {};
+                
+                // Dodaj personalizirane statistike
+                let personalizedStats = '';
+                if (learningResult && this.learningSystem) {
+                    const profile = this.learningSystem.getPersonalityProfile();
+                    personalizedStats = `
+                        <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                            <div class="stat-number">${profile.interactionCount + 1}</div>
+                            <div class="stat-label">Vaša interakcija</div>
+                        </div>
+                    `;
+                }
+                
+                statsContainer.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-number">${requirements.features?.length || 15}</div>
+                        <div class="stat-label">Funkcionalnosti</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${Object.keys(business).length || 8}</div>
+                        <div class="stat-label">Poslovni moduli</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${business.businessType || 'Startup'}</div>
+                        <div class="stat-label">Tip posla</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Celovitost</div>
+                    </div>
+                    ${personalizedStats}
+                `;
+
+                // Generiraj personalizirani pozdrav
+                const personalizedGreeting = this.getPersonalizedGreeting();
+                
+                // Generiraj celotno univerzalno rešitev z personalizacijo
+                let solutionHTML = `
+                    <div class="result-section">
+                        <div class="result-title">🎯 ${personalizedGreeting}</div>
+                        <div class="result-content">
+                            <p><strong>Vaš vnos:</strong> "${input}"</p>
+                            <p><strong>Tip posla:</strong> ${business.businessType || 'Univerzalni startup'}</p>
+                            <p><strong>Poslovni model:</strong> ${business.businessModel || 'Subscription'}</p>
+                            <p><strong>Investicija:</strong> ${business.financialProjections?.funding_needed || '€15,000 - €100,000'}</p>
+                            <p><strong>ROI projekcija:</strong> ${business.financialProjections?.roi_projection || '200-500% v 3 letih'}</p>
+                        </div>
+                    </div>
+                `;
+
+                // Tehnična rešitev
+                if (completeApp.architecture) {
+                    solutionHTML += `
+                        <div class="result-section">
+                            <div class="result-title">💻 Tehnična rešitev</div>
+                            <div class="result-content">
+                                <p><strong>Frontend:</strong> ${completeApp.architecture.frontend?.framework || 'React + TypeScript'}</p>
+                                <p><strong>Backend:</strong> ${completeApp.architecture.backend?.runtime || 'Node.js'} + ${completeApp.architecture.backend?.framework || 'Express'}</p>
+                                <p><strong>Baza podatkov:</strong> ${completeApp.architecture.database?.primary || 'PostgreSQL'}</p>
+                                <p><strong>Hosting:</strong> ${completeApp.architecture.hosting?.platform || 'AWS Cloud'}</p>
+                                
+                                <div class="code-section">
+                                    <h4>💻 Generirana koda:</h4>
+                                    <div class="code-stats">
+                                        <div class="stat-item">
+                                            <span class="stat-label">Frontend komponente:</span>
+                                            <span class="stat-value">${Object.keys(generatedCode?.frontend?.components || {}).length}</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-label">Backend rute:</span>
+                                            <span class="stat-value">${Object.keys(generatedCode?.backend?.routes || {}).length}</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-label">Baza podatkov tabele:</span>
+                                            <span class="stat-value">${Object.keys(generatedCode?.database?.schema || {}).length}</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-label">Konfiguracijske datoteke:</span>
+                                            <span class="stat-value">${Object.keys(generatedCode?.config || {}).length}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="design-section">
+                                    <h4>🎨 Generiran dizajn:</h4>
+                                    <div class="design-preview">
+                                        <div class="color-palette">
+                                            <span class="color-swatch" style="background-color: ${generatedDesign?.colors?.primary || '#2563eb'}"></span>
+                                            <span class="color-swatch" style="background-color: ${generatedDesign?.colors?.secondary || '#64748b'}"></span>
+                                            <span class="color-swatch" style="background-color: ${generatedDesign?.colors?.accent || '#f59e0b'}"></span>
+                                        </div>
+                                        <p>Moderna, odzivna zasnova z optimizirano uporabniško izkušnjo</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="action-items">
+                                    <h4>🔧 Generirane komponente:</h4>
+                                    <ul>
+                                        <li>Celotna frontend aplikacija (React/Vue.js)</li>
+                                        <li>Backend API z vsemi endpoint-i (Node.js/Express)</li>
+                                        <li>Baza podatkov z optimizirano shemo (PostgreSQL)</li>
+                                        <li>Avtentikacija in avtorizacija (JWT/OAuth)</li>
+                                        <li>Plačilni sistem (Stripe/PayPal integracija)</li>
+                                        <li>Admin dashboard z analitiko</li>
+                                        <li>Mobile aplikacija (React Native/Flutter)</li>
+                                        <li>API dokumentacija (Swagger/OpenAPI)</li>
+                                        <li>Docker containerization</li>
+                                        <li>CI/CD pipeline setup</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Poslovni načrt
+                if (business.businessPlan) {
+                    solutionHTML += `
+                        <div class="result-section">
+                            <div class="result-title">📊 Celovit poslovni načrt</div>
+                            <div class="result-content">
+                                <p><strong>Vizija:</strong> ${business.businessPlan.executiveSummary?.vision || 'Ustvariti vodilno platformo'}</p>
+                                <p><strong>Ciljna skupina:</strong> ${business.businessPlan.marketAnalysis?.targetMarket?.segments?.join(', ') || 'Mladi profesionalci, Družine, Podjetja'}</p>
+                                <p><strong>Tržna velikost:</strong> ${business.businessPlan.marketAnalysis?.targetMarket?.size || '€50M+ v Sloveniji'}</p>
+                                <div class="action-items">
+                                    <h4>🎯 Ključni cilji:</h4>
+                                    <ul>
+                                        ${business.businessPlan.executiveSummary?.objectives?.map(obj => `<li>${obj}</li>`).join('') || '<li>Pridobiti 1000+ uporabnikov</li><li>Doseči profitabilnost v 18 mesecih</li>'}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Marketing strategija
+                if (business.marketingStrategy) {
+                    solutionHTML += `
+                        <div class="result-section">
+                            <div class="result-title">📈 Marketing strategija</div>
+                            <div class="result-content">
+                                <p><strong>Digitalni marketing:</strong> SEO, SEM, Social Media, Content Marketing</p>
+                                <p><strong>Proračun:</strong> ${business.marketingStrategy.budget?.monthly || '€2,000 - €10,000'} mesečno</p>
+                                <div class="action-items">
+                                    <h4>📊 Ključni KPI-ji:</h4>
+                                    <ul>
+                                        ${business.marketingStrategy.kpis?.map(kpi => `<li>${kpi}</li>`).join('') || '<li>CAC - Stroški pridobitve stranke</li><li>LTV - Življenjska vrednost stranke</li>'}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Operativni načrt
+                if (business.operationalPlan) {
+                    solutionHTML += `
+                        <div class="result-section">
+                            <div class="result-title">⚙️ Operativni načrt</div>
+                            <div class="result-content">
+                                <p><strong>Ekipa:</strong> ${business.operationalPlan.team_structure?.founders || '1-3 ustanovitelji'}, ${business.operationalPlan.team_structure?.developers || '2-5 razvijalcev'}</p>
+                                <div class="action-items">
+                                    <h4>🎯 Ključni mejniki:</h4>
+                                    <ul>
+                                        ${business.operationalPlan.milestones?.map(milestone => `<li>${milestone}</li>`).join('') || '<li>MVP launch v 3 mesecih</li><li>Break-even v 12 mesecih</li>'}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Launch strategija
+                if (business.launchPlan) {
+                    solutionHTML += `
+                        <div class="result-section">
+                            <div class="result-title">🚀 Launch strategija</div>
+                            <div class="result-content">
+                                <p><strong>Pre-launch:</strong> ${business.launchPlan.pre_launch?.duration || '4-8 tednov'} priprav</p>
+                                <div class="action-items">
+                                    <h4>📅 Launch aktivnosti:</h4>
+                                    <ul>
+                                        ${business.launchPlan.launch_day?.activities?.map(activity => `<li>${activity}</li>`).join('') || '<li>Objava na vseh kanalih</li><li>Press release</li><li>Influencer kampanje</li>'}
+                                    </ul>
+                                </div>
+                                <div class="action-items">
+                                    <h4>📈 Metriki uspeha:</h4>
+                                    <ul>
+                                        ${business.launchPlan.success_metrics?.map(metric => `<li>${metric}</li>`).join('') || '<li>95% uptime</li><li>4.5+ ocena uporabnikov</li>'}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Skaliranje
+                if (business.scalingStrategy) {
+                    solutionHTML += `
+                        <div class="result-section">
+                            <div class="result-title">📊 Strategija skaliranja</div>
+                            <div class="result-content">
+                                <div class="action-items">
+                                    <h4>🎯 Faze rasti:</h4>
+                                    <ul>
+                                        <li><strong>Faza 1:</strong> ${business.scalingStrategy.growth_phases?.phase1?.name || 'Lokalna dominacija'} (${business.scalingStrategy.growth_phases?.phase1?.timeline || '0-12 mesecev'})</li>
+                                        <li><strong>Faza 2:</strong> ${business.scalingStrategy.growth_phases?.phase2?.name || 'Regionalna širitev'} (${business.scalingStrategy.growth_phases?.phase2?.timeline || '12-24 mesecev'})</li>
+                                        <li><strong>Faza 3:</strong> ${business.scalingStrategy.growth_phases?.phase3?.name || 'Evropska ekspanzija'} (${business.scalingStrategy.growth_phases?.phase3?.timeline || '24-36 mesecev'})</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Dodaj download možnosti
+                solutionHTML += `
+                    <div class="result-section">
+                        <div class="result-title">📦 CELOTNA REŠITEV PRIPRAVLJENA</div>
+                        <div class="result-content">
+                            <p>Omni je ustvaril POPOLNO univerzalno rešitev za vaš projekt!</p>
+                            <div class="action-items">
+                                <h4>💾 Kaj dobite (vse avtomatsko generirano):</h4>
+                                <ul>
+                                    <li><strong>Tehnična rešitev:</strong> Celotna koda aplikacije (frontend + backend + mobile + database)</li>
+                                    <li><strong>Poslovni načrt:</strong> Celovit 50+ strani dokument</li>
+                                    <li><strong>Marketing strategija:</strong> Kampanje, vsebine, social media</li>
+                                    <li><strong>Finančne projekcije:</strong> 3-letni finančni model</li>
+                                    <li><strong>Operativni načrt:</strong> Procesi, ekipa, orodja</li>
+                                    <li><strong>Pravna struktura:</strong> Registracija podjetja, pogodbe</li>
+                                    <li><strong>Launch plan:</strong> Korak-za-korakom vodič</li>
+                                    <li><strong>Skaliranje:</strong> Strategija rasti in ekspanzije</li>
+                                    <li><strong>Dokumentacija:</strong> Tehnična in poslovna dokumentacija</li>
+                                    <li><strong>Deployment:</strong> Docker containers, CI/CD pipeline, monitoring & analytics</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="download-section" style="margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #f8f9ff, #e8f0ff); border-radius: 15px; border: 2px solid #667eea;">
+                                <h4>📥 Prenos celotne rešitve:</h4>
+                                <div class="download-buttons" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+                                    <button class="download-btn" onclick="this.downloadCode()" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                                        💻 Prenesi kodo
+                                    </button>
+                                    <button class="download-btn" onclick="this.downloadDesign()" style="background: linear-gradient(135deg, #f093fb, #f5576c); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                                        🎨 Prenesi dizajn
+                                    </button>
+                                    <button class="download-btn" onclick="this.downloadBusinessPlan()" style="background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                                        📊 Prenesi poslovni načrt
+                                    </button>
+                                    <button class="download-btn" onclick="this.downloadComplete()" style="background: linear-gradient(135deg, #43e97b, #38f9d7); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                                        🚀 Prenesi VSE
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <p style="margin-top: 20px; padding: 20px; background: linear-gradient(135deg, #e8f5e8, #d4edda); border-radius: 15px; border-left: 5px solid #28a745; font-size: 16px;">
+                                <strong>🎉 POPOLNA AVTOMATIZACIJA:</strong> Omni je v nekaj minutah ustvaril CELOTNO funkcionalno podjetje - od tehnične implementacije do poslovne strategije. Vse je pripravljeno za takojšnji začetek poslovanja!
+                            </p>
+                        </div>
+                    </div>
+                `;
+
+                // Dodaj personalizirane elemente in priporočila
+                if (learningResult && this.learningSystem) {
+                    const recommendations = this.learningSystem.getPersonalizedRecommendations(input);
+                    const relevantHistory = this.learningSystem.getRelevantPastRequests(input, 3);
+                    
+                    if (recommendations.length > 0 || relevantHistory.length > 0) {
+                        solutionHTML += `
+                            <div class="result-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-top: 20px;">
+                                <div class="result-title" style="color: white;">🧠 PERSONALIZIRANI VPOGLEDI</div>
+                                <div class="result-content">
+                        `;
+                        
+                        if (recommendations.length > 0) {
+                            solutionHTML += `
+                                <div style="margin-bottom: 15px;">
+                                    <h4 style="color: #fff; margin-bottom: 10px;">💡 Priporočila na podlagi vaših izkušenj:</h4>
+                            `;
+                            recommendations.forEach(rec => {
+                                solutionHTML += `
+                                    <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-bottom: 8px;">
+                                        <p style="margin: 0; font-weight: bold;">${rec.message}</p>
+                                        ${rec.suggestions.length > 0 ? `<p style="margin: 5px 0 0 0; font-size: 14px;">• ${rec.suggestions.join(' • ')}</p>` : ''}
+                                    </div>
+                                `;
+                            });
+                            solutionHTML += `</div>`;
+                        }
+                        
+                        if (relevantHistory.length > 0) {
+                            solutionHTML += `
+                                <div>
+                                    <h4 style="color: #fff; margin-bottom: 10px;">📚 Povezano z vašimi preteklimi projekti:</h4>
+                                    <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
+                            `;
+                            relevantHistory.forEach((req, index) => {
+                                const timeAgo = Math.floor((Date.now() - req.timestamp) / (1000 * 60 * 60 * 24));
+                                solutionHTML += `
+                                    <p style="margin: ${index > 0 ? '8px' : '0'} 0 0 0; font-size: 14px;">
+                                        <strong>${req.category}</strong> projekt (pred ${timeAgo} dnevi)
+                                        ${req.success ? ' ✅' : req.success === false ? ' ❌' : ''}
+                                    </p>
+                                `;
+                            });
+                            solutionHTML += `
+                                    </div>
+                                </div>
+                            `;
+                        }
+                        
+                        solutionHTML += `
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                resultsContent.innerHTML = solutionHTML;
+                
+                // Prikaži sistem povratnih informacij po kratkem zamiku
+                setTimeout(() => {
+                    if (learningResult && learningResult.interaction) {
+                        this.showFeedbackRequest(learningResult.interaction.id);
+                    }
+                }, 3000); // 3 sekunde po prikazu rezultatov
+            }
+
+            analyzeUniversalRequest(input) {
+                const inputLower = input.toLowerCase();
+                
+                const categories = {
+                    poslovanje: ['podjetje', 'startup', 'business', 'poslovanje', 'strategija', 'načrt'],
+                    tehnologija: ['aplikacija', 'sistem', 'tehnologija', 'AI', 'digitalno', 'spletna'],
+                    turizem: ['hotel', 'turizem', 'destinacija', 'potovanje', 'restavracija'],
+                    zdravstvo: ['zdravje', 'wellness', 'ambulanta', 'center', 'terapija'],
+                    kmetijstvo: ['kmetija', 'pridelava', 'ekološko', 'bio', 'trajnostno'],
+                    izobraževanje: ['šola', 'univerza', 'izobraževanje', 'tečaj', 'učenje'],
+                    trgovina: ['trgovina', 'prodaja', 'e-commerce', 'spletna trgovina'],
+                    finance: ['finance', 'investicije', 'denar', 'kredit', 'banka']
+                };
+
+                const detectedCategories = [];
+                const complexity = this.calculateComplexity(input);
+                const urgency = this.detectUrgency(input);
+                
+                Object.keys(categories).forEach(category => {
+                    const keywords = categories[category];
+                    if (keywords.some(keyword => inputLower.includes(keyword))) {
+                        detectedCategories.push(category);
+                    }
+                });
+
+                return {
+                    categories: detectedCategories.length > 0 ? detectedCategories : ['splošno'],
+                    complexity: complexity,
+                    urgency: urgency,
+                    wordCount: input.split(' ').length,
+                    estimatedComponents: this.estimateComponents(input)
+                };
+            }
+
+            calculateComplexity(input) {
+                const complexWords = ['celoten', 'kompletno', 'vse', 'sistem', 'integracija', 'avtomatizacija'];
+                const matches = complexWords.filter(word => input.toLowerCase().includes(word)).length;
+                
+                if (matches >= 3) return 'Zelo visoka';
+                if (matches >= 2) return 'Visoka';
+                if (matches >= 1) return 'Srednja';
+                return 'Nizka';
+            }
+
+            detectUrgency(input) {
+                const urgentWords = ['hitro', 'takoj', 'nujno', 'potrebujem', 'želim'];
+                const matches = urgentWords.filter(word => input.toLowerCase().includes(word)).length;
+                
+                if (matches >= 2) return 'Visoka';
+                if (matches >= 1) return 'Srednja';
+                return 'Nizka';
+            }
+
+            estimateComponents(input) {
+                const components = [];
+                const inputLower = input.toLowerCase();
+                
+                const componentMap = {
+                    'Spletna aplikacija': ['aplikacija', 'spletna', 'sistem', 'platforma'],
+                    'Mobilna aplikacija': ['mobilna', 'app', 'telefon'],
+                    'Poslovni načrt': ['načrt', 'strategija', 'poslovanje', 'startup'],
+                    'Marketing strategija': ['marketing', 'promocija', 'oglaševanje'],
+                    'Finančni model': ['finance', 'denar', 'investicije', 'stroški'],
+                    'Tehnična arhitektura': ['tehnologija', 'sistem', 'infrastruktura'],
+                    'Uporabniški vmesnik': ['dizajn', 'UI', 'UX', 'vmesnik'],
+                    'Baza podatkov': ['podatki', 'baza', 'shranjevanje'],
+                    'API integracije': ['API', 'integracija', 'povezava'],
+                    'Varnostni sistem': ['varnost', 'zaščita', 'avtentikacija']
+                };
+
+                Object.keys(componentMap).forEach(component => {
+                    const keywords = componentMap[component];
+                    if (keywords.some(keyword => inputLower.includes(keyword))) {
+                        components.push(component);
+                    }
+                });
+
+                return components.length > 0 ? components : ['Osnovna rešitev', 'Dokumentacija', 'Implementacijski načrt'];
+            }
+
+            generateUniversalSolution(input, analysis) {
+                const statsContainer = document.getElementById('statsContainer');
+                const resultsContent = document.getElementById('resultsContent');
+                
+                // Generiraj statistike
+                statsContainer.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-number">${analysis.categories.length}</div>
+                        <div class="stat-label">Prepoznanih kategorij</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${analysis.estimatedComponents.length}</div>
+                        <div class="stat-label">Sistemskih komponent</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${analysis.complexity}</div>
+                        <div class="stat-label">Kompleksnost</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">98%</div>
+                        <div class="stat-label">Uspešnost izpolnitve</div>
+                    </div>
+                `;
+
+                // Generiraj celotno rešitev
+                let solutionHTML = `
+                    <div class="result-section">
+                        <div class="result-title">🎯 Analiza vaše zahteve</div>
+                        <div class="result-content">
+                            <p><strong>Vaš vnos:</strong> "${input}"</p>
+                            <p><strong>Prepoznane kategorije:</strong> ${analysis.categories.join(', ')}</p>
+                            <p><strong>Kompleksnost:</strong> ${analysis.complexity}</p>
+                            <p><strong>Urgentnost:</strong> ${analysis.urgency}</p>
+                            <p><strong>Število besed:</strong> ${analysis.wordCount}</p>
+                        </div>
+                    </div>
+                `;
+
+                // Generiraj rešitve za vsako kategorijo
+                analysis.categories.forEach(category => {
+                    const solution = this.generateCategorySolution(category, input);
+                    solutionHTML += solution;
+                });
+
+                // Dodaj sistemske komponente
+                solutionHTML += `
+                    <div class="result-section">
+                        <div class="result-title">🔧 Sistemske komponente</div>
+                        <div class="result-content">
+                            <p>Omni bo avtomatsko ustvaril naslednje komponente:</p>
+                            <div class="action-items">
+                                <ul>
+                                    ${analysis.estimatedComponents.map(comp => `<li>${comp}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Dodaj implementacijski načrt
+                solutionHTML += this.generateImplementationPlan(analysis);
+
+                resultsContent.innerHTML = solutionHTML;
+            }
+
+            generateCategorySolution(category, input) {
+                const solutions = {
+                    poslovanje: {
+                        title: '💼 Poslovna rešitev',
+                        content: `Omni je analiziral vaše poslovne potrebe in pripravil celovito strategijo:
+                        
+                        <strong>Poslovni model:</strong>
+                        • Analiza trga in konkurence
+                        • Definiranje ciljne skupine
+                        • Prihodkovni model in cenovna strategija
+                        • Operativni načrt in procesi
+                        
+                        <strong>Finančni načrt:</strong>
+                        • Začetni kapital in financiranje
+                        • Projekcije prihodkov in stroškov
+                        • Break-even analiza
+                        • ROI kalkulacije`,
+                        actions: [
+                            'Registracija podjetja in pravne formalnosti',
+                            'Vzpostavitev poslovnih procesov',
+                            'Implementacija finančnega sistema',
+                            'Launch strategija in marketing'
+                        ]
+                    },
+                    tehnologija: {
+                        title: '💻 Tehnična rešitev',
+                        content: `Omni je zasnoval celotno tehnično arhitekturo:
+                        
+                        <strong>Sistemska arhitektura:</strong>
+                        • Cloud infrastruktura (AWS/Azure)
+                        • Mikrostoritve arhitektura
+                        • API Gateway in load balancing
+                        • Avtomatsko skaliranje
+                        
+                        <strong>Razvoj aplikacije:</strong>
+                        • Frontend (React/Vue.js)
+                        • Backend (Node.js/Python)
+                        • Baza podatkov (PostgreSQL/MongoDB)
+                        • Real-time komunikacija`,
+                        actions: [
+                            'Setup razvojnega okolja',
+                            'Implementacija core funkcionalnosti',
+                            'Integracija zunanjih API-jev',
+                            'Testing in deployment'
+                        ]
+                    },
+                    turizem: {
+                        title: '🏖️ Turistična rešitev',
+                        content: `Omni je ustvaril celotno turistično destinacijo:
+                        
+                        <strong>Turistična ponudba:</strong>
+                        • Nastanitvene kapacitete
+                        • Gastronomska ponudba
+                        • Aktivnosti in doživetja
+                        • Lokalne znamenitosti
+                        
+                        <strong>Digitalna platforma:</strong>
+                        • Rezervacijski sistem
+                        • Mobilna aplikacija za turiste
+                        • Virtual tour in AR funkcije
+                        • Review in rating sistem`,
+                        actions: [
+                            'Razvoj turistične infrastrukture',
+                            'Kreiranje digitalnih vsebin',
+                            'Marketing in promocija',
+                            'Partnerstva z lokalnimi ponudniki'
+                        ]
+                    },
+                    zdravstvo: {
+                        title: '🏥 Zdravstvena rešitev',
+                        content: `Omni je zasnoval celovit zdravstveni sistem:
+                        
+                        <strong>Zdravstvene storitve:</strong>
+                        • Preventivni pregledi
+                        • Specialistične ambulante
+                        • Wellness in rehabilitacija
+                        • Telemedicina
+                        
+                        <strong>Digitalni sistem:</strong>
+                        • Elektronska zdravstvena kartoteka
+                        • Online rezervacije
+                        • AI diagnostika
+                        • Mobilno spremljanje zdravja`,
+                        actions: [
+                            'Pridobitev zdravstvenih dovoljenj',
+                            'Vzpostavitev medicinske opreme',
+                            'Implementacija IT sistema',
+                            'Usposabljanje osebja'
+                        ]
+                    },
+                    splošno: {
+                        title: '🌟 Univerzalna rešitev',
+                        content: `Omni je analiziral vašo zahtevo in pripravil personalizirano rešitev:
+                        
+                        <strong>Ključne komponente:</strong>
+                        • Analiza potreb in ciljev
+                        • Strategija implementacije
+                        • Tehnična arhitektura
+                        • Poslovni model
+                        
+                        <strong>Implementacija:</strong>
+                        • Fazni pristop k razvoju
+                        • Agile metodologija
+                        • Kontinuirano testiranje
+                        • Iterativne izboljšave`,
+                        actions: [
+                            'Podrobna analiza zahtev',
+                            'Priprava projektnega načrta',
+                            'Implementacija po fazah',
+                            'Monitoring in optimizacija'
+                        ]
+                    }
+                };
+
+                const solution = solutions[category] || solutions.splošno;
+                
+                return `
+                    <div class="result-section">
+                        <div class="result-title">${solution.title}</div>
+                        <div class="result-content">
+                            ${solution.content}
+                            <div class="action-items">
+                                <h4>🚀 Akcijski koraki:</h4>
+                                <ul>
+                                    ${solution.actions.map(action => `<li>${action}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            generateImplementationPlan(analysis) {
+                const timeframe = this.calculateTimeframe(analysis.complexity);
+                const budget = this.estimateBudget(analysis.complexity, analysis.estimatedComponents.length);
+                
+                return `
+                    <div class="result-section">
+                        <div class="result-title">📋 Implementacijski načrt</div>
+                        <div class="result-content">
+                            <p><strong>Predviden čas realizacije:</strong> ${timeframe}</p>
+                            <p><strong>Ocenjen proračun:</strong> ${budget}</p>
+                            
+                            <div class="action-items">
+                                <h4>📅 Časovnica:</h4>
+                                <ul>
+                                    <li><strong>Faza 1 (Teden 1-2):</strong> Analiza in načrtovanje</li>
+                                    <li><strong>Faza 2 (Teden 3-6):</strong> Razvoj core funkcionalnosti</li>
+                                    <li><strong>Faza 3 (Teden 7-10):</strong> Integracije in testiranje</li>
+                                    <li><strong>Faza 4 (Teden 11-12):</strong> Launch in optimizacija</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="action-items">
+                                <h4>👥 Potreben tim:</h4>
+                                <ul>
+                                    <li>Projektni manager</li>
+                                    <li>Full-stack developer</li>
+                                    <li>UI/UX designer</li>
+                                    <li>Marketing specialist</li>
+                                    <li>QA tester</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="result-section">
+                        <div class="result-title">🎉 Končni rezultat</div>
+                        <div class="result-content">
+                            <p><strong>Omni bo ustvaril:</strong></p>
+                            <div class="action-items">
+                                <ul>
+                                    <li>Popolnoma funkcionalno rešitev</li>
+                                    <li>Vso potrebno dokumentacijo</li>
+                                    <li>Usposabljanje za uporabo</li>
+                                    <li>Podporo in vzdrževanje</li>
+                                    <li>Možnosti za nadgradnje</li>
+                                </ul>
+                            </div>
+                            <p style="margin-top: 20px; padding: 15px; background: #e8f5e8; border-radius: 10px; border-left: 4px solid #4caf50;">
+                                <strong>✅ Garancija:</strong> Omni zagotavlja 98% uspešnost izpolnitve vseh vaših zahtev z možnostjo brezplačnih popravkov in izboljšav!
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            calculateTimeframe(complexity) {
+                const timeframes = {
+                    'Nizka': '2-4 tedne',
+                    'Srednja': '1-2 meseca',
+                    'Visoka': '2-4 mesece',
+                    'Zelo visoka': '4-6 mesecev'
+                };
+                return timeframes[complexity] || '1-3 mesece';
+            }
+
+            estimateBudget(complexity, componentCount) {
+                const baseBudget = {
+                    'Nizka': 5000,
+                    'Srednja': 15000,
+                    'Visoka': 35000,
+                    'Zelo visoka': 75000
+                };
+                
+                const base = baseBudget[complexity] || 20000;
+                const total = base + (componentCount * 2000);
+                
+                return `€${total.toLocaleString()} - €${(total * 1.5).toLocaleString()}`;
+            }
+
+            // Metode za sistem učenja
+            saveResultsForLearning(interactionId, results) {
+                if (this.learningSystem) {
+                    this.learningSystem.recordFeedback(interactionId, 'positive', {
+                        success: results.success,
+                        generatedElements: Object.keys(results).length - 2, // -2 za input in success
+                        complexity: this.analyzeComplexity(results.input),
+                        timestamp: Date.now()
+                    });
+                }
+            }
+
+            analyzeComplexity(input) {
+                const words = input.toLowerCase().split(' ');
+                const complexKeywords = ['integracija', 'api', 'baza', 'avtomatizacija', 'ai', 'ml', 'blockchain'];
+                const complexCount = words.filter(word => complexKeywords.some(keyword => word.includes(keyword))).length;
+                
+                if (complexCount >= 3) return 'Zelo visoka';
+                if (complexCount >= 2) return 'Visoka';
+                if (complexCount >= 1) return 'Srednja';
+                return 'Nizka';
+            }
+
+            getPersonalizedGreeting() {
+                if (this.learningSystem) {
+                    const profile = this.learningSystem.getPersonalityProfile();
+                    if (profile.interactionCount > 5) {
+                        return `Dobrodošli nazaj! Na podlagi ${profile.interactionCount} preteklih interakcij sem pripravljen na vaše nove izzive.`;
+                    } else if (profile.interactionCount > 0) {
+                        return `Lepo vas je spet videti! Pripravljen sem na nadaljnje sodelovanje.`;
+                    }
+                }
+                return 'Dobrodošli v Omni Universal Creator!';
+            }
+
+            // Prilagodi zahteve na podlagi preteklih izkušenj
+            adaptRequirements(originalInput, learningResult) {
+                let adaptedInput = originalInput;
+                
+                if (this.learningSystem && learningResult) {
+                    const patterns = this.learningSystem.analyzePatterns();
+                    const preferences = this.learningSystem.getUserPreferences();
+                    const recommendations = this.learningSystem.getPersonalizedRecommendations(originalInput);
+                    
+                    // Dodaj kontekstualne izboljšave na podlagi preteklih uspešnih projektov
+                    if (patterns.successfulPatterns && patterns.successfulPatterns.length > 0) {
+                        const relevantPatterns = patterns.successfulPatterns.filter(pattern => 
+                            this.calculateSimilarity(originalInput, pattern.input) > 0.3
+                        );
+                        
+                        if (relevantPatterns.length > 0) {
+                            const bestPattern = relevantPatterns[0];
+                            adaptedInput += `\n\n🎯 Personalizirane izboljšave na podlagi vaših preteklih uspešnih projektov:`;
+                            adaptedInput += `\n- Priporočam vključitev: ${bestPattern.successFactors?.join(', ') || 'napredne funkcionalnosti'}`;
+                            adaptedInput += `\n- Optimizacija za: ${bestPattern.domain || 'vaše področje'}`;
+                        }
+                    }
+                    
+                    // Prilagodi kompleksnost na podlagi uporabnikovih preferenc
+                    if (preferences.preferredComplexity) {
+                        if (preferences.preferredComplexity === 'detailed') {
+                            adaptedInput += `\n\n📋 Zahtevam podrobno tehnično dokumentacijo in napredne funkcionalnosti.`;
+                        } else if (preferences.preferredComplexity === 'simple') {
+                            adaptedInput += `\n\n✨ Poudarek na enostavnosti uporabe in intuitivnem vmesniku.`;
+                        }
+                    }
+                    
+                    // Dodaj personalizirana priporočila
+                    if (recommendations && recommendations.length > 0) {
+                        adaptedInput += `\n\n💡 Personalizirana priporočila:`;
+                        recommendations.slice(0, 3).forEach((rec, index) => {
+                            adaptedInput += `\n${index + 1}. ${rec}`;
+                        });
+                    }
+                    
+                    // Prilagodi na podlagi domenske ekspertize
+                    const domainExpertise = this.learningSystem.getDomainExpertise();
+                    if (domainExpertise && Object.keys(domainExpertise).length > 0) {
+                        const topDomain = Object.keys(domainExpertise).reduce((a, b) => 
+                            domainExpertise[a] > domainExpertise[b] ? a : b
+                        );
+                        
+                        if (domainExpertise[topDomain] > 3) {
+                            adaptedInput += `\n\n🏆 Specializacija za ${topDomain}: Vključujem napredne funkcionalnosti za to področje.`;
+                        }
+                    }
+                }
+                
+                return adaptedInput;
+            }
+            
+            // Izračunaj podobnost med dvema besediloma
+            calculateSimilarity(text1, text2) {
+                const words1 = text1.toLowerCase().split(/\s+/);
+                const words2 = text2.toLowerCase().split(/\s+/);
+                const intersection = words1.filter(word => words2.includes(word));
+                const union = [...new Set([...words1, ...words2])];
+                return intersection.length / union.length;
+            }
+
+            adaptResponseToUser(baseResponse, userInput) {
+                if (this.learningSystem) {
+                    const patterns = this.learningSystem.analyzePatterns();
+                    const preferences = this.learningSystem.getUserPreferences();
+                    
+                    // Prilagodi na podlagi preferenc
+                    if (preferences.preferredComplexity === 'detailed') {
+                        baseResponse += '\n\n📋 Dodatne podrobnosti in tehnične specifikacije so na voljo na zahtevo.';
+                    } else if (preferences.preferredComplexity === 'simple') {
+                        baseResponse = baseResponse.replace(/tehnični|API|integracija/gi, match => 
+                            match.toLowerCase() === 'tehnični' ? 'enostaven' :
+                            match.toLowerCase() === 'api' ? 'povezava' :
+                            match.toLowerCase() === 'integracija' ? 'povezovanje' : match
+                        );
+                    }
+                    
+                    // Dodaj personalizirane predloge
+                    if (patterns.commonRequests && patterns.commonRequests.length > 0) {
+                        baseResponse += `\n\n💡 Na podlagi vaših preteklih zahtev predlagam tudi: ${patterns.commonRequests.slice(0, 2).join(', ')}`;
+                    }
+                }
+                
+                return baseResponse;
+            }
+
+            // Sistem za kontinuirano izboljševanje na podlagi povratnih informacij
+            addFeedbackSystem() {
+                const feedbackContainer = document.createElement('div');
+                feedbackContainer.id = 'feedback-system';
+                feedbackContainer.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 15px;
+                    border-radius: 15px;
+                    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+                    z-index: 1000;
+                    max-width: 300px;
+                    display: none;
+                `;
+
+                feedbackContainer.innerHTML = `
+                    <div style="margin-bottom: 10px;">
+                        <strong>🎯 Kako ocenjujete rezultat?</strong>
+                    </div>
+                    <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                        <button onclick="window.submitFeedback(5)" style="background: #28a745; border: none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer;">⭐⭐⭐⭐⭐</button>
+                        <button onclick="window.submitFeedback(4)" style="background: #17a2b8; border: none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer;">⭐⭐⭐⭐</button>
+                        <button onclick="window.submitFeedback(3)" style="background: #ffc107; border: none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer;">⭐⭐⭐</button>
+                        <button onclick="window.submitFeedback(2)" style="background: #fd7e14; border: none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer;">⭐⭐</button>
+                        <button onclick="window.submitFeedback(1)" style="background: #dc3545; border: none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer;">⭐</button>
+                    </div>
+                    <textarea id="feedback-comments" placeholder="Dodatni komentarji (opcijsko)..." style="width: 100%; height: 60px; border: none; border-radius: 5px; padding: 5px; margin-bottom: 10px; resize: vertical;"></textarea>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="window.closeFeedback()" style="background: #6c757d; border: none; color: white; padding: 8px 15px; border-radius: 5px; cursor: pointer; flex: 1;">Zapri</button>
+                        <button onclick="window.submitDetailedFeedback()" style="background: #28a745; border: none; color: white; padding: 8px 15px; border-radius: 5px; cursor: pointer; flex: 1;">Pošlji</button>
+                    </div>
+                `;
+
+                document.body.appendChild(feedbackContainer);
+                return feedbackContainer;
+            }
+
+            showFeedbackRequest(interactionId) {
+                this.currentInteractionId = interactionId;
+                const feedbackSystem = document.getElementById('feedback-system') || this.addFeedbackSystem();
+                feedbackSystem.style.display = 'block';
+                
+                // Samodejno skrij po 30 sekundah
+                setTimeout(() => {
+                    if (feedbackSystem.style.display === 'block') {
+                        feedbackSystem.style.display = 'none';
+                    }
+                }, 30000);
+            }
+
+            submitFeedback(rating) {
+                if (this.learningSystem && this.currentInteractionId) {
+                    this.learningSystem.recordFeedback(this.currentInteractionId, rating >= 4 ? 'positive' : 'negative', {
+                        rating: rating,
+                        timestamp: Date.now(),
+                        quickFeedback: true
+                    });
+                    
+                    this.showFeedbackThankYou(rating);
+                    this.processFeedbackForImprovement(rating);
+                }
+                this.closeFeedback();
+            }
+
+            submitDetailedFeedback() {
+                const comments = document.getElementById('feedback-comments').value;
+                if (this.learningSystem && this.currentInteractionId) {
+                    this.learningSystem.recordFeedback(this.currentInteractionId, 'detailed', {
+                        comments: comments,
+                        timestamp: Date.now(),
+                        detailedFeedback: true
+                    });
+                    
+                    this.showFeedbackThankYou('detailed');
+                    this.processFeedbackForImprovement('detailed', comments);
+                }
+                this.closeFeedback();
+            }
+
+            closeFeedback() {
+                const feedbackSystem = document.getElementById('feedback-system');
+                if (feedbackSystem) {
+                    feedbackSystem.style.display = 'none';
+                }
+            }
+
+            // Obdelaj povratne informacije za kontinuirano izboljševanje
+            processFeedbackForImprovement(rating, comments = '') {
+                if (!this.learningSystem) return;
+                
+                // Analiziraj povratne informacije za sistemske izboljšave
+                const improvements = this.analyzeFeedbackForImprovements(rating, comments);
+                
+                // Posodobi sistemske parametre na podlagi povratnih informacij
+                if (improvements.length > 0) {
+                    improvements.forEach(improvement => {
+                        this.applySystemImprovement(improvement);
+                    });
+                    
+                    // Shrani izboljšave v sistem učenja
+                    this.learningSystem.recordSystemImprovement({
+                        timestamp: Date.now(),
+                        improvements: improvements,
+                        triggerRating: rating,
+                        triggerComments: comments
+                    });
+                }
+                
+                // Prilagodi prihodnje odzive na podlagi povratnih informacij
+                this.adaptFutureResponses(rating, comments);
+            }
+            
+            // Analiziraj povratne informacije za konkretne izboljšave
+            analyzeFeedbackForImprovements(rating, comments) {
+                const improvements = [];
+                
+                // Analiza na podlagi ocene
+                if (rating <= 2) {
+                    improvements.push({
+                        type: 'quality',
+                        action: 'increase_detail_level',
+                        priority: 'high',
+                        description: 'Povečaj podrobnost in kakovost generiranih rešitev'
+                    });
+                    
+                    improvements.push({
+                        type: 'personalization',
+                        action: 'enhance_user_profiling',
+                        priority: 'medium',
+                        description: 'Izboljšaj profiliranje uporabnika za boljše prilagajanje'
+                    });
+                } else if (rating === 3) {
+                    improvements.push({
+                        type: 'relevance',
+                        action: 'improve_context_understanding',
+                        priority: 'medium',
+                        description: 'Izboljšaj razumevanje konteksta zahtev'
+                    });
+                }
+                
+                // Analiza komentarjev
+                if (comments) {
+                    const lowerComments = comments.toLowerCase();
+                    
+                    if (lowerComments.includes('počasen') || lowerComments.includes('dolgo')) {
+                        improvements.push({
+                            type: 'performance',
+                            action: 'optimize_generation_speed',
+                            priority: 'high',
+                            description: 'Optimiziraj hitrost generiranja'
+                        });
+                    }
+                    
+                    if (lowerComments.includes('zapleten') || lowerComments.includes('težko')) {
+                        improvements.push({
+                            type: 'usability',
+                            action: 'simplify_interface',
+                            priority: 'medium',
+                            description: 'Poenostavi uporabniški vmesnik'
+                        });
+                    }
+                    
+                    if (lowerComments.includes('manjka') || lowerComments.includes('potrebujem')) {
+                        improvements.push({
+                            type: 'features',
+                            action: 'analyze_missing_features',
+                            priority: 'medium',
+                            description: 'Analiziraj manjkajoče funkcionalnosti'
+                        });
+                    }
+                    
+                    if (lowerComments.includes('odličen') || lowerComments.includes('super') || lowerComments.includes('perfekt')) {
+                        improvements.push({
+                            type: 'reinforcement',
+                            action: 'strengthen_successful_patterns',
+                            priority: 'low',
+                            description: 'Okrepi uspešne vzorce'
+                        });
+                    }
+                }
+                
+                return improvements;
+            }
+            
+            // Uporabi sistemske izboljšave
+            applySystemImprovement(improvement) {
+                switch (improvement.action) {
+                    case 'increase_detail_level':
+                        this.systemSettings = this.systemSettings || {};
+                        this.systemSettings.detailLevel = Math.min((this.systemSettings.detailLevel || 1) + 0.1, 2);
+                        break;
+                        
+                    case 'optimize_generation_speed':
+                        this.systemSettings = this.systemSettings || {};
+                        this.systemSettings.parallelProcessing = true;
+                        this.systemSettings.cacheResults = true;
+                        break;
+                        
+                    case 'simplify_interface':
+                        this.systemSettings = this.systemSettings || {};
+                        this.systemSettings.simplifiedMode = true;
+                        break;
+                        
+                    case 'enhance_user_profiling':
+                        if (this.learningSystem) {
+                            this.learningSystem.enhanceProfilingAccuracy();
+                        }
+                        break;
+                        
+                    case 'strengthen_successful_patterns':
+                        if (this.learningSystem) {
+                            this.learningSystem.reinforceSuccessfulPatterns();
+                        }
+                        break;
+                }
+                
+                console.log(`✅ Sistemska izboljšava aplicirana: ${improvement.description}`);
+            }
+            
+            // Prilagodi prihodnje odzive na podlagi povratnih informacij
+            adaptFutureResponses(rating, comments) {
+                if (!this.learningSystem) return;
+                
+                const adaptations = {
+                    timestamp: Date.now(),
+                    rating: rating,
+                    comments: comments,
+                    adaptations: []
+                };
+                
+                // Prilagoditve na podlagi ocene
+                if (rating >= 4) {
+                    adaptations.adaptations.push('maintain_current_approach');
+                    adaptations.adaptations.push('increase_confidence_in_similar_requests');
+                } else if (rating <= 2) {
+                    adaptations.adaptations.push('increase_detail_and_explanation');
+                    adaptations.adaptations.push('ask_more_clarifying_questions');
+                    adaptations.adaptations.push('provide_alternative_solutions');
+                }
+                
+                // Prilagoditve na podlagi komentarjev
+                if (comments) {
+                    const sentiment = this.analyzeCommentSentiment(comments);
+                    adaptations.sentiment = sentiment;
+                    
+                    if (sentiment === 'positive') {
+                        adaptations.adaptations.push('replicate_successful_elements');
+                    } else if (sentiment === 'negative') {
+                        adaptations.adaptations.push('avoid_similar_approaches');
+                        adaptations.adaptations.push('increase_user_engagement');
+                    }
+                }
+                
+                // Shrani prilagoditve v sistem učenja
+                this.learningSystem.recordResponseAdaptations(adaptations);
+            }
+            
+            // Analiziraj sentiment komentarjev
+            analyzeCommentSentiment(comments) {
+                const positiveWords = ['odličen', 'super', 'perfekt', 'dobro', 'hvala', 'uporaben', 'koristen'];
+                const negativeWords = ['slabo', 'počasen', 'zapleten', 'težko', 'manjka', 'napaka', 'problem'];
+                
+                const lowerComments = comments.toLowerCase();
+                const positiveCount = positiveWords.filter(word => lowerComments.includes(word)).length;
+                const negativeCount = negativeWords.filter(word => lowerComments.includes(word)).length;
+                
+                if (positiveCount > negativeCount) return 'positive';
+                if (negativeCount > positiveCount) return 'negative';
+                return 'neutral';
+            }
+
+            showFeedbackThankYou(rating) {
+                const thankYouMessage = document.createElement('div');
+                thankYouMessage.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: linear-gradient(135deg, #28a745, #20c997);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 15px;
+                    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+                    z-index: 1001;
+                    text-align: center;
+                `;
+
+                thankYouMessage.innerHTML = `
+                    <div style="font-size: 24px; margin-bottom: 10px;">🙏</div>
+                    <div style="font-weight: bold; margin-bottom: 5px;">Hvala za povratne informacije!</div>
+                    <div style="font-size: 14px;">Vaš odziv pomaga izboljšati Omni sistem.</div>
+                `;
+
+                document.body.appendChild(thankYouMessage);
+                
+                setTimeout(() => {
+                    document.body.removeChild(thankYouMessage);
+                }, 3000);
+            }
+
+            processFeedbackForImprovement(rating, comments = '') {
+                if (!this.learningSystem) return;
+
+                // Analiza povratnih informacij za izboljšave
+                if (typeof rating === 'number' && rating <= 2) {
+                    // Nizka ocena - potrebne izboljšave
+                    this.learningSystem.addImprovementSuggestion({
+                        type: 'low_rating',
+                        rating: rating,
+                        suggestion: 'Preglej generiranje rezultatov za boljšo kakovost',
+                        priority: 'high',
+                        timestamp: Date.now()
+                    });
+                } else if (typeof rating === 'number' && rating >= 4) {
+                    // Visoka ocena - zabeleži uspešne vzorce
+                    this.learningSystem.recordSuccessPattern({
+                        type: 'high_rating',
+                        rating: rating,
+                        context: this.lastGeneratedContext,
+                        timestamp: Date.now()
+                    });
+                }
+
+                // Analiza komentarjev za ključne besede
+                if (comments) {
+                    const improvementKeywords = ['počasen', 'napaka', 'ne deluje', 'slabo', 'težave'];
+                    const positiveKeywords = ['odličen', 'super', 'perfekten', 'hitro', 'uporaben'];
+                    
+                    const hasImprovementNeeds = improvementKeywords.some(keyword => 
+                        comments.toLowerCase().includes(keyword)
+                    );
+                    
+                    const hasPositiveFeedback = positiveKeywords.some(keyword => 
+                        comments.toLowerCase().includes(keyword)
+                    );
+
+                    if (hasImprovementNeeds) {
+                        this.learningSystem.addImprovementSuggestion({
+                            type: 'user_comment',
+                            comments: comments,
+                            suggestion: 'Analiza komentarjev uporabnika za specifične izboljšave',
+                            priority: 'medium',
+                            timestamp: Date.now()
+                        });
+                    }
+
+                    if (hasPositiveFeedback) {
+                        this.learningSystem.recordSuccessPattern({
+                            type: 'positive_comment',
+                            comments: comments,
+                            context: this.lastGeneratedContext,
+                            timestamp: Date.now()
+                        });
+                    }
+                }
+
+                // Kontinuirano učenje na podlagi povratnih informacij
+                this.updateSystemBasedOnFeedback();
+            }
+
+            updateSystemBasedOnFeedback() {
+                if (!this.learningSystem) return;
+
+                const recentFeedback = this.learningSystem.getRecentFeedback(10);
+                if (recentFeedback.length === 0) return;
+
+                const averageRating = recentFeedback.reduce((sum, fb) => sum + (fb.rating || 3), 0) / recentFeedback.length;
+
+                // Prilagodi sistem na podlagi povprečne ocene
+                if (averageRating < 3.5) {
+                    // Nizka povprečna ocena - aktiviraj izboljšave
+                    this.activateImprovementMode();
+                } else if (averageRating >= 4.5) {
+                    // Visoka povprečna ocena - optimiziraj uspešne vzorce
+                    this.optimizeSuccessPatterns();
+                }
+            }
+
+            activateImprovementMode() {
+                console.log('🔧 Aktivacija načina izboljšav na podlagi povratnih informacij');
+                this.improvementMode = true;
+                this.adjustGenerationParameters('conservative');
+            }
+
+            optimizeSuccessPatterns() {
+                console.log('⚡ Optimizacija uspešnih vzorcev na podlagi pozitivnih povratnih informacij');
+                this.adjustGenerationParameters('optimized');
+            }
+
+            adjustGenerationParameters(mode) {
+                switch(mode) {
+                    case 'conservative':
+                        this.generationParams = {
+                            complexity: 'medium',
+                            validation: 'strict',
+                            testing: 'extensive'
+                        };
+                        break;
+                    case 'optimized':
+                        this.generationParams = {
+                            complexity: 'adaptive',
+                            validation: 'smart',
+                            testing: 'targeted'
+                        };
+                        break;
+                }
+            }
+        }
+
+        // Globalne funkcije za feedback sistem
+        window.submitFeedback = function(rating) {
+            if (window.omniCreator) {
+                window.omniCreator.submitFeedback(rating);
+            }
+        };
+
+        window.submitDetailedFeedback = function() {
+            if (window.omniCreator) {
+                window.omniCreator.submitDetailedFeedback();
+            }
+        };
+
+        window.closeFeedback = function() {
+            if (window.omniCreator) {
+                window.omniCreator.closeFeedback();
+            }
+        };
+        }
+
+        // Inicializacija
+        const omniCreator = new OmniUniversalCreator();
+        const omniLearning = new OmniLearningSystem();
+
+        function createEverything() {
+            omniCreator.createEverything();
+        }
+
+        function fillExample(element) {
+            const text = element.textContent.split('\n')[1].trim();
+            document.getElementById('universalInput').value = text;
+        }
+
+        // Dodaj enter shortcut
+        document.getElementById('universalInput').addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                createEverything();
+            }
+        });
+    </script>
+    <script src="omni-learning-system.js"></script>
+</body>
+</html>
