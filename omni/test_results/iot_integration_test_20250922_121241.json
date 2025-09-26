@@ -1,0 +1,94 @@
+{
+  "test_run_id": "iot_integration_1758535961",
+  "start_time": "2025-09-22T12:12:19.785320",
+  "end_time": "2025-09-22T12:12:41.190614",
+  "total_tests": 12,
+  "passed_tests": 1,
+  "success_rate": 8.333333333333332,
+  "test_results": [
+    {
+      "test_name": "Module Imports",
+      "success": false,
+      "message": "0/4 modulov dostopnih",
+      "duration": 5.4836273193359375e-06,
+      "timestamp": "2025-09-22T12:12:19.785839"
+    },
+    {
+      "test_name": "Database Setup",
+      "success": false,
+      "message": "0/3 baz podatkov pripravljenih",
+      "duration": 0.000270843505859375,
+      "timestamp": "2025-09-22T12:12:19.786888"
+    },
+    {
+      "test_name": "Autonomous System Startup",
+      "success": false,
+      "message": "iot_autonomous modul ni dostopen",
+      "duration": 0.00024080276489257812,
+      "timestamp": "2025-09-22T12:12:19.787415"
+    },
+    {
+      "test_name": "Device Monitoring Startup",
+      "success": false,
+      "message": "Napaka pri zagonu spremljanja: 'NoneType' object has no attribute 'start_device_monitoring'",
+      "duration": 6.67572021484375e-06,
+      "timestamp": "2025-09-22T12:12:19.787648"
+    },
+    {
+      "test_name": "Auto Actions Startup",
+      "success": false,
+      "message": "Napaka pri zagonu ukrepov: 'NoneType' object has no attribute 'start_auto_actions'",
+      "duration": 3.814697265625e-06,
+      "timestamp": "2025-09-22T12:12:19.787926"
+    },
+    {
+      "test_name": "Integration API Startup",
+      "success": false,
+      "message": "Napaka pri zagonu API: HTTPConnectionPool(host='localhost', port=5001): Max retries exceeded with url: /api/status (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000014A849F74D0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))",
+      "duration": 9.121104001998901,
+      "timestamp": "2025-09-22T12:12:28.909471"
+    },
+    {
+      "test_name": "Device Control via API",
+      "success": false,
+      "message": "Napaka pri upravljanju: Ni testnih naprav",
+      "duration": 7.3909759521484375e-06,
+      "timestamp": "2025-09-22T12:12:28.910794"
+    },
+    {
+      "test_name": "Full System Integration",
+      "success": false,
+      "message": "Napaka pri celotni integraciji: HTTPConnectionPool(host='localhost', port=5001): Max retries exceeded with url: /api/system/full-start (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000014A84A33610>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))",
+      "duration": 4.069139719009399,
+      "timestamp": "2025-09-22T12:12:32.980642"
+    },
+    {
+      "test_name": "Real Scenario - Emergency Response",
+      "success": false,
+      "message": "Napaka pri testiranju krize: Ni testnih naprav",
+      "duration": 5.245208740234375e-06,
+      "timestamp": "2025-09-22T12:12:32.982094"
+    },
+    {
+      "test_name": "Real Scenario - Scheduled Automation",
+      "success": false,
+      "message": "Napaka pri testiranju urnika: 'NoneType' object has no attribute 'add_device'",
+      "duration": 5.125999450683594e-05,
+      "timestamp": "2025-09-22T12:12:32.982452"
+    },
+    {
+      "test_name": "System Performance",
+      "success": false,
+      "message": "Napaka pri testiranju performans: HTTPConnectionPool(host='localhost', port=5001): Max retries exceeded with url: /api/status (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000014A84A37410>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))",
+      "duration": 4.11940336227417,
+      "timestamp": "2025-09-22T12:12:37.102170"
+    },
+    {
+      "test_name": "Cleanup Test Environment",
+      "success": true,
+      "message": "Testno okolje počiščeno",
+      "duration": 4.069840431213379,
+      "timestamp": "2025-09-22T12:12:41.173633"
+    }
+  ]
+}

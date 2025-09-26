@@ -1,0 +1,44 @@
+# Docker Compose override za razvojno okolje
+version: '3.8'
+
+services:
+  # Licenčni strežnik - development
+  omni-server:
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+    volumes:
+      - ./server:/app:ro
+      - /app/node_modules
+    command: ["npm", "run", "dev"]
+    ports:
+      - "9229:9229"  # Node.js debug port
+
+  # Admin GUI - development
+  omni-admin:
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+    volumes:
+      - ./admin:/app:ro
+      - /app/node_modules
+    command: ["npm", "run", "dev"]
+
+  # Client Panel - development
+  omni-client:
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+    volumes:
+      - ./client:/app:ro
+      - /app/node_modules
+    command: ["npm", "run", "dev"]
+
+  # MongoDB - development z dodatnimi orodji
+  mongodb:
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: omni_licenses_dev

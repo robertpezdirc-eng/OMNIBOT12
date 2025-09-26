@@ -1,0 +1,283 @@
+
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tourism Master System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; text-align: center; }
+        .header h1 { font-size: 3rem; margin-bottom: 1rem; }
+        .header p { font-size: 1.2rem; opacity: 0.9; }
+        .nav { background: white; padding: 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .nav-links { display: flex; gap: 2rem; justify-content: center; }
+        .nav-link { padding: 0.75rem 1.5rem; background: #667eea; color: white; text-decoration: none; border-radius: 25px; transition: all 0.3s; }
+        .nav-link:hover { background: #5a67d8; transform: translateY(-2px); }
+        .main-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; padding: 2rem; }
+        .module-card { background: white; border-radius: 15px; padding: 2rem; box-shadow: 0 5px 20px rgba(0,0,0,0.1); transition: transform 0.3s; }
+        .module-card:hover { transform: translateY(-5px); }
+        .module-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .module-title { font-size: 1.5rem; margin-bottom: 1rem; color: #333; }
+        .module-desc { color: #666; margin-bottom: 1.5rem; line-height: 1.6; }
+        .module-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        .stat { text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: #667eea; }
+        .stat-label { font-size: 0.9rem; color: #666; }
+        .module-actions { display: flex; gap: 1rem; }
+        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; text-align: center; transition: all 0.3s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-secondary { background: #e2e8f0; color: #4a5568; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .status-indicator { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+        .status-online { background: #48bb78; }
+        .status-offline { background: #f56565; }
+        .footer { text-align: center; padding: 2rem; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏨 Tourism Master System</h1>
+        <p>Centralizirano upravljanje gostinstva in turizma</p>
+    </div>
+
+    <nav class="nav">
+        <div class="nav-links">
+            <a href="/" class="nav-link">🏠 Dashboard</a>
+            <a href="/admin" class="nav-link">⚙️ Admin</a>
+            <a href="/api/status" class="nav-link">📡 API Status</a>
+            <a href="http://localhost:5000" class="nav-link" target="_blank">📊 Analytics</a>
+        </div>
+    </nav>
+
+    <div class="main-grid">
+        <!-- POS & Core Module -->
+        <div class="module-card">
+            <div class="module-icon">🛒</div>
+            <h3 class="module-title">POS & Core System</h3>
+            <p class="module-desc">Upravljanje prodaje, rezervacij, zalog in osnovnih poslovnih procesov.</p>
+            <div class="module-stats">
+                <div class="stat">
+                    <div class="stat-value" id="todayTransactions">-</div>
+                    <div class="stat-label">Današnje transakcije</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="todayRevenue">-</div>
+                    <div class="stat-label">Današnji prihodek</div>
+                </div>
+            </div>
+            <div class="module-actions">
+                <button class="btn btn-primary" onclick="openPOSInterface()">Odpri POS</button>
+                <button class="btn btn-secondary" onclick="viewInventory()">Zaloge</button>
+            </div>
+        </div>
+
+        <!-- AI Engine Module -->
+        <div class="module-card">
+            <div class="module-icon">🤖</div>
+            <h3 class="module-title">AI Hospitality Engine</h3>
+            <p class="module-desc">Inteligentni predlogi za menu, cene, promocije in analiza zadovoljstva strank.</p>
+            <div class="module-stats">
+                <div class="stat">
+                    <div class="stat-value" id="aiInsights">-</div>
+                    <div class="stat-label">AI Insights</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="satisfactionScore">-</div>
+                    <div class="stat-label">Zadovoljstvo (%)</div>
+                </div>
+            </div>
+            <div class="module-actions">
+                <button class="btn btn-primary" onclick="getMenuSuggestions()">Menu predlogi</button>
+                <button class="btn btn-secondary" onclick="viewAIInsights()">AI Analitika</button>
+            </div>
+        </div>
+
+        <!-- Automation Module -->
+        <div class="module-card">
+            <div class="module-icon">⚡</div>
+            <h3 class="module-title">Automation Manager</h3>
+            <p class="module-desc">Avtomatizacija naročanja zalog, kadrovskih procesov in pošiljanja notifikacij.</p>
+            <div class="module-stats">
+                <div class="stat">
+                    <div class="stat-value" id="activeRules">-</div>
+                    <div class="stat-label">Aktivna pravila</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="pendingNotifications">-</div>
+                    <div class="stat-label">Čakajoče notifikacije</div>
+                </div>
+            </div>
+            <div class="module-actions">
+                <button class="btn btn-primary" onclick="manageAutomation()">Upravljaj pravila</button>
+                <button class="btn btn-secondary" onclick="viewNotifications()">Notifikacije</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Module -->
+        <div class="module-card">
+            <div class="module-icon">📊</div>
+            <h3 class="module-title">Premium Dashboard</h3>
+            <p class="module-desc">Real-time vizualizacija poslovanja, KPI indikatorji in napredne analitike.</p>
+            <div class="module-stats">
+                <div class="stat">
+                    <div class="stat-value" id="dashboardViews">-</div>
+                    <div class="stat-label">Dnevni pogledi</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="kpiScore">-</div>
+                    <div class="stat-label">KPI Score</div>
+                </div>
+            </div>
+            <div class="module-actions">
+                <button class="btn btn-primary" onclick="openDashboard()">Odpri Dashboard</button>
+                <button class="btn btn-secondary" onclick="exportReports()">Izvozi poročila</button>
+            </div>
+        </div>
+
+        <!-- Market Analysis Module -->
+        <div class="module-card">
+            <div class="module-icon">💰</div>
+            <h3 class="module-title">Market Analysis</h3>
+            <p class="module-desc">ROI kalkulacije, cenovna strategija, konkurenčna analiza in tržne projekcije.</p>
+            <div class="module-stats">
+                <div class="stat">
+                    <div class="stat-value" id="monthlyROI">-</div>
+                    <div class="stat-label">Mesečni ROI (%)</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="savings">-</div>
+                    <div class="stat-label">Prihranki (€)</div>
+                </div>
+            </div>
+            <div class="module-actions">
+                <button class="btn btn-primary" onclick="calculateROI()">ROI Kalkulator</button>
+                <button class="btn btn-secondary" onclick="viewMarketAnalysis()">Tržna analiza</button>
+            </div>
+        </div>
+
+        <!-- System Status Module -->
+        <div class="module-card">
+            <div class="module-icon">⚙️</div>
+            <h3 class="module-title">System Status</h3>
+            <p class="module-desc">Monitoring sistema, backup, sinhronizacija in sistemske nastavitve.</p>
+            <div class="module-stats">
+                <div class="stat">
+                    <div class="stat-value" id="systemUptime">-</div>
+                    <div class="stat-label">Uptime</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="lastBackup">-</div>
+                    <div class="stat-label">Zadnji backup</div>
+                </div>
+            </div>
+            <div class="module-actions">
+                <button class="btn btn-primary" onclick="viewSystemStatus()">Status sistema</button>
+                <button class="btn btn-secondary" onclick="createBackup()">Ustvari backup</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Tourism Master System v1.0 | Powered by Omni AI Platform</p>
+    </div>
+
+    <script>
+        // Load system data
+        async function loadSystemData() {
+            try {
+                // Load KPI data
+                const kpiResponse = await fetch('/api/dashboard/kpi');
+                const kpiData = await kpiResponse.json();
+                
+                document.getElementById('todayTransactions').textContent = kpiData.transactions?.value || '0';
+                document.getElementById('todayRevenue').textContent = '€' + (kpiData.revenue?.value || 0).toFixed(2);
+                document.getElementById('satisfactionScore').textContent = (kpiData.satisfaction?.value || 0).toFixed(1);
+                
+                // Load system status
+                const statusResponse = await fetch('/api/status');
+                const statusData = await statusResponse.json();
+                
+                const uptime = Math.floor(statusData.system_info.uptime_seconds / 3600);
+                document.getElementById('systemUptime').textContent = uptime + 'h';
+                
+                // Load automation data
+                const automationResponse = await fetch('/api/automation/rules');
+                const automationData = await automationResponse.json();
+                
+                document.getElementById('activeRules').textContent = automationData.length || '0';
+                
+            } catch (error) {
+                console.error('Error loading system data:', error);
+            }
+        }
+
+        // Module functions
+        function openPOSInterface() {
+            alert('POS Interface - V razvoju');
+        }
+
+        function viewInventory() {
+            window.open('/api/inventory', '_blank');
+        }
+
+        function getMenuSuggestions() {
+            window.open('/api/ai/menu-suggestions', '_blank');
+        }
+
+        function viewAIInsights() {
+            window.open('/api/ai/customer-insights', '_blank');
+        }
+
+        function manageAutomation() {
+            window.open('/api/automation/rules', '_blank');
+        }
+
+        function viewNotifications() {
+            window.open('/api/automation/notifications', '_blank');
+        }
+
+        function openDashboard() {
+            window.open('http://localhost:5000', '_blank');
+        }
+
+        function exportReports() {
+            alert('Export Reports - V razvoju');
+        }
+
+        function calculateROI() {
+            window.open('/api/market/pricing-plans', '_blank');
+        }
+
+        function viewMarketAnalysis() {
+            window.open('/api/market/business-case/restaurant', '_blank');
+        }
+
+        function viewSystemStatus() {
+            window.open('/api/status', '_blank');
+        }
+
+        async function createBackup() {
+            try {
+                const response = await fetch('/api/admin/backup', { method: 'POST' });
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Backup uspešno ustvarjen: ' + result.backup_path);
+                } else {
+                    alert('Napaka pri ustvarjanju backup-a: ' + result.error);
+                }
+            } catch (error) {
+                alert('Napaka: ' + error.message);
+            }
+        }
+
+        // Auto refresh every 30 seconds
+        setInterval(loadSystemData, 30000);
+
+        // Initial load
+        loadSystemData();
+    </script>
+</body>
+</html>

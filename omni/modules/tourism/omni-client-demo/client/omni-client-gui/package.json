@@ -1,0 +1,44 @@
+{
+  "name": "omni-client-gui",
+  "version": "1.0.0",
+  "description": "Omni Client Panel - Grafični GUI za upravljanje modulov z licenčno integracijo",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "test-demo": "set CLIENT_ID=DEMO001&& electron .",
+    "test-basic": "set CLIENT_ID=DEMO002&& electron .",
+    "test-premium": "set CLIENT_ID=DEMO003&& electron .",
+    "test-expired": "set CLIENT_ID=EXPIRED001&& electron .",
+    "test-invalid": "set CLIENT_ID=INVALID001&& electron ."
+  },
+  "keywords": [
+    "electron",
+    "gui",
+    "license",
+    "client-panel",
+    "omni"
+  ],
+  "author": "Omni AI Platform",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "electron": "^27.0.0",
+    "socket.io-client": "^4.8.1"
+  },
+  "devDependencies": {
+    "electron-builder": "^24.6.4"
+  },
+  "build": {
+    "appId": "com.omni.client-gui",
+    "productName": "Omni Client Panel",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!node_modules",
+      "!dist"
+    ]
+  }
+}

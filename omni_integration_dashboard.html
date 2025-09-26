@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 Omni Integration Dashboard - Integracijsko Jedro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2em;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto auto;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .panel h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .meta-agent-panel {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+        }
+
+        .system-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .status-card.warning {
+            border-left-color: #FF9800;
+        }
+
+        .status-card.error {
+            border-left-color: #F44336;
+        }
+
+        .status-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .status-label {
+            color: #718096;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .module-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .module-card:hover::before {
+            left: 100%;
+        }
+
+        .module-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .module-status {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .module-capabilities {
+            margin-top: 10px;
+            font-size: 0.8em;
+            opacity: 0.8;
+        }
+
+        .data-flow-container {
+            position: relative;
+            height: 400px;
+            background: #f7fafc;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .flow-node {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8em;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .flow-node:hover {
+            transform: scale(1.1);
+        }
+
+        .flow-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, #4CAF50, #2196F3);
+            transform-origin: left center;
+            opacity: 0.7;
+            animation: flowPulse 2s infinite;
+        }
+
+        @keyframes flowPulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .control-panel {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
+        }
+
+        .task-log {
+            max-height: 300px;
+            overflow-y: auto;
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .task-entry {
+            background: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border-left: 4px solid #4CAF50;
+            font-size: 0.9em;
+        }
+
+        .task-entry.processing {
+            border-left-color: #FF9800;
+        }
+
+        .task-entry.failed {
+            border-left-color: #F44336;
+        }
+
+        .timestamp {
+            color: #718096;
+            font-size: 0.8em;
+        }
+
+        .plugin-slot {
+            border: 2px dashed #cbd5e0;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            color: #718096;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .plugin-slot:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .module-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧠 Omni Integration Dashboard</h1>
+        <p>Centralno upravljanje integracijskega sloja z meta-agentom</p>
+    </div>
+
+    <div class="main-container">
+        <!-- Meta-Agent Panel -->
+        <div class="panel meta-agent-panel">
+            <h2>🤖 Meta-Agent Control Center</h2>
+            
+            <div class="control-panel">
+                <div class="input-group">
+                    <label for="userInput">Uporabniška naloga:</label>
+                    <input type="text" id="userInput" placeholder="Vnesite nalogo (npr. 'Analiziraj PDF dokument o prodaji')">
+                </div>
+                
+                <button class="btn" onclick="processTask()">🚀 Procesiranje naloge</button>
+                <button class="btn secondary" onclick="clearTasks()">🧹 Počisti zgodovino</button>
+                <button class="btn secondary" onclick="analyzeIntent()">🔍 Analiza namere</button>
+            </div>
+
+            <div class="task-log" id="taskLog">
+                <div class="task-entry">
+                    <strong>Sistem pripravljen</strong><br>
+                    Meta-agent je inicializiran in pripravljen za procesiranje nalog.
+                    <div class="timestamp">Danes ob 12:00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="panel">
+            <h2>📊 Status sistema</h2>
+            <div class="system-status">
+                <div class="status-card">
+                    <div class="status-value" id="totalModules">13</div>
+                    <div class="status-label">Skupaj modulov</div>
+                </div>
+                <div class="status-card">
+                    <div class="status-value" id="activeModules">11</div>
+                    <div class="status-label">Aktivnih modulov</div>
+                </div>
+                <div class="status-card">
+                    <div class="status-value" id="activeTasks">0</div>
+                    <div class="status-label">Aktivnih nalog</div>
+                </div>
+                <div class="status-card">
+                    <div class="status-value" id="systemHealth">✅</div>
+                    <div class="status-label">Zdravje sistema</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Module Registry -->
+        <div class="panel">
+            <h2>📋 Register modulov</h2>
+            <div class="module-grid" id="moduleGrid">
+                <!-- Moduli se bodo dinamično naložili -->
+            </div>
+        </div>
+
+        <!-- Data Flow Visualization -->
+        <div class="panel">
+            <h2>🔄 Pretok podatkov</h2>
+            <div class="data-flow-container" id="dataFlowContainer">
+                <!-- Vizualizacija pretoka podatkov -->
+            </div>
+        </div>
+
+        <!-- Plugin Framework -->
+        <div class="panel">
+            <h2>🔌 Plug-in sistem</h2>
+            <div class="plugin-slot" onclick="addPlugin()">
+                <h3>➕ Dodaj nov modul</h3>
+                <p>Kliknite za dodajanje novega plug-in modula</p>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <h4>Dostopni plug-ini:</h4>
+                <div id="availablePlugins">
+                    <div class="plugin-slot" style="margin-top: 10px;">
+                        <strong>🎤 Glasovni vmesnik</strong><br>
+                        <small>Dodaj podporo za glasovne ukaze</small>
+                    </div>
+                    <div class="plugin-slot" style="margin-top: 10px;">
+                        <strong>💼 CRM integracija</strong><br>
+                        <small>Povezava s CRM sistemi</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulacija podatkov o modulih
+        const modules = [
+            { id: 'global', name: 'Global Core', type: 'core', status: 'active', capabilities: ['system_coordination'] },
+            { id: 'analytics', name: 'Analytics Engine', type: 'analytics', status: 'active', capabilities: ['data_analysis', 'reporting'] },
+            { id: 'document', name: 'Document Processor', type: 'document', status: 'active', capabilities: ['pdf_processing', 'text_extraction'] },
+            { id: 'calendar', name: 'Calendar Manager', type: 'calendar', status: 'active', capabilities: ['scheduling', 'reminders'] },
+            { id: 'task_manager', name: 'Task Manager', type: 'task', status: 'active', capabilities: ['task_creation', 'workflow'] },
+            { id: 'search', name: 'Search Engine', type: 'search', status: 'active', capabilities: ['information_retrieval'] },
+            { id: 'finance', name: 'Finance Module', type: 'finance', status: 'active', capabilities: ['budget_analysis', 'reporting'] },
+            { id: 'tourism', name: 'Tourism Module', type: 'tourism', status: 'active', capabilities: ['itinerary_planning'] },
+            { id: 'healthcare', name: 'Healthcare Module', type: 'healthcare', status: 'active', capabilities: ['health_monitoring'] },
+            { id: 'agriculture', name: 'Agriculture Module', type: 'agriculture', status: 'active', capabilities: ['crop_management'] },
+            { id: 'energy', name: 'Energy Module', type: 'energy', status: 'active', capabilities: ['energy_optimization'] },
+            { id: 'logistics', name: 'Logistics Module', type: 'logistics', status: 'inactive', capabilities: ['route_optimization'] },
+            { id: 'security', name: 'Security Module', type: 'security', status: 'inactive', capabilities: ['threat_detection'] }
+        ];
+
+        let taskCounter = 0;
+
+        // Inicializacija dashboarda
+        function initDashboard() {
+            renderModules();
+            renderDataFlow();
+            updateSystemStatus();
+            
+            // Simulacija real-time posodobitev
+            setInterval(updateSystemStatus, 5000);
+        }
+
+        // Prikaz modulov
+        function renderModules() {
+            const moduleGrid = document.getElementById('moduleGrid');
+            moduleGrid.innerHTML = '';
+
+            modules.forEach(module => {
+                const moduleCard = document.createElement('div');
+                moduleCard.className = 'module-card';
+                moduleCard.onclick = () => showModuleDetails(module);
+                
+                const statusColor = module.status === 'active' ? '#4CAF50' : '#FF9800';
+                moduleCard.style.background = `linear-gradient(135deg, ${statusColor} 0%, #764ba2 100%)`;
+                
+                moduleCard.innerHTML = `
+                    <div class="module-name">${module.name}</div>
+                    <div class="module-status">Status: ${module.status}</div>
+                    <div class="module-capabilities">
+                        Zmožnosti: ${module.capabilities.join(', ')}
+                    </div>
+                `;
+                
+                moduleGrid.appendChild(moduleCard);
+            });
+        }
+
+        // Vizualizacija pretoka podatkov
+        function renderDataFlow() {
+            const container = document.getElementById('dataFlowContainer');
+            container.innerHTML = '';
+
+            // Pozicioniranje vozlišč v krogu
+            const centerX = 200;
+            const centerY = 200;
+            const radius = 150;
+            const coreModules = modules.slice(0, 8);
+
+            coreModules.forEach((module, index) => {
+                const angle = (index * 2 * Math.PI) / coreModules.length;
+                const x = centerX + radius * Math.cos(angle) - 40;
+                const y = centerY + radius * Math.sin(angle) - 40;
+
+                const node = document.createElement('div');
+                node.className = 'flow-node';
+                node.style.left = x + 'px';
+                node.style.top = y + 'px';
+                node.style.background = module.status === 'active' ? 
+                    'linear-gradient(135deg, #4CAF50, #45a049)' : 
+                    'linear-gradient(135deg, #FF9800, #f57c00)';
+                node.textContent = module.name.split(' ')[0];
+                node.onclick = () => triggerDataFlow(module.id);
+
+                container.appendChild(node);
+
+                // Povezave do centralnega vozlišča
+                if (index > 0) {
+                    const line = document.createElement('div');
+                    line.className = 'flow-line';
+                    const lineLength = Math.sqrt(Math.pow(x - (centerX - 40), 2) + Math.pow(y - (centerY - 40), 2));
+                    const lineAngle = Math.atan2(y - (centerY - 40), x - (centerX - 40)) * 180 / Math.PI;
+                    
+                    line.style.width = lineLength + 'px';
+                    line.style.left = (centerX - 40) + 'px';
+                    line.style.top = (centerY - 39) + 'px';
+                    line.style.transform = `rotate(${lineAngle}deg)`;
+                    
+                    container.appendChild(line);
+                }
+            });
+
+            // Centralno vozlišče (Global Core)
+            const centralNode = document.createElement('div');
+            centralNode.className = 'flow-node';
+            centralNode.style.left = (centerX - 40) + 'px';
+            centralNode.style.top = (centerY - 40) + 'px';
+            centralNode.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+            centralNode.style.width = '80px';
+            centralNode.style.height = '80px';
+            centralNode.textContent = 'CORE';
+            centralNode.onclick = () => showSystemOverview();
+
+            container.appendChild(centralNode);
+        }
+
+        // Posodobitev statusa sistema
+        function updateSystemStatus() {
+            const activeCount = modules.filter(m => m.status === 'active').length;
+            
+            document.getElementById('totalModules').textContent = modules.length;
+            document.getElementById('activeModules').textContent = activeCount;
+            document.getElementById('activeTasks').textContent = taskCounter;
+            document.getElementById('systemHealth').textContent = activeCount > 8 ? '✅' : '⚠️';
+        }
+
+        // Procesiranje naloge z meta-agentom
+        async function processTask() {
+            const userInput = document.getElementById('userInput').value.trim();
+            if (!userInput) {
+                alert('Prosimo, vnesite nalogo!');
+                return;
+            }
+
+            taskCounter++;
+            updateSystemStatus();
+
+            // Analiza namere
+            const intent = analyzeUserIntent(userInput);
+            
+            // Dodaj v log
+            addTaskToLog(`🔍 Analiza: "${userInput}"`, 'processing');
+            addTaskToLog(`🎯 Zaznana namera: ${intent.detected_intent} (zaupanje: ${intent.confidence})`, 'processing');
+            addTaskToLog(`📋 Potrebni moduli: ${intent.required_modules.join(', ')}`, 'processing');
+
+            // Simulacija procesiranja
+            setTimeout(() => {
+                addTaskToLog(`✅ Naloga uspešno procesirana z ${intent.required_modules.length} moduli`, 'completed');
+                
+                // Animacija pretoka podatkov
+                animateDataFlow(intent.required_modules);
+                
+                taskCounter--;
+                updateSystemStatus();
+            }, 2000);
+
+            // Počisti vhodno polje
+            document.getElementById('userInput').value = '';
+        }
+
+        // Analiza uporabniške namere
+        function analyzeUserIntent(input) {
+            const inputLower = input.toLowerCase();
+            
+            if (inputLower.includes('pdf') || inputLower.includes('dokument') || inputLower.includes('analiza')) {
+                return {
+                    detected_intent: 'document_analysis',
+                    confidence: 0.8,
+                    required_modules: ['document', 'analytics']
+                };
+            } else if (inputLower.includes('sestanek') || inputLower.includes('plan') || inputLower.includes('koledar')) {
+                return {
+                    detected_intent: 'meeting_planning',
+                    confidence: 0.85,
+                    required_modules: ['calendar', 'task_manager']
+                };
+            } else if (inputLower.includes('finance') || inputLower.includes('denar') || inputLower.includes('proračun')) {
+                return {
+                    detected_intent: 'financial_analysis',
+                    confidence: 0.9,
+                    required_modules: ['finance', 'analytics']
+                };
+            } else if (inputLower.includes('išči') || inputLower.includes('najdi') || inputLower.includes('search')) {
+                return {
+                    detected_intent: 'information_search',
+                    confidence: 0.75,
+                    required_modules: ['search', 'analytics']
+                };
+            } else {
+                return {
+                    detected_intent: 'general_query',
+                    confidence: 0.5,
+                    required_modules: ['global', 'analytics']
+                };
+            }
+        }
+
+        // Dodaj nalogo v log
+        function addTaskToLog(message, status = 'completed') {
+            const taskLog = document.getElementById('taskLog');
+            const entry = document.createElement('div');
+            entry.className = `task-entry ${status}`;
+            
+            const now = new Date();
+            const timestamp = now.toLocaleTimeString('sl-SI');
+            
+            entry.innerHTML = `
+                <strong>${message}</strong><br>
+                <div class="timestamp">${timestamp}</div>
+            `;
+            
+            taskLog.insertBefore(entry, taskLog.firstChild);
+            
+            // Omejitev na 10 vnosov
+            while (taskLog.children.length > 10) {
+                taskLog.removeChild(taskLog.lastChild);
+            }
+        }
+
+        // Animacija pretoka podatkov
+        function animateDataFlow(moduleIds) {
+            const container = document.getElementById('dataFlowContainer');
+            const nodes = container.querySelectorAll('.flow-node');
+            
+            moduleIds.forEach((moduleId, index) => {
+                setTimeout(() => {
+                    nodes.forEach(node => {
+                        if (node.textContent.toLowerCase().includes(moduleId.substring(0, 4))) {
+                            node.style.transform = 'scale(1.2)';
+                            node.style.boxShadow = '0 0 20px rgba(102, 126, 234, 0.8)';
+                            
+                            setTimeout(() => {
+                                node.style.transform = 'scale(1)';
+                                node.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.2)';
+                            }, 500);
+                        }
+                    });
+                }, index * 300);
+            });
+        }
+
+        // Prikaz podrobnosti modula
+        function showModuleDetails(module) {
+            alert(`Modul: ${module.name}\nTip: ${module.type}\nStatus: ${module.status}\nZmožnosti: ${module.capabilities.join(', ')}`);
+        }
+
+        // Sprožitev pretoka podatkov
+        function triggerDataFlow(moduleId) {
+            addTaskToLog(`🔄 Sprožen pretok podatkov za modul: ${moduleId}`, 'processing');
+            animateDataFlow([moduleId]);
+        }
+
+        // Prikaz pregleda sistema
+        function showSystemOverview() {
+            const activeModules = modules.filter(m => m.status === 'active').length;
+            alert(`Sistemski pregled:\n\nSkupaj modulov: ${modules.length}\nAktivnih: ${activeModules}\nNeaktivnih: ${modules.length - activeModules}\n\nSistem deluje normalno! ✅`);
+        }
+
+        // Počisti zgodovino nalog
+        function clearTasks() {
+            const taskLog = document.getElementById('taskLog');
+            taskLog.innerHTML = `
+                <div class="task-entry">
+                    <strong>Zgodovina počiščena</strong><br>
+                    Vsi prejšnji vnosi so bili odstranjeni.
+                    <div class="timestamp">${new Date().toLocaleTimeString('sl-SI')}</div>
+                </div>
+            `;
+        }
+
+        // Analiza namere brez procesiranja
+        function analyzeIntent() {
+            const userInput = document.getElementById('userInput').value.trim();
+            if (!userInput) {
+                alert('Prosimo, vnesite nalogo za analizo!');
+                return;
+            }
+
+            const intent = analyzeUserIntent(userInput);
+            addTaskToLog(`🔍 Analiza namere: ${intent.detected_intent}`, 'completed');
+            addTaskToLog(`📊 Zaupanje: ${(intent.confidence * 100).toFixed(1)}%`, 'completed');
+            addTaskToLog(`🎯 Predlagani moduli: ${intent.required_modules.join(', ')}`, 'completed');
+        }
+
+        // Dodaj plugin
+        function addPlugin() {
+            const pluginName = prompt('Vnesite ime novega plug-in modula:');
+            if (pluginName) {
+                addTaskToLog(`🔌 Dodan nov plug-in: ${pluginName}`, 'completed');
+                alert(`Plug-in "${pluginName}" je bil uspešno dodan v sistem!`);
+            }
+        }
+
+        // Inicializacija ob nalaganju strani
+        document.addEventListener('DOMContentLoaded', initDashboard);
+
+        // Tipkovne bližnjice
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.id === 'userInput') {
+                processTask();
+            } else if (e.key === 'Escape') {
+                clearTasks();
+            }
+        });
+    </script>
+</body>
+</html>

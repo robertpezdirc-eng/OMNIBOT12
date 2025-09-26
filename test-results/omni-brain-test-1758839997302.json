@@ -1,0 +1,145 @@
+{
+  "summary": {
+    "totalTests": 18,
+    "successfulTests": 3,
+    "failedTests": 15,
+    "successRate": 16.7,
+    "totalDuration": 30811,
+    "avgTestDuration": 1692.0555555555557
+  },
+  "tests": [
+    {
+      "name": "Inicializacija Omni Brain sistema",
+      "success": false,
+      "error": "Initialization timeout",
+      "duration": 30277,
+      "timestamp": 1758839996843
+    },
+    {
+      "name": "Preverjanje komponent",
+      "success": false,
+      "error": "Komponenta multiAgent ni pravilno inicializirana",
+      "duration": 1,
+      "timestamp": 1758839996845
+    },
+    {
+      "name": "Health check",
+      "success": false,
+      "error": "Test vrnil false",
+      "duration": 0,
+      "timestamp": 1758839996848
+    },
+    {
+      "name": "Povezava z OMNI sistemom",
+      "success": false,
+      "error": "Cannot read properties of undefined (reading 'success')",
+      "duration": 23,
+      "timestamp": 1758839996931
+    },
+    {
+      "name": "WebSocket komunikacija",
+      "success": true,
+      "error": null,
+      "duration": 14,
+      "timestamp": 1758839996946
+    },
+    {
+      "name": "API monitoring",
+      "success": false,
+      "error": "wsComponent.trackApiCall is not a function",
+      "duration": 1,
+      "timestamp": 1758839996948
+    },
+    {
+      "name": "Premium točke automation",
+      "success": false,
+      "error": "automationComponent.processUserActivity is not a function",
+      "duration": 14,
+      "timestamp": 1758839996989
+    },
+    {
+      "name": "Behavior analytics",
+      "success": false,
+      "error": "analyticsComponent.analyzeUserBehavior is not a function",
+      "duration": 4,
+      "timestamp": 1758839997011
+    },
+    {
+      "name": "Upsell predlogi",
+      "success": false,
+      "error": "upsellComponent.generatePersonalizedOffer is not a function",
+      "duration": 35,
+      "timestamp": 1758839997070
+    },
+    {
+      "name": "Multi-agent koordinacija",
+      "success": false,
+      "error": "Cannot read properties of undefined (reading 'coordinateAgents')",
+      "duration": 20,
+      "timestamp": 1758839997104
+    },
+    {
+      "name": "Memory usage",
+      "success": true,
+      "error": null,
+      "duration": 22,
+      "timestamp": 1758839997138
+    },
+    {
+      "name": "Response time",
+      "success": true,
+      "error": null,
+      "duration": 2,
+      "timestamp": 1758839997141
+    },
+    {
+      "name": "Throughput test",
+      "success": false,
+      "error": "this.omniBrain.processEvent is not a function",
+      "duration": 0,
+      "timestamp": 1758839997141
+    },
+    {
+      "name": "Concurrent users simulation",
+      "success": false,
+      "error": "Test vrnil false",
+      "duration": 3,
+      "timestamp": 1758839997147
+    },
+    {
+      "name": "High load test",
+      "success": false,
+      "error": "this.omniBrain.processEvent is not a function",
+      "duration": 13,
+      "timestamp": 1758839997172
+    },
+    {
+      "name": "Invalid data handling",
+      "success": false,
+      "error": "Test vrnil false",
+      "duration": 1,
+      "timestamp": 1758839997216
+    },
+    {
+      "name": "Component failure recovery",
+      "success": false,
+      "error": "Test vrnil false",
+      "duration": 7,
+      "timestamp": 1758839997231
+    },
+    {
+      "name": "Network failure simulation",
+      "success": false,
+      "error": "Test vrnil false",
+      "duration": 20,
+      "timestamp": 1758839997252
+    }
+  ],
+  "systemInfo": {
+    "version": "OMNI-BRAIN-TESTER-1.0",
+    "timestamp": "2025-09-25T22:39:57.301Z",
+    "environment": "test",
+    "nodeVersion": "v22.19.0",
+    "platform": "win32"
+  }
+}

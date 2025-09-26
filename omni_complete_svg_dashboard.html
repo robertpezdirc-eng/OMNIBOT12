@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni-APP Complete SVG Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+            animation: backgroundShift 10s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        /* SVG container */
+        #links {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* SVG lines styling */
+        .link {
+            stroke: rgba(255, 255, 255, 0.6);
+            stroke-width: 3;
+            stroke-dasharray: 10, 5;
+            animation: dashFlow 2s linear infinite;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+        }
+
+        @keyframes dashFlow {
+            to { stroke-dashoffset: -15; }
+        }
+
+        /* Dashboard container */
+        #dashboard {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        /* Node styling */
+        .node {
+            position: absolute;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 15px 20px;
+            min-width: 180px;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            font-weight: 600;
+            font-size: 14px;
+            color: #2c3e50;
+            user-select: none;
+            z-index: 100;
+        }
+
+        .node:active {
+            cursor: grabbing;
+            transform: scale(1.1) rotate(2deg);
+        }
+
+        .node:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.7);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Global node special styling */
+        #global {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            min-width: 220px;
+            padding: 20px;
+        }
+
+        /* Status indicators */
+        .status {
+            display: block;
+            margin-top: 8px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status.loading {
+            background: #ffa502;
+            color: white;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .status.active {
+            background: #2ed573;
+            color: white;
+        }
+
+        .status.inactive {
+            background: #ff4757;
+            color: white;
+        }
+
+        .status.processing {
+            background: #3742fa;
+            color: white;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(0.95); }
+        }
+
+        /* Info box */
+        #info-box {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            width: 300px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            font-size: 14px;
+            color: #2c3e50;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Controls panel */
+        #controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            width: 320px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            color: #2c3e50;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        #controls strong {
+            display: block;
+            margin: 15px 0 8px 0;
+            color: #1e3c72;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #controls strong:first-child {
+            margin-top: 0;
+        }
+
+        /* Form elements */
+        input, button {
+            width: 100%;
+            padding: 10px 12px;
+            margin: 4px 0;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            font-size: 13px;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3742fa;
+            box-shadow: 0 0 0 3px rgba(55, 66, 250, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #3742fa, #5352ed);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 8px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(55, 66, 250, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Statistics panel */
+        #stats {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Connection dots animation with status colors */
+        .connection-dot {
+            r: 4;
+            animation: dotTravel 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 3px currentColor);
+        }
+
+        .connection-dot.active {
+            fill: #2ed573;
+        }
+
+        .connection-dot.inactive {
+            fill: #ff4757;
+        }
+
+        .connection-dot.processing {
+            fill: #ffa502;
+        }
+
+        .connection-dot.loading {
+            fill: #3742fa;
+        }
+
+        @keyframes dotTravel {
+            0% { opacity: 0; r: 2; }
+            10% { opacity: 1; r: 4; }
+            90% { opacity: 1; r: 4; }
+            100% { opacity: 0; r: 2; }
+        }
+
+        /* Enhanced Auto-Layout Animations */
+        @keyframes nodeSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes nodeRepositioning {
+            from {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes layoutPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(74, 144, 226, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(74, 144, 226, 0);
+            }
+        }
+
+        .node.repositioning {
+            animation: nodeRepositioning 0.6s ease-in-out;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .node.layout-pulse {
+            animation: layoutPulse 1s ease-in-out;
+        }
+
+        .dashboard.layout-active {
+            position: relative;
+        }
+
+        .dashboard.layout-active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(74, 144, 226, 0.05), rgba(156, 39, 176, 0.05));
+            pointer-events: none;
+            z-index: -1;
+            animation: layoutBackground 2s ease-in-out;
+        }
+
+        @keyframes layoutBackground {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        /* Enhanced Alert Styles */
+        .alert-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            max-width: 400px;
+        }
+
+        .alert {
+            background: white;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 4px solid #007bff;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            border-left-color: #28a745;
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        }
+
+        .alert-error {
+            border-left-color: #dc3545;
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+        }
+
+        .alert-warning {
+            border-left-color: #ffc107;
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+        }
+
+        .alert-info {
+            border-left-color: #17a2b8;
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+        }
+
+        .alert-close {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #666;
+            margin-left: 10px;
+        }
+
+        .alert-close:hover {
+            color: #333;
+        }
+
+        /* Alert animations */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* Enhanced responsive design with optimized spacing */
+        @media (max-width: 1400px) {
+            .node {
+                min-width: 140px;
+                font-size: 13px;
+                padding: 10px 12px;
+            }
+            
+            #global {
+                min-width: 160px;
+                font-size: 15px;
+            }
+            
+            #controls, #info-box {
+                width: 300px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .node {
+                min-width: 120px;
+                font-size: 12px;
+                padding: 8px 10px;
+            }
+            
+            #global {
+                min-width: 140px;
+                font-size: 14px;
+            }
+            
+            #controls, #info-box {
+                width: 280px;
+                font-size: 12px;
+            }
+            
+            .control-group {
+                margin-bottom: 8px;
+            }
+            
+            .control-group input, .control-group button {
+                padding: 6px 8px;
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .node {
+                min-width: 100px;
+                font-size: 11px;
+                padding: 6px 8px;
+            }
+            
+            #global {
+                min-width: 120px;
+                font-size: 13px;
+            }
+            
+            #controls, #info-box {
+                width: 260px;
+                font-size: 11px;
+            }
+            
+            .connection-line {
+                stroke-width: 1.5;
+            }
+            
+            .connection-dot {
+                r: 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #controls, #info-box {
+                width: 280px;
+                font-size: 12px;
+            }
+            
+            .node {
+                min-width: 150px;
+                font-size: 12px;
+                padding: 12px 15px;
+            }
+            
+            #global {
+                min-width: 180px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .node {
+                min-width: 80px;
+                font-size: 10px;
+                padding: 4px 6px;
+            }
+            
+            #global {
+                min-width: 100px;
+                font-size: 12px;
+            }
+            
+            #controls {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                background: rgba(0, 0, 0, 0.95);
+                backdrop-filter: blur(10px);
+                border-radius: 15px 15px 0 0;
+                max-height: 45vh;
+                overflow-y: auto;
+                z-index: 1000;
+                padding: 15px;
+            }
+            
+            #info-box {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                width: auto;
+                min-width: 200px;
+                max-width: calc(100vw - 40px);
+                font-size: 10px;
+                z-index: 999;
+            }
+            
+            .connection-line {
+                stroke-width: 1;
+            }
+            
+            .connection-dot {
+                r: 1.5;
+            }
+            
+            .control-group {
+                margin-bottom: 6px;
+            }
+            
+            .control-group input, .control-group button {
+                padding: 4px 6px;
+                font-size: 10px;
+            }
+        }
+
+        /* Enhanced layout animations for responsive design */
+        .layout-active .node {
+            animation: layoutPulse 1.5s ease-in-out;
+        }
+
+        .layout-active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(0, 255, 255, 0.1) 0%, transparent 70%);
+            animation: layoutBackground 2s ease-in-out;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Node selection styles */
+        .node.selected {
+            border: 3px solid #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            transform: scale(1.05);
+            z-index: 1000;
+        }
+
+        /* Info box enhanced styles */
+        .info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .info-header h3 {
+            margin: 0;
+            color: #ffd700;
+            font-size: 1.2em;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .status-badge.active {
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ed573;
+            border: 1px solid #2ed573;
+        }
+
+        .status-badge.inactive {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+            border: 1px solid #ff4757;
+        }
+
+        .status-badge.processing {
+            background: rgba(255, 165, 2, 0.2);
+            color: #ffa502;
+            border: 1px solid #ffa502;
+        }
+
+        .status-badge.loading {
+            background: rgba(55, 66, 250, 0.2);
+            color: #3742fa;
+            border: 1px solid #3742fa;
+        }
+
+        .info-content p {
+            margin: 8px 0;
+            line-height: 1.4;
+        }
+
+        .info-content strong {
+            color: #4a90e2;
+        }
+
+        /* Loading animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 5px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- SVG for connections -->
+    <svg id="links" width="100%" height="900"></svg>
+    
+    <!-- Dashboard container -->
+    <div id="dashboard">
+        <div class="node" id="global" style="top: 50px; left: 600px;">
+            🌐 Global Optimizer
+            <span class="status loading" id="status-global">
+                <span class="loading-spinner"></span>Loading...
+            </span>
+        </div>
+    </div>
+    
+    <!-- Info box -->
+    <div id="info-box">
+        <h3>📊 Module Information</h3>
+        <p>Klikni na modul za več informacij</p>
+        <div id="module-details" style="margin-top: 15px; display: none;">
+            <p><strong>Ime:</strong> <span id="detail-name">-</span></p>
+            <p><strong>Status:</strong> <span id="detail-status">-</span></p>
+            <p><strong>Pozicija:</strong> <span id="detail-position">-</span></p>
+            <p><strong>Povezav:</strong> <span id="detail-connections">-</span></p>
+        </div>
+    </div>
+    
+    <!-- Controls panel -->
+    <div id="controls">
+        <strong>🔧 Dodaj modul:</strong>
+        <input type="text" id="new-node-name" placeholder="Ime modula"/>
+        <input type="text" id="new-node-icon" placeholder="Emoji (npr. 🏥)"/>
+        <button id="add-node">➕ Dodaj modul</button>
+        
+        <strong>📁 Dodaj podmodul:</strong>
+        <input type="text" id="parent-node-name" placeholder="Glavni modul"/>
+        <input type="text" id="sub-node-name" placeholder="Ime podmodula"/>
+        <input type="text" id="sub-node-icon" placeholder="Emoji"/>
+        <button id="add-subnode">➕ Dodaj podmodul</button>
+        
+        <strong>🗑️ Odstrani modul/podmodul:</strong>
+        <input type="text" id="remove-node-name" placeholder="Ime modula"/>
+        <button id="remove-node">🗑️ Odstrani</button>
+        
+        <strong>🎛️ Upravljanje:</strong>
+        <button id="reset-layout">🔄 Reset Layout</button>
+        <button id="randomize-status">🎲 Random Status</button>
+    </div>
+
+    <!-- Statistics -->
+    <div id="stats">
+        <div>Moduli: <span id="node-count">1</span></div>
+        <div>Povezave: <span id="connection-count">0</span></div>
+        <div>Aktivni: <span id="active-count">0</span></div>
+        <div>FPS: <span id="fps">0</span></div>
+    </div>
+
+    <script>
+        // Global variables
+        const linksSVG = document.getElementById("links");
+        const dashboard = document.getElementById("dashboard");
+        const infoBox = document.getElementById("info-box");
+        
+        let nodes = [{id:"global", icon:"🌐", top:50, left:600, parent:null}];
+        let lines = [];
+        let nodeStatuses = {global:"loading"};
+        let selectedNode = null;
+        let draggedNode = null;
+        let dragOffset = {x: 0, y: 0};
+        let animationId = null;
+        let fps = 0;
+        let lastFrameTime = Date.now();
+
+        // Initialize dashboard
+        function initDashboard() {
+            setupEventListeners();
+            updateConnections();
+            startAnimationLoop();
+            startPeriodicUpdates();
+            
+            // Simulate loading completion
+            setTimeout(() => {
+                updateNodeStatus('global', 'active');
+            }, 2000);
+        }
+
+        // Periodic updates and system monitoring
+        let updateInterval;
+        let animationInterval;
+        let statusUpdateInterval;
+
+        function startPeriodicUpdates() {
+            // Update animations every 3 seconds
+            animationInterval = setInterval(() => {
+                updateConnectionAnimations();
+            }, 3000);
+
+            // Update status indicators every 5 seconds
+            statusUpdateInterval = setInterval(() => {
+                refreshAllModules();
+                updateSystemStats();
+            }, 5000);
+
+            // General system update every 10 seconds
+            updateInterval = setInterval(() => {
+                performSystemMaintenance();
+            }, 10000);
+        }
+
+        function updateConnectionAnimations() {
+            lines.forEach((line, index) => {
+                if (line.dot) {
+                    const targetStatus = nodeStatuses[line.target] || 'loading';
+                    const statusClass = targetStatus.includes('✅') ? 'active' : 
+                                      targetStatus.includes('⚠') ? 'processing' : 
+                                      targetStatus.includes('❌') ? 'inactive' : 'loading';
+                    
+                    line.dot.setAttribute('class', `connection-dot ${statusClass}`);
+                    line.dot.style.animationDelay = (index * 0.3) + 's';
+                }
+            });
+        }
+
+        function refreshAllModules() {
+            // Simulate status updates for demo
+            const statuses = ['✅ Online', '⚠ Warning', '❌ Offline', '⏳ Loading...'];
+            
+            nodes.forEach(node => {
+                if (Math.random() < 0.1) { // 10% chance to change status
+                    const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+                    nodeStatuses[node.id] = randomStatus;
+                    
+                    // Update visual status indicator
+                    const statusEl = document.getElementById(`status-${node.id}`);
+                    if (statusEl) {
+                        statusEl.textContent = randomStatus;
+                        statusEl.className = `status-indicator ${randomStatus.includes('✅') ? 'active' : 
+                                                               randomStatus.includes('⚠') ? 'processing' : 
+                                                               randomStatus.includes('❌') ? 'inactive' : 'loading'}`;
+                    }
+                }
+            });
+        }
+
+        function updateSystemStats() {
+            // Update live statistics
+            const activeNodes = Object.values(nodeStatuses).filter(s => s.includes('✅')).length;
+            const totalNodes = nodes.length;
+            const connectionCount = lines.length;
+            
+            document.getElementById('active-nodes').textContent = activeNodes;
+            document.getElementById('total-nodes').textContent = totalNodes;
+            document.getElementById('connection-count').textContent = connectionCount;
+            
+            // Update system health indicator
+            const healthPercentage = Math.round((activeNodes / totalNodes) * 100);
+            const healthIndicator = document.querySelector('.system-health');
+            if (healthIndicator) {
+                healthIndicator.textContent = `${healthPercentage}%`;
+                healthIndicator.className = `system-health ${healthPercentage > 80 ? 'healthy' : 
+                                                           healthPercentage > 50 ? 'warning' : 'critical'}`;
+            }
+        }
+
+        function performSystemMaintenance() {
+            // Clean up orphaned connections
+            lines = lines.filter(line => {
+                const targetExists = document.getElementById(line.target);
+                if (!targetExists && line.line.parentNode) {
+                    line.line.parentNode.removeChild(line.line);
+                    if (line.dot && line.dot.parentNode) {
+                        line.dot.parentNode.removeChild(line.dot);
+                    }
+                    return false;
+                }
+                return true;
+            });
+
+            // Update connection count after cleanup
+            document.getElementById('connection-count').textContent = lines.length;
+            
+            // Log system status
+            console.log(`System maintenance: ${nodes.length} nodes, ${lines.length} connections`);
+        }
+
+        function stopPeriodicUpdates() {
+            if (updateInterval) clearInterval(updateInterval);
+            if (animationInterval) clearInterval(animationInterval);
+            if (statusUpdateInterval) clearInterval(statusUpdateInterval);
+        }
+
+        // Create new node
+        function createNode(id, icon, top=200, left=100, parent=null) {
+            if (document.getElementById(id)) {
+                alert('Modul s tem imenom že obstaja!');
+                return;
+            }
+
+            const div = document.createElement("div");
+            div.className = "node";
+            div.id = id;
+            div.style.top = top + "px";
+            div.style.left = left + "px";
+            div.innerHTML = `${icon} ${id}<span class="status loading" id="status-${id}"><span class="loading-spinner"></span>Loading...</span>`;
+            
+            dashboard.appendChild(div);
+            nodes.push({id, icon, top, left, parent});
+            nodeStatuses[id] = "loading";
+            
+            attachNodeEvents(div);
+            makeDraggable(div);
+            updateConnections();
+            updateStats();
+            
+            // Simulate loading
+            setTimeout(() => {
+                const statuses = ['active', 'inactive', 'processing'];
+                const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+                updateNodeStatus(id, randomStatus);
+            }, 1000 + Math.random() * 2000);
+        }
+
+        // Remove node and its children
+        function removeNode(id) {
+            if (id === "global") {
+                alert("Global Optimizer ne more biti odstranjen!");
+                return;
+            }
+
+            // Find all children recursively
+            const toRemove = [id];
+            let found = true;
+            while (found) {
+                found = false;
+                nodes.forEach(n => {
+                    if (toRemove.includes(n.parent) && !toRemove.includes(n.id)) {
+                        toRemove.push(n.id);
+                        found = true;
+                    }
+                });
+            }
+
+            // Remove DOM elements and data
+            toRemove.forEach(nodeId => {
+                const div = document.getElementById(nodeId);
+                if (div) dashboard.removeChild(div);
+                delete nodeStatuses[nodeId];
+            });
+
+            nodes = nodes.filter(n => !toRemove.includes(n.id));
+            
+            if (selectedNode && toRemove.includes(selectedNode.id)) {
+                selectedNode = null;
+                updateInfoBox();
+            }
+            
+            updateConnections();
+            updateStats();
+        }
+
+        // Update connections with SVG lines and animated dots
+        function updateConnections() {
+            // Clear existing lines
+            linksSVG.innerHTML = '';
+            lines = [];
+
+            let connectionCount = 0;
+            
+            nodes.filter(n => n.id !== "global").forEach((n, index) => {
+                const parentId = n.parent || "global";
+                const source = document.getElementById(parentId);
+                const target = document.getElementById(n.id);
+                
+                if (!source || !target) return;
+
+                const x1 = source.offsetLeft + source.offsetWidth / 2;
+                const y1 = source.offsetTop + source.offsetHeight / 2;
+                const x2 = target.offsetLeft + target.offsetWidth / 2;
+                const y2 = target.offsetTop + target.offsetHeight / 2;
+
+                // Create curved path
+                const midX = (x1 + x2) / 2;
+                const midY = (y1 + y2) / 2 - 30;
+                
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute("d", `M ${x1} ${y1} Q ${midX} ${midY} ${x2} ${y2}`);
+                path.setAttribute("class", "link");
+                linksSVG.appendChild(path);
+
+                // Add animated dot with status-based color
+                const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                const targetStatus = nodeStatuses[n.id] || 'loading';
+                dot.setAttribute("class", `connection-dot ${targetStatus}`);
+                dot.setAttribute("r", "4");
+                dot.style.animationDelay = (index * 0.5) + 's';
+                
+                const animateMotion = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
+                animateMotion.setAttribute("dur", "3s");
+                animateMotion.setAttribute("repeatCount", "indefinite");
+                animateMotion.setAttribute("path", `M ${x1} ${y1} Q ${midX} ${midY} ${x2} ${y2}`);
+                
+                dot.appendChild(animateMotion);
+                linksSVG.appendChild(dot);
+
+                lines.push({line: path, target: n.id, dot: dot});
+                connectionCount++;
+            });
+
+            document.getElementById('connection-count').textContent = connectionCount;
+        }
+
+        // Enhanced click handler with detailed info display
+        function attachNodeClick(div) {
+            div.onclick = (e) => {
+                e.stopPropagation();
+                
+                // Remove previous selection
+                document.querySelectorAll('.node').forEach(n => n.classList.remove('selected'));
+                div.classList.add('selected');
+                
+                const id = div.id;
+                const status = nodeStatuses[id] || "⏳ Loading...";
+                const node = nodes.find(n => n.id === id);
+                const children = nodes.filter(n => n.parent === id);
+                
+                // Enhanced info display
+                let infoHTML = `
+                    <div class="info-header">
+                        <h3>${node?.icon || '📦'} ${id.toUpperCase()}</h3>
+                        <span class="status-badge ${status.includes('✅') ? 'active' : status.includes('⚠') ? 'processing' : status.includes('❌') ? 'inactive' : 'loading'}">${status}</span>
+                    </div>
+                    <div class="info-content">
+                        <p><strong>Tip:</strong> ${node?.parent ? 'Podmodul' : 'Glavni modul'}</p>
+                        ${node?.parent ? `<p><strong>Nadrejeni:</strong> ${node.parent}</p>` : ''}
+                        <p><strong>Pozicija:</strong> x: ${Math.round(div.offsetLeft)}, y: ${Math.round(div.offsetTop)}</p>
+                        ${children.length > 0 ? `<p><strong>Podmoduli:</strong> ${children.map(c => c.id).join(', ')}</p>` : ''}
+                        <p><strong>Opis:</strong> Funkcija modula ${id} - ${getModuleDescription(id)}</p>
+                        <p><strong>Zadnja posodobitev:</strong> ${new Date().toLocaleTimeString()}</p>
+                    </div>
+                `;
+                
+                infoBox.innerHTML = infoHTML;
+                
+                // Highlight connections
+                highlightConnections(id);
+            };
+        }
+
+        // Get module description based on ID
+        function getModuleDescription(id) {
+            const descriptions = {
+                'global': 'Centralni optimizator sistema',
+                'finance': 'Upravljanje finančnih operacij',
+                'marketing': 'Digitalne marketinške kampanje',
+                'operations': 'Operativno upravljanje procesov',
+                'analytics': 'Analiza podatkov in poročila',
+                'security': 'Varnostni protokoli sistema',
+                'ai': 'Umetna inteligenca in strojno učenje',
+                'communication': 'Komunikacijski kanali',
+                'storage': 'Upravljanje podatkovnih baz'
+            };
+            return descriptions[id] || 'Specializiran modul za specifične naloge';
+        }
+
+        // Highlight connections for selected node
+        function highlightConnections(nodeId) {
+            // Reset all connections
+            document.querySelectorAll('.link').forEach(link => {
+                link.style.stroke = '#4a90e2';
+                link.style.strokeWidth = '2';
+            });
+            
+            // Highlight connections for selected node
+            lines.forEach(line => {
+                if (line.target === nodeId || nodes.find(n => n.id === nodeId)?.parent === line.target) {
+                    line.line.style.stroke = '#ffd700';
+                    line.line.style.strokeWidth = '3';
+                }
+            });
+        }
+
+        // Attach click and hover events to node
+        function attachNodeEvents(nodeElement) {
+            attachNodeClick(nodeElement);
+
+            nodeElement.addEventListener('mouseenter', function() {
+                if (!draggedNode) {
+                    nodeElement.style.zIndex = '200';
+                }
+            });
+
+            nodeElement.addEventListener('mouseleave', function() {
+                if (!draggedNode) {
+                    nodeElement.style.zIndex = '100';
+                }
+            });
+        }
+
+        // Enhanced drag & drop functionality
+        function makeDraggable(nodeElement) {
+            let offsetX, offsetY;
+            let isDragging = false;
+            let startX, startY;
+            
+            nodeElement.onmousedown = (e) => {
+                e.preventDefault();
+                isDragging = false;
+                startX = e.clientX;
+                startY = e.clientY;
+                offsetX = e.clientX - nodeElement.offsetLeft;
+                offsetY = e.clientY - nodeElement.offsetTop;
+                
+                // Add dragging visual feedback
+                nodeElement.style.cursor = 'grabbing';
+                nodeElement.style.zIndex = '1001';
+                nodeElement.style.transform = 'scale(1.1)';
+                nodeElement.style.opacity = '0.8';
+                
+                function moveHandler(e) {
+                    if (!isDragging) {
+                        // Check if mouse moved enough to start dragging
+                        const deltaX = Math.abs(e.clientX - startX);
+                        const deltaY = Math.abs(e.clientY - startY);
+                        if (deltaX > 5 || deltaY > 5) {
+                            isDragging = true;
+                        }
+                    }
+                    
+                    if (isDragging) {
+                        const newLeft = e.clientX - offsetX;
+                        const newTop = e.clientY - offsetY;
+                        
+                        // Boundary constraints
+                        const dashboard = document.getElementById('dashboard');
+                        const maxLeft = dashboard.offsetWidth - nodeElement.offsetWidth;
+                        const maxTop = dashboard.offsetHeight - nodeElement.offsetHeight;
+                        
+                        nodeElement.style.left = Math.max(0, Math.min(newLeft, maxLeft)) + "px";
+                        nodeElement.style.top = Math.max(0, Math.min(newTop, maxTop)) + "px";
+                        
+                        // Update node data
+                        const nodeData = nodes.find(n => n.id === nodeElement.id);
+                        if (nodeData) {
+                            nodeData.left = parseInt(nodeElement.style.left);
+                            nodeData.top = parseInt(nodeElement.style.top);
+                        }
+                        
+                        // Update connections in real-time with throttling
+                        clearTimeout(nodeElement.updateTimeout);
+                        nodeElement.updateTimeout = setTimeout(updateConnections, 16); // ~60fps
+                    }
+                }
+                
+                function upHandler(e) {
+                    // Reset visual feedback
+                    nodeElement.style.cursor = 'grab';
+                    nodeElement.style.zIndex = '';
+                    nodeElement.style.transform = '';
+                    nodeElement.style.opacity = '';
+                    
+                    // If it was just a click (not drag), trigger click handler
+                    if (!isDragging) {
+                        nodeElement.click();
+                    }
+                    
+                    // Final connection update
+                    updateConnections();
+                    
+                    // Cleanup
+                    document.removeEventListener("mousemove", moveHandler);
+                    document.removeEventListener("mouseup", upHandler);
+                    isDragging = false;
+                }
+                
+                document.addEventListener("mousemove", moveHandler);
+                document.addEventListener("mouseup", upHandler);
+            };
+            
+            // Set initial cursor
+            nodeElement.style.cursor = 'grab';
+        }
+
+        // Legacy drag functions (kept for compatibility)
+        function startDrag(e) {
+            // This function is now handled by makeDraggable
+        }
+
+        function drag(e) {
+            // This function is now handled by makeDraggable
+        }
+
+        function stopDrag() {
+            // This function is now handled by makeDraggable
+        }
+
+        // Node selection
+        function selectNode(nodeId) {
+            // Remove previous selection
+            if (selectedNode) {
+                const prevElement = document.getElementById(selectedNode.id);
+                if (prevElement) prevElement.classList.remove('selected');
+            }
+
+            selectedNode = nodes.find(n => n.id === nodeId);
+            if (selectedNode) {
+                const nodeElement = document.getElementById(nodeId);
+                nodeElement.classList.add('selected');
+                updateInfoBox();
+            }
+        }
+
+        // Update info box
+        function updateInfoBox() {
+            const detailsDiv = document.getElementById('module-details');
+            
+            if (!selectedNode) {
+                detailsDiv.style.display = 'none';
+                return;
+            }
+
+            detailsDiv.style.display = 'block';
+            document.getElementById('detail-name').textContent = selectedNode.id;
+            document.getElementById('detail-status').textContent = nodeStatuses[selectedNode.id] || 'unknown';
+            document.getElementById('detail-position').textContent = `(${selectedNode.left}, ${selectedNode.top})`;
+            
+            const connections = lines.filter(l => l.target === selectedNode.id).length + 
+                              nodes.filter(n => n.parent === selectedNode.id).length;
+            document.getElementById('detail-connections').textContent = connections;
+        }
+
+        // Update node status
+        function updateNodeStatus(nodeId, status) {
+            nodeStatuses[nodeId] = status;
+            const statusElement = document.getElementById(`status-${nodeId}`);
+            if (statusElement) {
+                statusElement.className = `status ${status}`;
+                
+                let statusText = status;
+                let icon = '';
+                
+                switch(status) {
+                    case 'active':
+                        statusText = 'Active';
+                        icon = '✅';
+                        break;
+                    case 'inactive':
+                        statusText = 'Inactive';
+                        icon = '❌';
+                        break;
+                    case 'processing':
+                        statusText = 'Processing';
+                        icon = '⚡';
+                        break;
+                    case 'loading':
+                        statusText = 'Loading...';
+                        icon = '<span class="loading-spinner"></span>';
+                        break;
+                }
+                
+                statusElement.innerHTML = icon + statusText;
+            }
+            updateStats();
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.getElementById('node-count').textContent = nodes.length;
+            const activeCount = Object.values(nodeStatuses).filter(s => s === 'active').length;
+            document.getElementById('active-count').textContent = activeCount;
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Enhanced add module button with auto-layout
+            document.getElementById('add-node').addEventListener('click', function() {
+                const name = document.getElementById('new-node-name').value.trim();
+                const icon = document.getElementById('new-node-icon').value.trim() || '📦';
+                
+                if (!name) {
+                    showAlert('⚠️ Prosim vnesite ime modula!', 'warning');
+                    return;
+                }
+                
+                if (nodes.find(n => n.id === name)) {
+                    showAlert(`❌ Modul "${name}" že obstaja!`, 'error');
+                    return;
+                }
+                
+                // Create node at temporary position
+                createNode(name, icon, 200, 100);
+                
+                // Clear inputs
+                document.getElementById('new-node-name').value = '';
+                document.getElementById('new-node-icon').value = '';
+                
+                // Trigger auto-layout with animation
+                setTimeout(() => {
+                    triggerAutoLayout();
+                    showAlert(`✅ Modul "${name}" uspešno dodan!`, 'success');
+                }, 100);
+            });
+
+            // Enhanced add submodule button with auto-layout
+            document.getElementById('add-subnode').addEventListener('click', function() {
+                const parentName = document.getElementById('parent-node-name').value.trim();
+                const subName = document.getElementById('sub-node-name').value.trim();
+                const subIcon = document.getElementById('sub-node-icon').value.trim() || '📋';
+                
+                if (!parentName || !subName) {
+                    showAlert('⚠️ Prosim vnesite ime glavnega modula in podmodula!', 'warning');
+                    return;
+                }
+                
+                const parentNode = nodes.find(n => n.id === parentName);
+                if (!parentNode) {
+                    showAlert(`❌ Glavni modul "${parentName}" ne obstaja!`, 'error');
+                    return;
+                }
+                
+                if (nodes.find(n => n.id === subName)) {
+                    showAlert(`❌ Podmodul "${subName}" že obstaja!`, 'error');
+                    return;
+                }
+                
+                // Create subnode at temporary position
+                createNode(subName, subIcon, 300, 200, parentName);
+                
+                // Clear inputs
+                document.getElementById('parent-node-name').value = '';
+                document.getElementById('sub-node-name').value = '';
+                document.getElementById('sub-node-icon').value = '';
+                
+                // Trigger auto-layout with animation
+                setTimeout(() => {
+                    triggerAutoLayout();
+                    showAlert(`✅ Podmodul "${subName}" dodan pod "${parentName}"!`, 'success');
+                }, 100);
+            });
+
+            // Enhanced remove node button with auto-layout
+            document.getElementById('remove-node').addEventListener('click', function() {
+                const name = document.getElementById('remove-node-name').value.trim();
+                
+                if (!name) {
+                    showAlert('⚠️ Prosim vnesite ime modula za odstranitev!', 'warning');
+                    return;
+                }
+                
+                if (!nodes.find(n => n.id === name)) {
+                    showAlert(`❌ Modul "${name}" ne obstaja!`, 'error');
+                    return;
+                }
+                
+                if (name === 'global') {
+                    showAlert('❌ Global Optimizer ni mogoče odstraniti!', 'error');
+                    return;
+                }
+                
+                // Check for children
+                const hasChildren = nodes.some(n => n.parent === name);
+                if (hasChildren) {
+                    const confirmRemoval = confirm(`Modul "${name}" ima podmodule. Ali želite odstraniti tudi vse podmodule?`);
+                    if (!confirmRemoval) return;
+                }
+                
+                removeNode(name);
+                document.getElementById('remove-node-name').value = '';
+                
+                // Trigger auto-layout with animation
+                setTimeout(() => {
+                    triggerAutoLayout();
+                    showAlert(`✅ Modul "${name}" uspešno odstranjen!`, 'success');
+                }, 100);
+            });
+
+            // Enhanced reset layout button with auto-layout
+            document.getElementById('reset-layout').addEventListener('click', function() {
+                showAlert('🔄 Prerazporejam module...', 'info');
+                triggerAutoLayout();
+                setTimeout(() => {
+                    showAlert('✅ Layout uspešno posodobljen!', 'success');
+                }, 1000);
+            });
+
+            // Enhanced alert system
+            function showAlert(message, type = 'info') {
+                const alertContainer = document.querySelector('.alert-container') || createAlertContainer();
+                
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${type}`;
+                alert.innerHTML = `
+                    <span class="alert-message">${message}</span>
+                    <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+                `;
+                
+                // Add slide-in animation
+                alert.style.animation = 'slideIn 0.3s ease-out';
+                alertContainer.appendChild(alert);
+                
+                // Auto-remove after 4 seconds
+                setTimeout(() => {
+                    if (alert.parentElement) {
+                        alert.style.animation = 'slideOut 0.3s ease-in';
+                        setTimeout(() => alert.remove(), 300);
+                    }
+                }, 4000);
+            }
+
+            function createAlertContainer() {
+                const container = document.createElement('div');
+                container.className = 'alert-container';
+                container.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    z-index: 10000;
+                    max-width: 400px;
+                `;
+                document.body.appendChild(container);
+                return container;
+            }
+
+            // Randomize status button
+            document.getElementById('randomize-status').addEventListener('click', function() {
+                const statuses = ['active', 'inactive', 'processing'];
+                nodes.forEach(node => {
+                    if (node.id !== 'global') {
+                        const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+                        updateNodeStatus(node.id, randomStatus);
+                    }
+                });
+            });
+
+            // Deselect on background click
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.node') && !e.target.closest('#controls') && !e.target.closest('#info-box')) {
+                    if (selectedNode) {
+                        const nodeElement = document.getElementById(selectedNode.id);
+                        if (nodeElement) nodeElement.classList.remove('selected');
+                        selectedNode = null;
+                        updateInfoBox();
+                    }
+                }
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Delete' && selectedNode && selectedNode.id !== 'global') {
+                    removeNode(selectedNode.id);
+                } else if (e.key === 'Escape') {
+                    if (selectedNode) {
+                        const nodeElement = document.getElementById(selectedNode.id);
+                        if (nodeElement) nodeElement.classList.remove('selected');
+                        selectedNode = null;
+                        updateInfoBox();
+                    }
+                }
+            });
+
+            // Window resize
+            window.addEventListener('resize', function() {
+                updateConnections();
+            });
+
+            // Attach events to global node
+            attachNodeEvents(document.getElementById('global'));
+            makeDraggable(document.getElementById('global'));
+        }
+
+        // Animation loop for FPS counter
+        function startAnimationLoop() {
+            function animate() {
+                const now = Date.now();
+                fps = Math.round(1000 / (now - lastFrameTime));
+                document.getElementById('fps').textContent = fps;
+                lastFrameTime = now;
+                
+                animationId = requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        // WebSocket real-time integration
+        let ws = null;
+        
+        function initWebSocket() {
+            try {
+                // Try to connect to local backend first, then fallback to demo
+                ws = new WebSocket("ws://localhost:8080");
+                
+                ws.onopen = () => {
+                    console.log("✅ Povezano z Omni-APP backendom");
+                    updateConnectionStatus(true);
+                };
+                
+                ws.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        
+                        // Handle module status updates
+                        if (data.modules) {
+                            data.modules.forEach(mod => {
+                                updateNodeStatusFromWebSocket(mod.id, mod.status);
+                            });
+                        }
+                        
+                        // Handle system alerts
+                        if (data.alert) {
+                            showSystemAlert(data.alert);
+                        }
+                        
+                        // Handle performance metrics
+                        if (data.metrics) {
+                            updatePerformanceMetrics(data.metrics);
+                        }
+                    } catch (e) {
+                        console.warn("WebSocket message parsing error:", e);
+                    }
+                };
+                
+                ws.onclose = () => {
+                    console.log("🔌 WebSocket povezava prekinjena");
+                    updateConnectionStatus(false);
+                    // Auto-reconnect after 5 seconds
+                    setTimeout(initWebSocket, 5000);
+                };
+                
+                ws.onerror = (error) => {
+                    console.error("WebSocket napaka:", error);
+                    updateConnectionStatus(false);
+                };
+                
+            } catch (error) {
+                console.warn("WebSocket ni na voljo, uporabljam simulacijo");
+                simulateWebSocketData();
+            }
+        }
+        
+        function updateConnectionStatus(connected) {
+            const statusIndicator = document.getElementById('ws-status') || createConnectionIndicator();
+            statusIndicator.textContent = connected ? '🟢 Povezano' : '🔴 Prekinjeno';
+            statusIndicator.style.color = connected ? '#2ed573' : '#ff4757';
+        }
+        
+        function createConnectionIndicator() {
+            const indicator = document.createElement('div');
+            indicator.id = 'ws-status';
+            indicator.style.cssText = `
+                position: fixed;
+                top: 10px;
+                right: 350px;
+                background: rgba(0,0,0,0.8);
+                color: white;
+                padding: 8px 12px;
+                border-radius: 20px;
+                font-size: 12px;
+                z-index: 2000;
+                font-weight: bold;
+            `;
+            document.body.appendChild(indicator);
+            return indicator;
+        }
+        
+        function updateNodeStatusFromWebSocket(nodeId, status) {
+            // Convert WebSocket status to our format
+            let localStatus = 'inactive';
+            let statusText = status;
+            
+            if (status.includes('Online') || status.includes('✅')) {
+                localStatus = 'active';
+                statusText = 'Online';
+            } else if (status.includes('Warning') || status.includes('⚠')) {
+                localStatus = 'processing';
+                statusText = 'Warning';
+            } else if (status.includes('Error') || status.includes('❌')) {
+                localStatus = 'inactive';
+                statusText = 'Error';
+            }
+            
+            updateNodeStatus(nodeId, localStatus);
+            
+            // Update status text if element exists
+            const statusEl = document.getElementById(`status-${nodeId}`);
+            if (statusEl) {
+                const icon = localStatus === 'active' ? '✅' : 
+                           localStatus === 'processing' ? '⚠️' : '❌';
+                statusEl.innerHTML = `${icon} ${statusText}`;
+            }
+        }
+        
+        function showSystemAlert(alert) {
+            const alertDiv = document.createElement('div');
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 50px;
+                right: 20px;
+                background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+                z-index: 3000;
+                max-width: 300px;
+                animation: slideIn 0.3s ease-out;
+            `;
+            alertDiv.innerHTML = `
+                <strong>🚨 Sistemski Alert</strong><br>
+                ${alert.message || alert}
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                alertDiv.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => document.body.removeChild(alertDiv), 300);
+            }, 5000);
+        }
+        
+        function simulateWebSocketData() {
+            // Simulate real-time data when WebSocket is not available
+            setInterval(() => {
+                const modules = nodes.map(node => ({
+                    id: node.id,
+                    status: Math.random() > 0.7 ? '✅ Online' : 
+                           Math.random() > 0.5 ? '⚠ Warning' : '❌ Error'
+                }));
+                
+                modules.forEach(mod => {
+                    updateNodeStatusFromWebSocket(mod.id, mod.status);
+                });
+                
+                // Occasional system alerts
+                if (Math.random() > 0.95) {
+                    showSystemAlert({
+                        message: `Visoka obremenitev na modulu ${nodes[Math.floor(Math.random() * nodes.length)].id}`
+                    });
+                }
+            }, 3000);
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            initDashboard();
+            initWebSocket();
+        });
+
+        // Auto-start periodic updates when page loads
+        window.addEventListener('load', () => {
+            setTimeout(startPeriodicUpdates, 2000); // Start after 2 seconds
+        });
+
+        // Smart Auto-Layout System
+        // Enhanced Smart Auto-Layout with responsive spacing and advanced animations
+        function autoLayout() {
+            const dashboard = document.getElementById('dashboard');
+            const dashboardWidth = dashboard.offsetWidth;
+            const dashboardHeight = dashboard.offsetHeight;
+            
+            // Responsive margins and spacing based on screen size
+            const baseMarginX = Math.max(50, dashboardWidth * 0.05);
+            const baseMarginY = Math.max(160, dashboardHeight * 0.12);
+            const responsiveSpacingX = Math.max(200, dashboardWidth * 0.15);
+            const responsiveSubSpacingX = Math.max(120, dashboardWidth * 0.08);
+            
+            // Global Optimizer positioning (center top) with enhanced animation
+            const global = document.getElementById("global");
+            if (global) {
+                const topGlobal = 50;
+                const leftGlobal = Math.max(100, (dashboardWidth / 2) - 75);
+                
+                // Enhanced animation for global optimizer
+                animateNodeToPosition("global", leftGlobal, topGlobal);
+                
+                // Update node data
+                const globalNode = nodes.find(n => n.id === "global");
+                if (globalNode) {
+                    globalNode.top = topGlobal;
+                    globalNode.left = leftGlobal;
+                }
+            }
+
+            // Main modules positioning with staggered animations
+            const mainModules = nodes.filter(n => n.parent === null && n.id !== "global");
+            if (mainModules.length > 0) {
+                const spacingX = Math.min(responsiveSpacingX, (dashboardWidth - 200) / Math.max(1, mainModules.length - 1));
+                const totalWidth = (mainModules.length - 1) * spacingX;
+                const startX = Math.max(baseMarginX, (dashboardWidth - totalWidth) / 2);
+                const mainY = 50 + baseMarginY;
+
+                // Animate main modules with staggered timing
+                const animationPromises = [];
+                
+                mainModules.forEach((mod, i) => {
+                    const newLeft = startX + i * spacingX;
+                    
+                    // Stagger animations for visual appeal
+                    setTimeout(() => {
+                        const promise = animateNodeToPosition(mod.id, newLeft, mainY);
+                        animationPromises.push(promise);
+                    }, i * 150);
+                    
+                    // Update node data
+                    mod.top = mainY;
+                    mod.left = newLeft;
+
+                    // Position submodules with enhanced spacing and animations
+                    const submodules = nodes.filter(n => n.parent === mod.id);
+                    if (submodules.length > 0) {
+                        const subSpacingX = Math.min(responsiveSubSpacingX, 300 / Math.max(1, submodules.length - 1));
+                        const subTotalWidth = (submodules.length - 1) * subSpacingX;
+                        const startSubX = Math.max(baseMarginX, newLeft - subTotalWidth / 2);
+                        const subY = mainY + baseMarginY;
+
+                        submodules.forEach((sub, j) => {
+                            const subLeft = startSubX + j * subSpacingX;
+                            
+                            // Stagger submodule animations after main module
+                            setTimeout(() => {
+                                const subPromise = animateNodeToPosition(sub.id, subLeft, subY);
+                                animationPromises.push(subPromise);
+                            }, (i * 150) + 300 + (j * 100));
+                            
+                            // Update node data
+                            sub.top = subY;
+                            sub.left = subLeft;
+                        });
+                    }
+                });
+
+                // Update connections and stats after all animations
+                Promise.all(animationPromises).then(() => {
+                    setTimeout(() => {
+                        updateConnections();
+                        updateSystemStats();
+                        
+                        // Show completion feedback
+                        showAlert('Smart Auto-Layout uspešno izveden! 🎯', 'success');
+                    }, 200);
+                });
+            } else {
+                // If no main modules, just update connections
+                setTimeout(() => {
+                    updateConnections();
+                    updateSystemStats();
+                }, 100);
+            }
+        }
+
+        // Enhanced animate node to new position with advanced transitions
+        function animateNodeToPosition(nodeId, targetLeft, targetTop) {
+            const element = document.getElementById(nodeId);
+            if (!element) return Promise.resolve();
+
+            return new Promise((resolve) => {
+                // Add repositioning class for enhanced animation
+                element.classList.add('repositioning');
+                
+                // Apply smooth transition with cubic-bezier for natural movement
+                element.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+                element.style.left = targetLeft + "px";
+                element.style.top = targetTop + "px";
+
+                // Update node data
+                const node = nodes.find(n => n.id === nodeId);
+                if (node) {
+                    node.top = targetTop;
+                    node.left = targetLeft;
+                }
+
+                // Remove animation classes and transition after completion
+                setTimeout(() => {
+                    element.classList.remove('repositioning');
+                    element.style.transition = '';
+                    resolve();
+                }, 800);
+            });
+        }
+
+        // Enhanced auto-layout trigger with comprehensive visual feedback
+        function triggerAutoLayout() {
+            const dashboard = document.getElementById('dashboard');
+            dashboard.classList.add('layout-active');
+            
+            // Show enhanced layout animation feedback
+            showLayoutAnimation();
+            
+            // Execute layout with slight delay for visual effect
+            setTimeout(() => {
+                autoLayout();
+            }, 100);
+            
+            // Remove layout-active class after animation sequence
+            setTimeout(() => {
+                dashboard.classList.remove('layout-active');
+            }, 2000);
+        }
+
+        // Enhanced visual feedback for layout changes with staggered animations
+        function showLayoutAnimation() {
+            const dashboard = document.getElementById('dashboard');
+            
+            // Add pulse effect to all nodes with staggered timing
+            const nodeElements = document.querySelectorAll('.node');
+            nodeElements.forEach((node, index) => {
+                setTimeout(() => {
+                    node.classList.add('layout-pulse');
+                    
+                    // Remove pulse class after animation
+                    setTimeout(() => {
+                        node.classList.remove('layout-pulse');
+                    }, 1000);
+                }, index * 100); // Staggered by 100ms
+            });
+            
+            // Animate connections update with delay
+            setTimeout(() => {
+                updateConnections();
+            }, 400);
+        }
+
+        // Enhanced responsive auto-layout on window resize with visual feedback
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            
+            // Show resize feedback
+            const dashboard = document.getElementById('dashboard');
+            dashboard.style.opacity = '0.8';
+            dashboard.style.transition = 'opacity 0.2s ease';
+            
+            // Debounced resize with responsive recalculation
+            resizeTimeout = setTimeout(() => {
+                // Trigger responsive auto-layout
+                triggerAutoLayout();
+                
+                // Restore opacity after layout
+                setTimeout(() => {
+                    dashboard.style.opacity = '1';
+                    
+                    // Show resize completion feedback
+                    showAlert('Layout prilagojen novi velikosti zaslona! 📱', 'info');
+                }, 500);
+            }, 200); // Optimized delay for better responsiveness
+        });
+    </script>
+</body>
+</html>

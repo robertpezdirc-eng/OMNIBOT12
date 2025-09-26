@@ -1,0 +1,183 @@
+{
+  "main_application": {
+    "status": "match",
+    "details": {
+      "service_active": {
+        "reported": true,
+        "actual": true,
+        "match": true
+      },
+      "https_accessible": {
+        "reported": true,
+        "actual": true,
+        "match": true
+      },
+      "ssl_valid": {
+        "reported": true,
+        "actual": true,
+        "match": true,
+        "note": "V lokalnem na\u010dinu SSL ni preverjen"
+      }
+    },
+    "assessment": "Glavna aplikacija deluje kot poro\u010dano"
+  },
+  "angel_systems": {
+    "status": "major_mismatch",
+    "matches": 0,
+    "mismatches": 8,
+    "total_angels": 8,
+    "details": {
+      "LearningAngel": {
+        "reported_api": true,
+        "actual_api": false,
+        "match": false,
+        "service_active": true
+      },
+      "CommercialAngel": {
+        "reported_api": true,
+        "actual_api": false,
+        "match": false,
+        "service_active": true
+      },
+      "OptimizationAngel": {
+        "reported_api": true,
+        "actual_api": false,
+        "match": false,
+        "service_active": true
+      },
+      "InnovationAngel": {
+        "reported_api": true,
+        "actual_api": false,
+        "match": false,
+        "service_active": true
+      },
+      "AnalyticsAngel": {
+        "reported_api": true,
+        "actual_api": false,
+        "match": false,
+        "service_active": true
+      },
+      "EngagementAngel": {
+        "reported_api": true,
+        "actual_api": false,
+        "match": false,
+        "service_active": true
+      },
+      "GrowthAngel": {
+        "reported_api": true,
+        "actual_api": false,
+        "match": false,
+        "service_active": true
+      },
+      "VisionaryAngel": {
+        "reported_api": true,
+        "actual_api": false,
+        "match": false,
+        "service_active": true
+      }
+    },
+    "assessment": "API dostopnost: 8/8 Angel sistemov ne deluje kot poro\u010dano"
+  },
+  "backup_monitoring": {
+    "status": "mismatch",
+    "matches": 0,
+    "total_checks": 5,
+    "details": {
+      "backup_configured": {
+        "reported": true,
+        "actual": false,
+        "match": false
+      },
+      "first_backup_successful": {
+        "reported": true,
+        "actual": false,
+        "match": false
+      },
+      "monitoring_active": {
+        "reported": true,
+        "actual": false,
+        "match": false
+      },
+      "real_time_metrics": {
+        "reported": true,
+        "actual": false,
+        "match": false
+      },
+      "alarms_configured": {
+        "reported": true,
+        "actual": false,
+        "match": false
+      }
+    },
+    "assessment": "Backup/Monitoring: 0/5 funkcij deluje kot poro\u010dano"
+  },
+  "systemd_logging": {
+    "status": "match",
+    "matches": 3,
+    "total_checks": 3,
+    "details": {
+      "systemd_services_active": {
+        "reported": true,
+        "actual": true,
+        "match": true
+      },
+      "auto_restart_configured": {
+        "reported": true,
+        "actual": true,
+        "match": true
+      },
+      "logging_active": {
+        "reported": true,
+        "actual": true,
+        "match": true
+      }
+    },
+    "assessment": "Systemd/Logging: 3/3 funkcij deluje kot poro\u010dano"
+  },
+  "quantum_processing": {
+    "status": "match",
+    "matches": 3,
+    "total_checks": 3,
+    "details": {
+      "global_memory_initialized": {
+        "reported": true,
+        "actual": true,
+        "match": true
+      },
+      "memory_capacity_multiplier": {
+        "reported": 1000000,
+        "actual": 1000000,
+        "match": true
+      },
+      "quantum_processor_active": {
+        "reported": true,
+        "actual": true,
+        "match": true
+      }
+    },
+    "assessment": "Kvantno procesiranje: 3/3 funkcij deluje kot poro\u010dano"
+  },
+  "overall_assessment": {
+    "overall_score": 55.6,
+    "status": "partial_match",
+    "description": "Delno ujemanje - pomembne razlike",
+    "detailed_scores": {
+      "main_app": 100,
+      "angels": 0.0,
+      "backup": 0.0,
+      "systemd": 100.0,
+      "quantum": 100.0
+    },
+    "key_findings": [
+      "\u2705 Glavna aplikacija deluje popolnoma kot poro\u010dano",
+      "\u274c 8 Angel sistemov ne deluje kot poro\u010dano - potrebna pozornost",
+      "\u274c Backup in monitoring ne delujeta - kriti\u010dna napaka",
+      "\u2705 Kvantno procesiranje deluje kot poro\u010dano"
+    ]
+  },
+  "metadata": {
+    "generated_at": "2025-09-26T11:56:02.178811",
+    "reported_timestamp": "2025-09-26T11:55:00",
+    "actual_timestamp": "2025-09-26T11:54:27"
+  }
+}

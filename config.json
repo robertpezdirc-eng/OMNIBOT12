@@ -1,0 +1,167 @@
+{
+  "debug": true,
+  "log_level": "INFO",
+  "data_path": "./omni/data",
+  
+  "modules": {
+    "finance": {
+      "enabled": true,
+      "currency": "EUR",
+      "auto_categorize": true,
+      "budget_alerts": true
+    },
+    "tourism": {
+      "enabled": true,
+      "default_language": "sl",
+      "auto_suggestions": true,
+      "weather_integration": false
+    },
+    "devops": {
+      "enabled": true,
+      "auto_deploy": false,
+      "monitoring_interval": 300,
+      "alert_threshold": 80
+    },
+    "iot": {
+      "enabled": true,
+      "simulation_mode": true,
+      "device_timeout": 5,
+      "auto_discovery": false,
+      "protocols": ["mqtt", "http", "websocket"]
+    },
+    "iot_secure": {
+      "enabled": true,
+      "mqtt_secure_broker": "localhost",
+      "mqtt_secure_port": 8883,
+      "mqtt_secure_username": "omni_secure",
+      "mqtt_secure_password": "",
+      "mqtt_ca_cert": "",
+      "mqtt_client_cert": "",
+      "mqtt_client_key": "",
+      "iot_api_token": "",
+      "iot_api_secret": "",
+      "max_retry_attempts": 3,
+      "command_timeout": 10,
+      "rate_limit_enabled": true,
+      "audit_logging": true,
+      "security_level": "high",
+      "auto_reconnect": true
+    },
+    "healthcare": {
+      "enabled": false,
+      "privacy_mode": true,
+      "data_retention_days": 90
+    },
+    "art": {
+      "enabled": false,
+      "auto_generate": false,
+      "quality": "medium"
+    }
+  },
+  
+  "integrations": {
+    "github": {
+      "enabled": false,
+      "token": null,
+      "auto_sync": false,
+      "sync_interval": 3600,
+      "webhook_secret": null,
+      "organizations": []
+    },
+    "google": {
+      "enabled": false,
+      "credentials_path": null,
+      "calendar_sync": false,
+      "gmail_sync": false,
+      "drive_sync": false
+    },
+    "slack": {
+      "enabled": false,
+      "bot_token": null,
+      "signing_secret": null,
+      "channels": []
+    },
+    "discord": {
+      "enabled": false,
+      "bot_token": null,
+      "guild_id": null
+    },
+    "stripe": {
+      "enabled": false,
+      "api_key": null,
+      "webhook_secret": null,
+      "test_mode": true
+    },
+    "paypal": {
+      "enabled": false,
+      "client_id": null,
+      "client_secret": null,
+      "sandbox": true
+    }
+  },
+  
+  "ui": {
+    "web_port": 8080,
+    "web_host": "localhost",
+    "auto_open_browser": true,
+    "theme": "dark",
+    "language": "sl",
+    "voice_enabled": false,
+    "voice_language": "sl-SI",
+    "tts_speed": 150,
+    "stt_timeout": 5
+  },
+  
+  "network": {
+    "omni_network_enabled": false,
+    "discovery_port": 9090,
+    "sync_encryption": true,
+    "trusted_nodes": [],
+    "max_connections": 10
+  },
+  
+  "security": {
+    "encryption_enabled": true,
+    "session_timeout": 3600,
+    "max_login_attempts": 5,
+    "password_policy": {
+      "min_length": 8,
+      "require_uppercase": true,
+      "require_numbers": true,
+      "require_symbols": false
+    }
+  },
+  
+  "performance": {
+    "max_memory_usage": "1GB",
+    "cache_size": "100MB",
+    "background_tasks": true,
+    "parallel_processing": true,
+    "max_workers": 4
+  },
+  
+  "logging": {
+    "file_logging": true,
+    "log_file": "./omni/data/logs/omni.log",
+    "max_log_size": "10MB",
+    "backup_count": 5,
+    "log_format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  },
+  
+  "ai": {
+    "model_provider": "local",
+    "openai_api_key": null,
+    "anthropic_api_key": null,
+    "max_tokens": 2000,
+    "temperature": 0.7,
+    "context_window": 4000
+  },
+  
+  "database": {
+    "type": "sqlite",
+    "path": "./omni/data/omni.db",
+    "backup_enabled": true,
+    "backup_interval": 86400,
+    "vacuum_interval": 604800
+  }
+}

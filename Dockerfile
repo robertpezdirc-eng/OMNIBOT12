@@ -1,0 +1,79 @@
+# 🔹 Omni Ultimate Turbo Flow System - Docker Configuration
+# Multi-stage build za optimalno velikost slike
+
+# Stage 1: Build stage
+FROM node:18-alpine AS builder
+
+# Nastavi delovni direktorij
+WORKDIR /app
+
+# Namesti sistemske odvisnosti
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    git \
+    curl \
+    openssl
+
+# Kopiraj package.json in package-lock.json
+COPY package*.json ./
+
+# Namesti odvisnosti
+RUN npm ci --only=production && npm cache clean --force
+
+# Stage 2: Production stage
+FROM node:18-alpine AS production
+
+# Ustvari non-root uporabnika za varnost
+RUN addgroup -g 1001 -S omni && \
+    adduser -S omni -u 1001 -G omni
+
+# Namesti runtime odvisnosti
+RUN apk add --no-cache \
+    curl \
+    openssl \
+    dumb-init
+
+# Nastavi delovni direktorij
+WORKDIR /app
+
+# Kopiraj odvisnosti iz build stage
+COPY --from=builder /app/node_modules ./node_modules
+
+# Kopiraj aplikacijske datoteke
+COPY --chown=omni:omni . .
+
+# Copy Docker utility scripts
+COPY --chown=omni:omni docker-env-validator.js ./
+COPY --chown=omni:omni docker-ssl-setup.js ./
+COPY --chown=omni:omni docker-health-check.js ./
+
+# Make scripts executable
+RUN chmod +x docker-env-validator.js docker-ssl-setup.js docker-health-check.js
+
+# Ustvari potrebne direktorije
+RUN mkdir -p /app/logs /app/uploads /app/temp /app/certs && \
+    chown -R omni:omni /app/logs /app/uploads /app/temp /app/certs
+
+# Nastavi environment spremenljivke
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV LOG_LEVEL=info
+ENV OMNI_VERSION=1.0.0
+
+# Izpostavi porte
+EXPOSE 3000 3001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:3000/api/health || exit 1
+
+# Preklopi na non-root uporabnika
+USER omni
+
+# Uporabi dumb-init za pravilno signal handling
+ENTRYPOINT ["dumb-init", "--"]
+
+# Startup script with validation and SSL setup
+CMD ["sh", "-c", "node docker-env-validator.js && node docker-ssl-setup.js && node server-modular.js"]

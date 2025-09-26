@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Nadzorna Plošča - Omni</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            color: #4a5568;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ai-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .analysis-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .analysis-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .analysis-card h3 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .device-analysis {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .device-name {
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .anomaly {
+            color: #e53e3e;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .prediction {
+            color: #38a169;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .automation-rules {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+
+        .rule-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+
+        .rule-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .rule-active {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .rule-inactive {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-online {
+            background: #48bb78;
+        }
+
+        .status-offline {
+            background: #f56565;
+        }
+
+        .status-learning {
+            background: #ed8936;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .chart-container {
+            height: 200px;
+            background: #f7fafc;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .analysis-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <div class="ai-icon">AI</div>
+                AI Nadzorna Plošča
+                <span class="status-indicator status-learning"></span>
+                <span style="font-size: 0.6em; color: #666;">Učenje v teku</span>
+            </h1>
+            <p>Inteligentno upravljanje in analiza IoT naprav</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="refreshAIData()">🔄 Osveži podatke</button>
+            <button class="btn btn-secondary" onclick="exportAIReport()">📊 Izvozi poročilo</button>
+            <button class="btn btn-secondary" onclick="configureAI()">⚙️ Nastavitve AI</button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalDevices">0</div>
+                <div class="stat-label">Analizirane naprave</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="anomaliesDetected">0</div>
+                <div class="stat-label">Zaznane anomalije</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="automationRules">0</div>
+                <div class="stat-label">Aktivna pravila</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="aiAccuracy">0%</div>
+                <div class="stat-label">Natančnost AI</div>
+            </div>
+        </div>
+
+        <div class="analysis-section">
+            <div class="analysis-card">
+                <h3>🔍 Analiza naprav</h3>
+                <div id="deviceAnalysis">
+                    <div class="device-analysis">
+                        <div class="device-name">Nalaganje podatkov...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="analysis-card">
+                <h3>🔮 Napovedi in vzorci</h3>
+                <div id="predictions">
+                    <div class="prediction">Analiziranje vzorcev...</div>
+                </div>
+                <div class="chart-container">
+                    📈 Graf napovedi (v pripravi)
+                </div>
+            </div>
+        </div>
+
+        <div class="automation-rules">
+            <h3>🤖 Avtomatizacijska pravila</h3>
+            <div id="automationRules">
+                <div class="rule-item">
+                    <span>Nalaganje pravil...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let aiData = {};
+        let socket = null;
+
+        // Inicializacija
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAIDashboard();
+            connectWebSocket();
+            refreshAIData();
+            
+            // Avtomatsko osveževanje vsakih 10 sekund
+            setInterval(refreshAIData, 10000);
+        });
+
+        function initializeAIDashboard() {
+            console.log('🤖 Inicializacija AI nadzorne plošče...');
+        }
+
+        function connectWebSocket() {
+            try {
+                socket = io();
+                
+                socket.on('connect', () => {
+                    console.log('✅ WebSocket povezan');
+                });
+
+                socket.on('aiStats', (stats) => {
+                    updateAIStats(stats);
+                });
+
+                socket.on('aiNotification', (notification) => {
+                    showAINotification(notification);
+                });
+
+                socket.on('deviceUpdate', (device) => {
+                    updateDeviceAnalysis(device);
+                });
+
+            } catch (error) {
+                console.error('Napaka pri povezavi WebSocket:', error);
+            }
+        }
+
+        async function refreshAIData() {
+            try {
+                // Pridobi AI statistike
+                const statsResponse = await fetch('/api/ai/stats');
+                if (statsResponse.ok) {
+                    const stats = await statsResponse.json();
+                    updateAIStats(stats);
+                }
+
+                // Pridobi analize naprav
+                const devicesResponse = await fetch('/api/devices');
+                if (devicesResponse.ok) {
+                    const devices = await devicesResponse.json();
+                    updateDeviceAnalyses(devices);
+                }
+
+            } catch (error) {
+                console.error('Napaka pri osveževanju AI podatkov:', error);
+            }
+        }
+
+        function updateAIStats(stats) {
+            document.getElementById('totalDevices').textContent = stats.totalDevices || 0;
+            document.getElementById('anomaliesDetected').textContent = stats.anomaliesDetected || 0;
+            document.getElementById('automationRules').textContent = stats.activeRules || 0;
+            document.getElementById('aiAccuracy').textContent = (stats.accuracy || 0) + '%';
+        }
+
+        async function updateDeviceAnalyses(devices) {
+            const analysisContainer = document.getElementById('deviceAnalysis');
+            analysisContainer.innerHTML = '';
+
+            for (const device of devices) {
+                try {
+                    const analysisResponse = await fetch(`/api/ai/analysis/${device.id}`);
+                    if (analysisResponse.ok) {
+                        const analysis = await analysisResponse.json();
+                        
+                        const deviceDiv = document.createElement('div');
+                        deviceDiv.className = 'device-analysis';
+                        
+                        let content = `<div class="device-name">${device.name}</div>`;
+                        
+                        if (analysis.anomalies && analysis.anomalies.length > 0) {
+                            content += `<div class="anomaly">⚠️ ${analysis.anomalies.join(', ')}</div>`;
+                        }
+                        
+                        if (analysis.patterns && analysis.patterns.length > 0) {
+                            content += `<div class="prediction">📊 ${analysis.patterns.join(', ')}</div>`;
+                        }
+                        
+                        deviceDiv.innerHTML = content;
+                        analysisContainer.appendChild(deviceDiv);
+                    }
+                } catch (error) {
+                    console.error(`Napaka pri analizi naprave ${device.id}:`, error);
+                }
+            }
+        }
+
+        function updateDeviceAnalysis(device) {
+            // Posodobi analizo posamezne naprave v realnem času
+            console.log('Posodabljam analizo naprave:', device);
+        }
+
+        function showAINotification(notification) {
+            // Prikaži AI obvestilo
+            console.log('AI obvestilo:', notification);
+            
+            // Lahko dodamo toast notifikacijo
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #4299e1;
+                color: white;
+                padding: 15px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 1000;
+                max-width: 300px;
+            `;
+            toast.innerHTML = `
+                <strong>🤖 AI Obvestilo</strong><br>
+                ${notification.message}
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 5000);
+        }
+
+        function exportAIReport() {
+            // Izvozi AI poročilo
+            const report = {
+                timestamp: new Date().toISOString(),
+                stats: aiData,
+                devices: Array.from(document.querySelectorAll('.device-analysis')).map(el => el.textContent)
+            };
+            
+            const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ai-report-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function configureAI() {
+            alert('AI nastavitve bodo na voljo v naslednji različici!');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+{
+  "name": "omni-client-panel",
+  "version": "1.0.0",
+  "description": "Omni Client Panel GUI with License Management",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "package-win": "electron-builder --win",
+    "package-mac": "electron-builder --mac",
+    "package-all": "electron-builder --win --mac",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "electron",
+    "client",
+    "license",
+    "omni"
+  ],
+  "author": "Omni System",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.5.0",
+    "crypto-js": "^4.2.0",
+    "electron-store": "^10.1.0",
+    "socket.io-client": "^4.7.2"
+  },
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4"
+  },
+  "build": {
+    "appId": "com.omni.tourism.client",
+    "productName": "Omni Tourism Client",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!node_modules",
+      "!src",
+      "!dist"
+    ],
+    "win": {
+      "target": "portable",
+      "forceCodeSigning": false
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}

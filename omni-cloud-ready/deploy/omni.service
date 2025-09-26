@@ -1,0 +1,51 @@
+[Unit]
+Description=OMNI-BRAIN-MAXI-ULTRA Fast Mode Service
+Documentation=https://docs.omni-brain.ai
+After=network.target network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=omni
+Group=omni
+WorkingDirectory=/home/omni-cloud-ready/app
+ExecStart=/usr/bin/python3 /home/omni-cloud-ready/app/main.py
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+# Restart policy
+Restart=always
+RestartSec=5
+StartLimitBurst=3
+
+# Environment
+Environment=NODE_ENV=production
+Environment=PYTHONPATH=/home/omni-cloud-ready/app
+Environment=PYTHONUNBUFFERED=1
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/home/omni-cloud-ready
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+MemoryMax=2G
+CPUQuota=200%
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=omni-brain
+
+[Install]
+WantedBy=multi-user.target

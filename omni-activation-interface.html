@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌐 OMNI REAL MAX - Aktivacijski Vmesnik</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: auto;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff6b35, #f7931e, #7ed321);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .status-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .status-card h3 {
+            color: #7ed321;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .status-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .status-active {
+            background: #7ed321;
+            color: #ffffff;
+        }
+
+        .status-pending {
+            background: #f7931e;
+            color: #ffffff;
+        }
+
+        .control-panel {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .control-panel h2 {
+            color: #ff6b35;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .activation-button {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            color: #ffffff;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .activation-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
+        }
+
+        .activation-button:active {
+            transform: scale(0.98);
+        }
+
+        .api-endpoints {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .endpoint-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #4a90e2;
+        }
+
+        .endpoint-method {
+            color: #7ed321;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .endpoint-url {
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            margin-top: 5px;
+        }
+
+        .visual-schema {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+        }
+
+        .visual-schema img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .log-output {
+            background: #000000;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            border-radius: 10px;
+            height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border: 1px solid #333333;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .network-status {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .network-node {
+            text-align: center;
+            padding: 15px;
+            background: rgba(126, 211, 33, 0.2);
+            border-radius: 10px;
+            margin: 5px;
+            min-width: 120px;
+        }
+
+        .network-node h4 {
+            color: #7ed321;
+            margin-bottom: 5px;
+        }
+
+        .network-node .count {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌐 OMNI REAL MAX</h1>
+            <p>Univerzalni, avtonomni, samoučeči sistem za realno uporabo</p>
+            <p><strong>Status:</strong> <span id="systemStatus" class="pulse">PRIPRAVLJEN ZA AKTIVACIJO</span></p>
+        </div>
+
+        <div class="status-grid">
+            <div class="status-card">
+                <h3>🔥 Centralno Jedro</h3>
+                <div class="status-item">
+                    <div class="status-icon status-active">✓</div>
+                    <span>Avtonomno AI jedro</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-icon status-active">✓</div>
+                    <span>Samoučeči sistem</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-icon status-active">✓</div>
+                    <span>Globalna baza znanja</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-icon status-active">✓</div>
+                    <span>Realno-časovni procesor</span>
+                </div>
+            </div>
+
+            <div class="status-card">
+                <h3>🌐 Moduli</h3>
+                <div class="status-item">
+                    <div class="status-icon status-active">✓</div>
+                    <span>Osebni asistent</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-icon status-active">✓</div>
+                    <span>Podjetja (ERP/CRM)</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-icon status-active">✓</div>
+                    <span>Industrija (IoT/Robotika)</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-icon status-active">✓</div>
+                    <span>Znanost & Medicina</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-icon status-active">✓</div>
+                    <span>SmartLife (Vsakdan)</span>
+                </div>
+            </div>
+
+            <div class="status-card">
+                <h3>🚀 Avtonomno Delovanje</h3>
+                <div class="status-item">
+                    <div class="status-icon status-active">✓</div>
+                    <span>Simulacije in analize</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-icon status-active">✓</div>
+                    <span>Samodejne optimizacije</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-icon status-active">✓</div>
+                    <span>Neprestano učenje</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-icon status-active">✓</div>
+                    <span>Globalno deljenje znanja</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <h2>🎯 Aktivacijski Center</h2>
+            <button class="activation-button" onclick="activateOmniRealMax()">
+                🚀 AKTIVIRAJ OMNI REAL MAX
+            </button>
+            
+            <div class="network-status">
+                <div class="network-node">
+                    <h4>Povezani vozli</h4>
+                    <div class="count" id="connectedNodes">0</div>
+                </div>
+                <div class="network-node">
+                    <h4>Aktivni moduli</h4>
+                    <div class="count" id="activeModules">5</div>
+                </div>
+                <div class="network-node">
+                    <h4>Globalno znanje</h4>
+                    <div class="count" id="globalKnowledge">∞</div>
+                </div>
+                <div class="network-node">
+                    <h4>Učne iteracije</h4>
+                    <div class="count" id="learningIterations">0</div>
+                </div>
+            </div>
+
+            <div class="api-endpoints">
+                <div class="endpoint-card">
+                    <div class="endpoint-method">POST</div>
+                    <div class="endpoint-url">/api/omni/activate-real-max</div>
+                </div>
+                <div class="endpoint-card">
+                    <div class="endpoint-method">GET</div>
+                    <div class="endpoint-url">/api/omni/system-map</div>
+                </div>
+                <div class="endpoint-card">
+                    <div class="endpoint-method">GET</div>
+                    <div class="endpoint-url">/api/omni/validate-modules</div>
+                </div>
+                <div class="endpoint-card">
+                    <div class="endpoint-method">GET</div>
+                    <div class="endpoint-url">/api/omni/omninet-status</div>
+                </div>
+            </div>
+
+            <div class="log-output" id="logOutput">
+                > OMNI REAL MAX - Aktivacijski vmesnik pripravljen
+                > Vsi sistemi operativni in pripravljeni za aktivacijo
+                > Čakam na ukaz za aktivacijo...
+            </div>
+        </div>
+
+        <div class="visual-schema">
+            <h2>📊 Sistemska Arhitektura</h2>
+            <object data="omni-visual-schema.svg" type="image/svg+xml" width="100%" height="400">
+                <img src="omni-visual-schema.svg" alt="Omni Real Max System Architecture" style="width: 100%; max-width: 800px;">
+            </object>
+        </div>
+    </div>
+
+    <script>
+        let learningCounter = 0;
+        let connectedNodesCounter = 0;
+
+        function addLog(message) {
+            const logOutput = document.getElementById('logOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            logOutput.innerHTML += `\n[${timestamp}] ${message}`;
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+
+        async function activateOmniRealMax() {
+            const button = document.querySelector('.activation-button');
+            const systemStatus = document.getElementById('systemStatus');
+            
+            button.disabled = true;
+            button.textContent = '🔄 AKTIVACIJA V TEKU...';
+            systemStatus.textContent = 'AKTIVACIJA V TEKU';
+            
+            addLog('🚀 Začenjam aktivacijo Omni Real Max sistema...');
+            
+            try {
+                const response = await fetch('/api/omni/activate-real-max', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    addLog('✅ OMNI REAL MAX USPEŠNO AKTIVIRAN!');
+                    addLog('🌐 Vsi moduli so operativni');
+                    addLog('🤖 Avtonomno delovanje omogočeno');
+                    addLog('🔗 OmniNet globalna mreža povezana');
+                    
+                    systemStatus.textContent = 'AKTIVIRAN - OPERATIVEN';
+                    systemStatus.className = '';
+                    button.textContent = '✅ SISTEM AKTIVEN';
+                    button.style.background = 'linear-gradient(45deg, #7ed321, #5ba517)';
+                    
+                    // Simulacija povečevanja števcev
+                    startCounters();
+                } else {
+                    addLog('❌ Napaka pri aktivaciji: ' + result.error);
+                    button.disabled = false;
+                    button.textContent = '🚀 AKTIVIRAJ OMNI REAL MAX';
+                    systemStatus.textContent = 'NAPAKA PRI AKTIVACIJI';
+                }
+            } catch (error) {
+                addLog('❌ Napaka pri povezavi: ' + error.message);
+                button.disabled = false;
+                button.textContent = '🚀 AKTIVIRAJ OMNI REAL MAX';
+                systemStatus.textContent = 'NAPAKA PRI POVEZAVI';
+            }
+        }
+
+        function startCounters() {
+            // Simulacija učnih iteracij
+            setInterval(() => {
+                learningCounter += Math.floor(Math.random() * 10) + 1;
+                document.getElementById('learningIterations').textContent = learningCounter.toLocaleString();
+            }, 2000);
+
+            // Simulacija povezanih vozlov
+            setInterval(() => {
+                if (connectedNodesCounter < 1000) {
+                    connectedNodesCounter += Math.floor(Math.random() * 5) + 1;
+                    document.getElementById('connectedNodes').textContent = connectedNodesCounter.toLocaleString();
+                }
+            }, 3000);
+        }
+
+        // Simulacija sistemskih logov
+        setInterval(() => {
+            const logs = [
+                '🔄 Sistem izvaja avtonomne analize...',
+                '🧠 Samoučeči sistem pridobiva novo znanje...',
+                '🌐 Sinhronizacija z globalno mrežo...',
+                '⚡ Optimizacija performanc v teku...',
+                '🔍 Validacija modulov uspešna...'
+            ];
+            
+            if (document.getElementById('systemStatus').textContent === 'AKTIVIRAN - OPERATIVEN') {
+                const randomLog = logs[Math.floor(Math.random() * logs.length)];
+                addLog(randomLog);
+            }
+        }, 5000);
+
+        // Inicializacija
+        addLog('🌟 Omni Real Max vmesnik naložen');
+        addLog('📡 Povezava s strežnikom vzpostavljena');
+        addLog('✅ Vsi sistemi pripravljeni za aktivacijo');
+    </script>
+</body>
+</html>

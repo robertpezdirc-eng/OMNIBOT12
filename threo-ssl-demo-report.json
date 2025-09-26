@@ -1,0 +1,18 @@
+{
+  "timestamp": "2025-09-26T10:15:03.308306",
+  "demo_mode": true,
+  "domain": "localhost",
+  "email": "admin@localhost.com",
+  "os": "windows",
+  "steps_completed": [
+    "Sistemske zahteve",
+    "Mre\u017eni porti",
+    "SSL orodja",
+    "SSL certifikat",
+    "Samodejno obnavljanje",
+    "Web stre\u017enik",
+    "SSL preverjanje"
+  ],
+  "success_rate": "100%",
+  "status": "Demo uspe\u0161no kon\u010dan"
+}

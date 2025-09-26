@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni Client Panel - Electron</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="utils/encryption.js"></script>
+    
+    <style>
+        .module-card {
+            transition: all 0.3s ease;
+            border: 2px solid #e9ecef;
+        }
+        .module-card.locked {
+            opacity: 0.6;
+            background-color: #f8f9fa;
+            border-color: #dc3545;
+        }
+        .module-card.unlocked {
+            border-color: #28a745;
+            background-color: #f8fff9;
+        }
+        .license-status {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .license-valid {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .license-invalid {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .license-demo {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .premium-badge {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            font-weight: bold;
+        }
+        .demo-badge {
+            background: linear-gradient(45deg, #ff9500, #ffb347);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Connection Status -->
+    <div class="connection-status">
+        <span id="connectionStatus" class="badge bg-secondary">
+            <i class="fas fa-circle"></i> Povezovanje...
+        </span>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 bg-dark text-white p-4">
+                <h3><i class="fas fa-user-circle"></i> Omni Client</h3>
+                <hr>
+                
+                <!-- License Status -->
+                <div id="licenseStatus" class="license-status license-invalid">
+                    <h6><i class="fas fa-key"></i> Status licence</h6>
+                    <div id="licenseInfo">Preverjam licenco...</div>
+                </div>
+
+                <!-- Client Info -->
+                <div class="mb-3">
+                    <h6><i class="fas fa-id-card"></i> Client ID</h6>
+                    <code id="clientId">Nalagam...</code>
+                </div>
+
+                <!-- License Expiry -->
+                <div class="mb-3">
+                    <h6><i class="fas fa-calendar-alt"></i> Veljavnost</h6>
+                    <div id="licenseExpiry">-</div>
+                </div>
+
+                <!-- Actions -->
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" onclick="checkLicense()">
+                        <i class="fas fa-sync"></i> Preveri licenco
+                    </button>
+                    <button class="btn btn-warning" onclick="refreshModules()">
+                        <i class="fas fa-refresh"></i> Osveži module
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 p-4">
+                <h2><i class="fas fa-tachometer-alt"></i> Nadzorna plošča</h2>
+                
+                <!-- Modules Grid -->
+                <div class="row" id="modulesGrid">
+                    <!-- Modules will be dynamically loaded here -->
+                </div>
+
+                <!-- License Details -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-info-circle"></i> Podrobnosti licence</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Plan:</strong> <span id="licensePlan">-</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Zadnja preveritev:</strong> <span id="lastCheck">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="fas fa-bell text-primary me-2"></i>
+                <strong class="me-auto">Obvestilo</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toastMessage">
+                <!-- Toast message will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Configuration
+        const SERVER_URL = 'http://localhost:3000';
+        const ENCRYPTION_KEY = 'omni-client-secret-key-2024';
+        
+        // Global variables
+        let socket = null;
+        let currentLicense = null;
+        let clientId = null;
+        let availableModules = [
+            { id: 'tourism', name: 'Turizem', icon: 'fas fa-map-marked-alt', premium: false },
+            { id: 'finance', name: 'Finance', icon: 'fas fa-chart-line', premium: true },
+            { id: 'analytics', name: 'Analitika', icon: 'fas fa-chart-bar', premium: true },
+            { id: 'automation', name: 'Avtomatizacija', icon: 'fas fa-robot', premium: true },
+            { id: 'ai-assistant', name: 'AI Pomočnik', icon: 'fas fa-brain', premium: true },
+            { id: 'reporting', name: 'Poročila', icon: 'fas fa-file-alt', premium: false }
+        ];
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        async function initializeApp() {
+            showToast('Inicializiram aplikacijo...', 'info');
+            
+            // Generate or load client ID
+            clientId = getOrCreateClientId();
+            document.getElementById('clientId').textContent = clientId;
+            
+            // Load stored license token
+            const storedToken = getStoredLicenseToken();
+            if (storedToken) {
+                showToast('Naložen shranjeni licenčni žeton', 'success');
+            }
+            
+            // Initialize WebSocket connection
+            initializeWebSocket();
+            
+            // Check license on startup
+            await checkLicense();
+            
+            // Render modules
+            renderModules();
+        }
+
+        // Secure token storage using encryption
+        function storeLicenseToken(token) {
+            try {
+                const encrypted = CryptoJS.AES.encrypt(JSON.stringify(token), ENCRYPTION_KEY).toString();
+                localStorage.setItem('omni_license_token', encrypted);
+                showToast('Licenčni žeton varno shranjen', 'success');
+            } catch (error) {
+                console.error('Error storing license token:', error);
+                showToast('Napaka pri shranjevanju žetona', 'error');
+            }
+        }
+
+        function getStoredLicenseToken() {
+            try {
+                const encrypted = localStorage.getItem('omni_license_token');
+                if (!encrypted) return null;
+                
+                const decrypted = CryptoJS.AES.decrypt(encrypted, ENCRYPTION_KEY);
+                return JSON.parse(decrypted.toString(CryptoJS.enc.Utf8));
+            } catch (error) {
+                console.error('Error retrieving license token:', error);
+                return null;
+            }
+        }
+
+        function getOrCreateClientId() {
+            let id = localStorage.getItem('omni_client_id');
+            if (!id) {
+                id = 'client_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('omni_client_id', id);
+            }
+            return id;
+        }
+
+        // License checking
+        async function checkLicense() {
+            try {
+                showToast('Preverjam licenco...', 'info');
+                
+                // First try to get license by client_id
+                let response;
+                const storedToken = getStoredLicenseToken();
+                
+                if (storedToken && storedToken.license_token) {
+                    // Use stored token for validation
+                    response = await axios.post(`${SERVER_URL}/api/license/check`, {
+                        client_id: clientId,
+                        license_token: storedToken.license_token
+                    }, {
+                        timeout: 5000
+                    });
+                } else {
+                    // Try to get license by client_id only
+                    try {
+                        response = await axios.get(`${SERVER_URL}/api/license/${clientId}`, {
+                            timeout: 5000
+                        });
+                    } catch (getError) {
+                        // If no license exists, try to create a demo license
+                        showToast('Ustvarjam demo licenco...', 'info');
+                        response = await axios.post(`${SERVER_URL}/api/license/create`, {
+                            client_id: clientId,
+                            plan: 'demo'
+                        }, {
+                            timeout: 5000
+                        });
+                    }
+                }
+
+                if (response.data.success || response.data.license) {
+                    currentLicense = response.data.license || response.data;
+                    
+                    // Store license token if available
+                    if (currentLicense.license_token) {
+                        storeLicenseToken(currentLicense);
+                    }
+                    
+                    updateLicenseDisplay();
+                    
+                    if (currentLicense.status === 'active') {
+                        unlockModules(currentLicense.modules);
+                        showToast('Licenca je veljavna!', 'success');
+                    } else {
+                        lockAllModules();
+                        showToast('Licenca ni aktivna', 'warning');
+                    }
+                } else {
+                    lockAllModules();
+                    showToast('Licenca ni veljavna', 'error');
+                }
+            } catch (error) {
+                console.error('License check error:', error);
+                lockAllModules();
+                showToast('Napaka pri preverjanju licence', 'error');
+            }
+        }
+
+        // WebSocket initialization
+        function initializeWebSocket() {
+            try {
+                socket = io(SERVER_URL, {
+                    transports: ['websocket', 'polling']
+                });
+
+                socket.on('connect', () => {
+                    updateConnectionStatus(true);
+                    showToast('Povezan s strežnikom', 'success');
+                });
+
+                socket.on('disconnect', () => {
+                    updateConnectionStatus(false);
+                    showToast('Povezava s strežnikom prekinjena', 'warning');
+                });
+
+                socket.on('license_update', (data) => {
+                    if (data.license && data.license.client_id === clientId) {
+                        showToast('Licenca posodobljena', 'info');
+                        checkLicense();
+                    }
+                });
+
+                socket.on('connect_error', (error) => {
+                    console.error('WebSocket connection error:', error);
+                    updateConnectionStatus(false);
+                });
+
+            } catch (error) {
+                console.error('WebSocket initialization error:', error);
+                updateConnectionStatus(false);
+            }
+        }
+
+        // Module management
+        function unlockModules(modules) {
+            const moduleList = Array.isArray(modules) ? modules : modules.split(',');
+            
+            availableModules.forEach(module => {
+                const moduleElement = document.getElementById(`module-${module.id}`);
+                if (moduleElement) {
+                    if (moduleList.includes(module.id)) {
+                        moduleElement.classList.remove('locked');
+                        moduleElement.classList.add('unlocked');
+                        moduleElement.querySelector('.module-status').innerHTML = '<i class="fas fa-unlock text-success"></i> Odklenjen';
+                    } else {
+                        moduleElement.classList.remove('unlocked');
+                        moduleElement.classList.add('locked');
+                        moduleElement.querySelector('.module-status').innerHTML = '<i class="fas fa-lock text-danger"></i> Zaklenjen';
+                    }
+                }
+            });
+        }
+
+        function lockAllModules() {
+            availableModules.forEach(module => {
+                const moduleElement = document.getElementById(`module-${module.id}`);
+                if (moduleElement) {
+                    moduleElement.classList.remove('unlocked');
+                    moduleElement.classList.add('locked');
+                    moduleElement.querySelector('.module-status').innerHTML = '<i class="fas fa-lock text-danger"></i> Zaklenjen';
+                }
+            });
+        }
+
+        // UI Updates
+        function updateLicenseDisplay() {
+            const statusElement = document.getElementById('licenseStatus');
+            const infoElement = document.getElementById('licenseInfo');
+            const planElement = document.getElementById('licensePlan');
+            const expiryElement = document.getElementById('licenseExpiry');
+            const lastCheckElement = document.getElementById('lastCheck');
+
+            if (currentLicense) {
+                if (currentLicense.status === 'active') {
+                    statusElement.className = 'license-status license-valid';
+                    infoElement.innerHTML = '<i class="fas fa-check-circle"></i> Licenca je veljavna';
+                } else {
+                    statusElement.className = 'license-status license-invalid';
+                    infoElement.innerHTML = '<i class="fas fa-times-circle"></i> Licenca ni aktivna';
+                }
+
+                planElement.innerHTML = `<span class="badge ${currentLicense.plan === 'premium' ? 'premium-badge' : 'demo-badge'}">${currentLicense.plan.toUpperCase()}</span>`;
+                expiryElement.textContent = new Date(currentLicense.expires_at).toLocaleString('sl-SI');
+                lastCheckElement.textContent = new Date(currentLicense.last_check).toLocaleString('sl-SI');
+
+                // Check for demo license expiry
+                if (currentLicense.plan === 'demo' && new Date(currentLicense.expires_at) < new Date()) {
+                    statusElement.className = 'license-status license-demo';
+                    infoElement.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Demo licenca je potekla';
+                    lockAllModules();
+                }
+            } else {
+                statusElement.className = 'license-status license-invalid';
+                infoElement.innerHTML = '<i class="fas fa-times-circle"></i> Licenca ni najdena';
+                planElement.textContent = '-';
+                expiryElement.textContent = '-';
+                lastCheckElement.textContent = '-';
+            }
+        }
+
+        function updateConnectionStatus(connected) {
+            const statusElement = document.getElementById('connectionStatus');
+            if (connected) {
+                statusElement.className = 'badge bg-success';
+                statusElement.innerHTML = '<i class="fas fa-circle"></i> Povezan';
+            } else {
+                statusElement.className = 'badge bg-danger';
+                statusElement.innerHTML = '<i class="fas fa-circle"></i> Nepovezan';
+            }
+        }
+
+        function renderModules() {
+            const grid = document.getElementById('modulesGrid');
+            grid.innerHTML = '';
+
+            availableModules.forEach(module => {
+                const moduleCard = `
+                    <div class="col-md-4 mb-3">
+                        <div class="card module-card locked" id="module-${module.id}">
+                            <div class="card-body text-center">
+                                <i class="${module.icon} fa-3x mb-3 text-primary"></i>
+                                <h5 class="card-title">${module.name}</h5>
+                                <p class="module-status"><i class="fas fa-lock text-danger"></i> Zaklenjen</p>
+                                ${module.premium ? '<span class="badge premium-badge">Premium</span>' : '<span class="badge bg-secondary">Osnovno</span>'}
+                                <div class="mt-3">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="accessModule('${module.id}')" disabled>
+                                        Dostop
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += moduleCard;
+            });
+        }
+
+        function accessModule(moduleId) {
+            const module = availableModules.find(m => m.id === moduleId);
+            if (module) {
+                showToast(`Dostopam do modula: ${module.name}`, 'info');
+                // Here you would implement the actual module access logic
+            }
+        }
+
+        function refreshModules() {
+            showToast('Osvežujem module...', 'info');
+            checkLicense();
+        }
+
+        // Utility functions
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('liveToast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            let icon = 'fas fa-info-circle';
+            let bgClass = 'bg-info';
+            
+            switch(type) {
+                case 'success':
+                    icon = 'fas fa-check-circle';
+                    bgClass = 'bg-success';
+                    break;
+                case 'error':
+                    icon = 'fas fa-exclamation-circle';
+                    bgClass = 'bg-danger';
+                    break;
+                case 'warning':
+                    icon = 'fas fa-exclamation-triangle';
+                    bgClass = 'bg-warning';
+                    break;
+            }
+            
+            toast.querySelector('.toast-header i').className = `${icon} text-primary me-2`;
+            toastMessage.innerHTML = `<i class="${icon}"></i> ${message}`;
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+        }
+
+        // Auto-refresh license every 5 minutes
+        setInterval(() => {
+            if (currentLicense) {
+                checkLicense();
+            }
+        }, 5 * 60 * 1000);
+    </script>
+</body>
+</html>

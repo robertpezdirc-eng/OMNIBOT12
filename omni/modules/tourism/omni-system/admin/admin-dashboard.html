@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni License Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        .status-active { color: #28a745; font-weight: bold; }
+        .status-inactive { color: #dc3545; font-weight: bold; }
+        .status-expired { color: #ffc107; font-weight: bold; }
+        .last-check-recent { color: #28a745; }
+        .last-check-old { color: #dc3545; }
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+        .connected { background-color: #28a745; color: white; }
+        .disconnected { background-color: #dc3545; color: white; }
+        .loading { opacity: 0.6; pointer-events: none; }
+        .table-container { max-height: 600px; overflow-y: auto; }
+        .action-buttons { white-space: nowrap; }
+        .module-badge { 
+            font-size: 0.75em; 
+            margin: 1px; 
+            padding: 2px 6px;
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .create-license-form {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Connection Status Indicator -->
+    <div id="connectionStatus" class="connection-status disconnected">
+        <i class="fas fa-circle"></i> Disconnected
+    </div>
+
+    <div class="container-fluid mt-3">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="display-4 text-center">
+                    <i class="fas fa-shield-alt text-primary"></i>
+                    Omni License Admin Dashboard
+                </h1>
+                <p class="text-center text-muted">Upravljanje licenc v realnem času</p>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stats-card text-center">
+                    <h3 id="totalLicenses">0</h3>
+                    <p>Skupaj licenc</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card text-center">
+                    <h3 id="activeLicenses">0</h3>
+                    <p>Aktivne licence</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card text-center">
+                    <h3 id="expiredLicenses">0</h3>
+                    <p>Potekle licence</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card text-center">
+                    <h3 id="recentChecks">0</h3>
+                    <p>Nedavni preveri</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create License Form -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="create-license-form">
+                    <h4><i class="fas fa-plus-circle text-success"></i> Ustvari novo licenco</h4>
+                    <form id="createLicenseForm" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="clientId" class="form-label">Client ID</label>
+                            <input type="text" class="form-control" id="clientId" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="plan" class="form-label">Plan</label>
+                            <select class="form-select" id="plan" required>
+                                <option value="">Izberi plan</option>
+                                <option value="basic">Basic</option>
+                                <option value="premium">Premium</option>
+                                <option value="enterprise">Enterprise</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="modules" class="form-label">Moduli</label>
+                            <input type="text" class="form-control" id="modules" placeholder="tourism,finance,iot" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="expiresAt" class="form-label">Poteče</label>
+                            <input type="date" class="form-control" id="expiresAt" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="fas fa-plus"></i> Ustvari
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- License Table -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-table"></i> Tabela licenc</h5>
+                        <div>
+                            <button class="btn btn-outline-primary btn-sm" onclick="refreshLicenses()">
+                                <i class="fas fa-sync-alt"></i> Osveži
+                            </button>
+                            <button class="btn btn-outline-success btn-sm" onclick="exportLicenses()">
+                                <i class="fas fa-download"></i> Izvozi
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-container">
+                            <table class="table table-striped table-hover mb-0" id="licensesTable">
+                                <thead class="table-dark sticky-top">
+                                    <tr>
+                                        <th>Client ID</th>
+                                        <th>Plan</th>
+                                        <th>Status</th>
+                                        <th>Moduli</th>
+                                        <th>Poteče</th>
+                                        <th>Zadnji preveri</th>
+                                        <th>Akcije</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="licensesTableBody">
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Nalagam...</span>
+                                            </div>
+                                            <p class="mt-2">Nalagam licence...</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Extend License Modal -->
+    <div class="modal fade" id="extendLicenseModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Podaljšaj licenco</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="extendLicenseForm">
+                        <input type="hidden" id="extendLicenseId">
+                        <div class="mb-3">
+                            <label for="extendClientId" class="form-label">Client ID</label>
+                            <input type="text" class="form-control" id="extendClientId" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newExpiresAt" class="form-label">Nov datum poteka</label>
+                            <input type="date" class="form-control" id="newExpiresAt" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Prekliči</button>
+                    <button type="button" class="btn btn-primary" onclick="confirmExtendLicense()">Podaljšaj</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Configuration
+        const SERVER_URL = 'http://localhost:3000';
+        const ADMIN_URL = window.location.origin;
+        
+        // Global variables
+        let socket = null;
+        let licenses = [];
+        let isConnected = false;
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeWebSocket();
+            setupEventListeners();
+            refreshLicenses();
+            
+            // Set default expiration date to 1 year from now
+            const nextYear = new Date();
+            nextYear.setFullYear(nextYear.getFullYear() + 1);
+            document.getElementById('expiresAt').value = nextYear.toISOString().split('T')[0];
+        });
+
+        // WebSocket initialization and management
+        function initializeWebSocket() {
+            try {
+                socket = io(SERVER_URL, {
+                    rejectUnauthorized: false,
+                    transports: ['websocket', 'polling']
+                });
+
+                socket.on('connect', function() {
+                    console.log('✅ WebSocket connected to', SERVER_URL);
+                    isConnected = true;
+                    updateConnectionStatus(true);
+                    showToast('Povezava vzpostavljena', 'success');
+                });
+
+                socket.on('disconnect', function() {
+                    console.log('❌ WebSocket disconnected');
+                    isConnected = false;
+                    updateConnectionStatus(false);
+                    showToast('Povezava prekinjena', 'warning');
+                });
+
+                socket.on('license_update', function(license) {
+                    console.log('📡 License update received:', license);
+                    handleLicenseUpdate(license);
+                    showToast(`Licenca ${license.client_id} posodobljena`, 'info');
+                });
+
+                socket.on('connect_error', function(error) {
+                    console.error('❌ WebSocket connection error:', error);
+                    updateConnectionStatus(false);
+                });
+
+            } catch (error) {
+                console.error('❌ WebSocket initialization error:', error);
+                updateConnectionStatus(false);
+            }
+        }
+
+        // Update connection status indicator
+        function updateConnectionStatus(connected) {
+            const statusEl = document.getElementById('connectionStatus');
+            if (connected) {
+                statusEl.className = 'connection-status connected';
+                statusEl.innerHTML = '<i class="fas fa-circle"></i> Connected';
+            } else {
+                statusEl.className = 'connection-status disconnected';
+                statusEl.innerHTML = '<i class="fas fa-circle"></i> Disconnected';
+            }
+        }
+
+        // Handle real-time license updates
+        function handleLicenseUpdate(updatedLicense) {
+            const index = licenses.findIndex(l => l._id === updatedLicense._id);
+            if (index !== -1) {
+                licenses[index] = updatedLicense;
+            } else {
+                licenses.push(updatedLicense);
+            }
+            renderLicensesTable();
+            updateStatistics();
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('createLicenseForm').addEventListener('submit', handleCreateLicense);
+        }
+
+        // Refresh licenses from server
+        async function refreshLicenses() {
+            try {
+                const response = await axios.get(`${SERVER_URL}/api/license/all`, {
+                    timeout: 5000
+                });
+                
+                licenses = Array.isArray(response.data) ? response.data : 
+                          response.data.licenses ? response.data.licenses : 
+                          response.data.data ? response.data.data : [];
+                
+                renderLicensesTable();
+                updateStatistics();
+                
+            } catch (error) {
+                console.error('❌ Error fetching licenses:', error);
+                showToast('Napaka pri nalaganju licenc', 'danger');
+                
+                // Show empty state
+                document.getElementById('licensesTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-4">
+                            <i class="fas fa-exclamation-triangle text-warning fa-2x"></i>
+                            <p class="mt-2">Napaka pri nalaganju licenc</p>
+                            <button class="btn btn-outline-primary btn-sm" onclick="refreshLicenses()">
+                                <i class="fas fa-retry"></i> Poskusi znova
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Render licenses table
+        function renderLicensesTable() {
+            const tbody = document.getElementById('licensesTableBody');
+            
+            if (!licenses || licenses.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-4">
+                            <i class="fas fa-inbox text-muted fa-2x"></i>
+                            <p class="mt-2">Ni licenc</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = licenses.map(license => {
+                const status = getLicenseStatus(license);
+                const statusClass = getStatusClass(status);
+                const lastCheckClass = getLastCheckClass(license.last_check);
+                const modules = Array.isArray(license.modules) ? license.modules : [];
+                
+                return `
+                    <tr>
+                        <td><strong>${license.client_id}</strong></td>
+                        <td><span class="badge bg-secondary">${license.plan || 'N/A'}</span></td>
+                        <td><span class="${statusClass}">${status}</span></td>
+                        <td>
+                            ${modules.map(module => 
+                                `<span class="badge bg-info module-badge">${module}</span>`
+                            ).join('')}
+                        </td>
+                        <td>${formatDate(license.expires_at)}</td>
+                        <td class="${lastCheckClass}">${formatLastCheck(license.last_check)}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-sm ${license.active ? 'btn-warning' : 'btn-success'}" 
+                                    onclick="toggleLicense('${license._id}')" 
+                                    title="${license.active ? 'Deaktiviraj' : 'Aktiviraj'}">
+                                <i class="fas ${license.active ? 'fa-pause' : 'fa-play'}"></i>
+                            </button>
+                            <button class="btn btn-sm btn-primary" 
+                                    onclick="showExtendModal('${license._id}', '${license.client_id}')" 
+                                    title="Podaljšaj">
+                                <i class="fas fa-calendar-plus"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" 
+                                    onclick="deleteLicense('${license._id}')" 
+                                    title="Izbriši">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Update statistics
+        function updateStatistics() {
+            const total = licenses.length;
+            const active = licenses.filter(l => l.active && !isExpired(l)).length;
+            const expired = licenses.filter(l => isExpired(l)).length;
+            const recentChecks = licenses.filter(l => isRecentCheck(l.last_check)).length;
+
+            document.getElementById('totalLicenses').textContent = total;
+            document.getElementById('activeLicenses').textContent = active;
+            document.getElementById('expiredLicenses').textContent = expired;
+            document.getElementById('recentChecks').textContent = recentChecks;
+        }
+
+        // Handle create license form submission
+        async function handleCreateLicense(event) {
+            event.preventDefault();
+            
+            const formData = {
+                client_id: document.getElementById('clientId').value,
+                plan: document.getElementById('plan').value,
+                modules: document.getElementById('modules').value.split(',').map(m => m.trim()),
+                expires_at: document.getElementById('expiresAt').value,
+                active: true
+            };
+
+            try {
+                const response = await axios.post(`${SERVER_URL}/api/license/create`, formData);
+                showToast(`Licenca ${formData.client_id} ustvarjena`, 'success');
+                document.getElementById('createLicenseForm').reset();
+                
+                // Set default expiration date again
+                const nextYear = new Date();
+                nextYear.setFullYear(nextYear.getFullYear() + 1);
+                document.getElementById('expiresAt').value = nextYear.toISOString().split('T')[0];
+                
+            } catch (error) {
+                console.error('❌ Error creating license:', error);
+                showToast('Napaka pri ustvarjanju licence', 'danger');
+            }
+        }
+
+        // Toggle license status
+        async function toggleLicense(licenseId) {
+            try {
+                const response = await axios.post(`${SERVER_URL}/api/license/toggle/${licenseId}`);
+                const license = response.data;
+                showToast(`Licenca ${license.client_id} ${license.active ? 'aktivirana' : 'deaktivirana'}`, 'success');
+            } catch (error) {
+                console.error('❌ Error toggling license:', error);
+                showToast('Napaka pri preklapljanju licence', 'danger');
+            }
+        }
+
+        // Show extend license modal
+        function showExtendModal(licenseId, clientId) {
+            document.getElementById('extendLicenseId').value = licenseId;
+            document.getElementById('extendClientId').value = clientId;
+            
+            // Set default new expiration to 1 year from now
+            const nextYear = new Date();
+            nextYear.setFullYear(nextYear.getFullYear() + 1);
+            document.getElementById('newExpiresAt').value = nextYear.toISOString().split('T')[0];
+            
+            new bootstrap.Modal(document.getElementById('extendLicenseModal')).show();
+        }
+
+        // Confirm extend license
+        async function confirmExtendLicense() {
+            const licenseId = document.getElementById('extendLicenseId').value;
+            const newExpiresAt = document.getElementById('newExpiresAt').value;
+
+            try {
+                const response = await axios.post(`${SERVER_URL}/api/license/extend/${licenseId}`, {
+                    expires_at: newExpiresAt
+                });
+                
+                showToast('Licenca podaljšana', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('extendLicenseModal')).hide();
+                
+            } catch (error) {
+                console.error('❌ Error extending license:', error);
+                showToast('Napaka pri podaljšanju licence', 'danger');
+            }
+        }
+
+        // Delete license
+        async function deleteLicense(licenseId) {
+            if (!confirm('Ali ste prepričani, da želite izbrisati to licenco?')) {
+                return;
+            }
+
+            try {
+                await axios.delete(`${SERVER_URL}/api/license/${licenseId}`);
+                showToast('Licenca izbrisana', 'success');
+            } catch (error) {
+                console.error('❌ Error deleting license:', error);
+                showToast('Napaka pri brisanju licence', 'danger');
+            }
+        }
+
+        // Export licenses
+        function exportLicenses() {
+            const csv = convertToCSV(licenses);
+            downloadCSV(csv, 'licenses.csv');
+            showToast('Licence izvožene', 'success');
+        }
+
+        // Utility functions
+        function getLicenseStatus(license) {
+            if (!license.active) return 'Neaktivna';
+            if (isExpired(license)) return 'Potekla';
+            return 'Aktivna';
+        }
+
+        function getStatusClass(status) {
+            switch (status) {
+                case 'Aktivna': return 'status-active';
+                case 'Neaktivna': return 'status-inactive';
+                case 'Potekla': return 'status-expired';
+                default: return '';
+            }
+        }
+
+        function getLastCheckClass(lastCheck) {
+            return isRecentCheck(lastCheck) ? 'last-check-recent' : 'last-check-old';
+        }
+
+        function isExpired(license) {
+            return new Date(license.expires_at) < new Date();
+        }
+
+        function isRecentCheck(lastCheck) {
+            if (!lastCheck) return false;
+            const checkTime = new Date(lastCheck);
+            const now = new Date();
+            return (now - checkTime) < (24 * 60 * 60 * 1000); // 24 hours
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            return new Date(dateString).toLocaleDateString('sl-SI');
+        }
+
+        function formatLastCheck(lastCheck) {
+            if (!lastCheck) return 'Nikoli';
+            const checkTime = new Date(lastCheck);
+            const now = new Date();
+            const diffMs = now - checkTime;
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            
+            if (diffHours < 1) return 'Pred kratkim';
+            if (diffHours < 24) return `Pred ${diffHours}h`;
+            const diffDays = Math.floor(diffHours / 24);
+            return `Pred ${diffDays}d`;
+        }
+
+        function convertToCSV(data) {
+            const headers = ['Client ID', 'Plan', 'Status', 'Modules', 'Expires At', 'Last Check'];
+            const rows = data.map(license => [
+                license.client_id,
+                license.plan || '',
+                getLicenseStatus(license),
+                Array.isArray(license.modules) ? license.modules.join(';') : '',
+                license.expires_at || '',
+                license.last_check || ''
+            ]);
+            
+            return [headers, ...rows].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+        }
+
+        function downloadCSV(csv, filename) {
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toastId = 'toast-' + Date.now();
+            
+            const toastHTML = `
+                <div class="toast align-items-center text-bg-${type} border-0" role="alert" id="${toastId}">
+                    <div class="d-flex">
+                        <div class="toast-body">${message}</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+            const toastElement = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+            
+            // Remove toast element after it's hidden
+            toastElement.addEventListener('hidden.bs.toast', () => {
+                toastElement.remove();
+            });
+        }
+    </script>
+</body>
+</html>

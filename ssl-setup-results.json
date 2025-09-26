@@ -1,0 +1,19 @@
+﻿{
+    "TestMode":  {
+                     "IsPresent":  false
+                 },
+    "StartTime":  "\/Date(1758873997628)\/",
+    "Results":  {
+                    "DomainCheck":  false,
+                    "Monitoring":  false,
+                    "CertbotInstall":  false,
+                    "HTTPSConfiguration":  false,
+                    "CertificateGeneration":  false,
+                    "AutoRenewal":  false
+                },
+    "SuccessRate":  0,
+    "Duration":  0.021791668333333333,
+    "EndTime":  "\/Date(1758873998936)\/",
+    "Domain":  "vasa-domena.com",
+    "Email":  "admin@vasa-domena.com"
+}

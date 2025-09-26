@@ -1,0 +1,179 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="coreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff6b35;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f7931e;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="moduleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4a90e2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#357abd;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="networkGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7ed321;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#5ba517;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="600" fill="#1a1a2e"/>
+  
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="24" font-weight="bold">
+    🌐 OMNI REAL MAX - SYSTEM ARCHITECTURE
+  </text>
+  
+  <!-- Central Core -->
+  <rect x="250" y="80" width="300" height="80" rx="15" fill="url(#coreGradient)" stroke="#ffffff" stroke-width="2"/>
+  <text x="400" y="105" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="16" font-weight="bold">
+    CENTRAL CORE
+  </text>
+  <text x="400" y="125" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="12">
+    AI • Samoučenje • Globalna baza
+  </text>
+  <text x="400" y="145" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="12">
+    Avtonomno delovanje
+  </text>
+  
+  <!-- Connection lines from core -->
+  <line x1="400" y1="160" x2="400" y2="200" stroke="#ffffff" stroke-width="3"/>
+  <line x1="400" y1="200" x2="150" y2="240" stroke="#ffffff" stroke-width="2"/>
+  <line x1="400" y1="200" x2="400" y2="240" stroke="#ffffff" stroke-width="2"/>
+  <line x1="400" y1="200" x2="650" y2="240" stroke="#ffffff" stroke-width="2"/>
+  
+  <!-- Top Row Modules -->
+  <!-- Personal Assistant -->
+  <rect x="50" y="240" width="200" height="100" rx="10" fill="url(#moduleGradient)" stroke="#ffffff" stroke-width="1"/>
+  <text x="150" y="265" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="14" font-weight="bold">
+    Osebni Asistent
+  </text>
+  <text x="150" y="285" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="10">
+    • Tekst/Govor
+  </text>
+  <text x="150" y="300" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="10">
+    • Vizualno
+  </text>
+  <text x="150" y="315" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="10">
+    • AR/VR
+  </text>
+  
+  <!-- Business -->
+  <rect x="300" y="240" width="200" height="100" rx="10" fill="url(#moduleGradient)" stroke="#ffffff" stroke-width="1"/>
+  <text x="400" y="265" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="14" font-weight="bold">
+    Podjetja
+  </text>
+  <text x="400" y="285" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="10">
+    • ERP/CRM/HR
+  </text>
+  <text x="400" y="300" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="10">
+    • Finance/Logistika
+  </text>
+  <text x="400" y="315" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="10">
+    • Marketing
+  </text>
+  
+  <!-- Industry -->
+  <rect x="550" y="240" width="200" height="100" rx="10" fill="url(#moduleGradient)" stroke="#ffffff" stroke-width="1"/>
+  <text x="650" y="265" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="14" font-weight="bold">
+    Industrija
+  </text>
+  <text x="650" y="285" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="10">
+    • IoT/Stroji
+  </text>
+  <text x="650" y="300" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="10">
+    • Robotika
+  </text>
+  <text x="650" y="315" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="10">
+    • Proizvodnja
+  </text>
+  
+  <!-- Connection lines to bottom row -->
+  <line x1="150" y1="340" x2="150" y2="380" stroke="#ffffff" stroke-width="2"/>
+  <line x1="400" y1="340" x2="400" y2="380" stroke="#ffffff" stroke-width="2"/>
+  <line x1="650" y1="340" x2="650" y2="380" stroke="#ffffff" stroke-width="2"/>
+  
+  <!-- Bottom Row Modules -->
+  <!-- Science & Medicine -->
+  <rect x="50" y="380" width="200" height="100" rx="10" fill="url(#moduleGradient)" stroke="#ffffff" stroke-width="1"/>
+  <text x="150" y="405" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="14" font-weight="bold">
+    Znanost &amp; Medicina
+  </text>
+  <text x="150" y="425" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="10">
+    • Diagnostika
+  </text>
+  <text x="150" y="440" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="10">
+    • Kirurgija/Veterina
+  </text>
+  <text x="150" y="455" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="10">
+    • Raziskave
+  </text>
+  
+  <!-- Smart Life -->
+  <rect x="300" y="380" width="200" height="100" rx="10" fill="url(#moduleGradient)" stroke="#ffffff" stroke-width="1"/>
+  <text x="400" y="405" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="14" font-weight="bold">
+    Vsakdan / SmartLife
+  </text>
+  <text x="400" y="425" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="10">
+    • Pametni dom
+  </text>
+  <text x="400" y="440" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="10">
+    • Avto/Energija
+  </text>
+  <text x="400" y="455" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="10">
+    • Prehrana/Trening
+  </text>
+  
+  <!-- OmniNet Global Network -->
+  <rect x="550" y="380" width="200" height="100" rx="10" fill="url(#networkGradient)" stroke="#ffffff" stroke-width="1"/>
+  <text x="650" y="405" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="14" font-weight="bold">
+    Globalna Mreža
+  </text>
+  <text x="650" y="420" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="12" font-weight="bold">
+    (OmniNet)
+  </text>
+  <text x="650" y="440" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="10">
+    • Povezovanje Omni-jev
+  </text>
+  <text x="650" y="455" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="10">
+    • Deljenje znanja
+  </text>
+  
+  <!-- Status indicators -->
+  <circle cx="70" cy="520" r="8" fill="#7ed321"/>
+  <text x="85" y="525" fill="#ffffff" font-family="Arial, sans-serif" font-size="12">
+    ✅ Centralno jedro: AKTIVIRANO
+  </text>
+  
+  <circle cx="70" cy="540" r="8" fill="#7ed321"/>
+  <text x="85" y="545" fill="#ffffff" font-family="Arial, sans-serif" font-size="12">
+    ✅ Vsi moduli: INTEGRIRANI
+  </text>
+  
+  <circle cx="70" cy="560" r="8" fill="#7ed321"/>
+  <text x="85" y="565" fill="#ffffff" font-family="Arial, sans-serif" font-size="12">
+    ✅ Avtonomno delovanje: OMOGOČENO
+  </text>
+  
+  <circle cx="400" cy="520" r="8" fill="#7ed321"/>
+  <text x="415" y="525" fill="#ffffff" font-family="Arial, sans-serif" font-size="12">
+    ✅ OmniNet: POVEZAN
+  </text>
+  
+  <circle cx="400" cy="540" r="8" fill="#7ed321"/>
+  <text x="415" y="545" fill="#ffffff" font-family="Arial, sans-serif" font-size="12">
+    ✅ Neprestano učenje: AKTIVNO
+  </text>
+  
+  <circle cx="400" cy="560" r="8" fill="#7ed321"/>
+  <text x="415" y="565" fill="#ffffff" font-family="Arial, sans-serif" font-size="12">
+    ✅ Sistem: PRIPRAVLJEN ZA UPORABO
+  </text>
+  
+  <!-- Network connections visualization -->
+  <g opacity="0.3">
+    <line x1="650" y1="430" x2="750" y2="430" stroke="#7ed321" stroke-width="2" stroke-dasharray="5,5"/>
+    <circle cx="760" cy="430" r="5" fill="#7ed321"/>
+    <text x="770" y="435" fill="#7ed321" font-family="Arial, sans-serif" font-size="10">
+      Globalna mreža
+    </text>
+  </g>
+</svg>

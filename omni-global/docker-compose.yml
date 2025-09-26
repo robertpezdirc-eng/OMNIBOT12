@@ -1,0 +1,240 @@
+version: "3.9"
+
+services:
+  # MongoDB Database
+  mongo:
+    image: mongo:7
+    container_name: omni-mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: omni
+      MONGO_INITDB_ROOT_PASSWORD: omni123
+      MONGO_INITDB_DATABASE: omni
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+      - ./mongo-init:/docker-entrypoint-initdb.d
+    networks:
+      - omni-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: omni-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - omni-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Omni License Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: omni-server
+    restart: always
+    environment:
+      NODE_ENV: production
+      MONGO_URI: mongodb://omni:omni123@mongo:27017/omni?authSource=admin
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-super_secret_key_change_in_production}
+      PORT: 3000
+      SSL_ENABLED: "true"
+      SSL_CERT_PATH: /app/certs/fullchain.pem
+      SSL_KEY_PATH: /app/certs/privkey.pem
+    ports:
+      - "3000:3000"
+      - "3443:3443"  # HTTPS port
+    volumes:
+      - ./certs:/app/certs:ro
+      - server-logs:/app/logs
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - omni-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Omni Admin GUI
+  admin:
+    build:
+      context: ./admin
+      dockerfile: Dockerfile
+    container_name: omni-admin
+    restart: always
+    environment:
+      NODE_ENV: production
+      SERVER_URL: https://server:3443
+      SERVER_URL_HTTP: http://server:3000
+      PORT: 4000
+      SSL_ENABLED: "true"
+      SSL_CERT_PATH: /app/certs/fullchain.pem
+      SSL_KEY_PATH: /app/certs/privkey.pem
+    ports:
+      - "4000:4000"
+      - "4443:4443"  # HTTPS port
+    volumes:
+      - ./certs:/app/certs:ro
+      - admin-logs:/app/logs
+    depends_on:
+      server:
+        condition: service_healthy
+    networks:
+      - omni-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Nginx Reverse Proxy & Load Balancer
+  nginx:
+    image: nginx:alpine
+    container_name: omni-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./certs:/etc/nginx/certs:ro
+      - nginx-logs:/var/log/nginx
+    depends_on:
+      - server
+      - admin
+    networks:
+      - omni-network
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Monitoring - Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: omni-prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - omni-network
+    profiles:
+      - monitoring
+
+  # Monitoring - Grafana
+  grafana:
+    image: grafana/grafana:latest
+    container_name: omni-grafana
+    restart: always
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin123}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana:/etc/grafana/provisioning
+    networks:
+      - omni-network
+    profiles:
+      - monitoring
+
+  # Log Management - ELK Stack (Optional)
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: omni-elasticsearch
+    restart: always
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - omni-network
+    profiles:
+      - logging
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.0
+    container_name: omni-logstash
+    restart: always
+    volumes:
+      - ./logging/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    depends_on:
+      - elasticsearch
+    networks:
+      - omni-network
+    profiles:
+      - logging
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: omni-kibana
+    restart: always
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - omni-network
+    profiles:
+      - logging
+
+# Networks
+networks:
+  omni-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# Volumes
+volumes:
+  mongo-data:
+    driver: local
+  redis-data:
+    driver: local
+  server-logs:
+    driver: local
+  admin-logs:
+    driver: local
+  nginx-logs:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+  elasticsearch-data:
+    driver: local

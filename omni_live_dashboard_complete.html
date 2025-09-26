@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni-APP Live Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .dashboard-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .node {
+            border: 3px solid #333;
+            border-radius: 12px;
+            padding: 15px;
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            text-align: center;
+            width: 160px;
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            user-select: none;
+        }
+
+        .node:hover {
+            background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+            transform: scale(1.08) translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            border-color: #2196F3;
+        }
+
+        .node.active {
+            border-color: #4CAF50;
+            background: linear-gradient(145deg, #e8f5e8, #c8e6c9);
+        }
+
+        .node.warning {
+            border-color: #FF9800;
+            background: linear-gradient(145deg, #fff3e0, #ffe0b2);
+        }
+
+        .node.offline {
+            border-color: #f44336;
+            background: linear-gradient(145deg, #ffebee, #ffcdd2);
+        }
+
+        .node.loading {
+            border-color: #2196F3;
+            background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .node-icon {
+            font-size: 2.5em;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .node-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .status {
+            font-weight: bold;
+            margin-top: 8px;
+            display: block;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            color: white;
+        }
+
+        .status.online {
+            background: #4CAF50;
+        }
+
+        .status.warning {
+            background: #FF9800;
+        }
+
+        .status.offline {
+            background: #f44336;
+        }
+
+        .status.loading {
+            background: #2196F3;
+        }
+
+        #links {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .link {
+            stroke: #333;
+            stroke-width: 3px;
+            stroke-dasharray: 8,4;
+            animation: dash 2s linear infinite;
+            opacity: 0.7;
+        }
+
+        .link.active {
+            stroke: #4CAF50;
+            stroke-width: 4px;
+            opacity: 1;
+        }
+
+        .link.warning {
+            stroke: #FF9800;
+            stroke-width: 4px;
+        }
+
+        .link.offline {
+            stroke: #f44336;
+            stroke-width: 2px;
+            stroke-dasharray: 2,6;
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: -12; }
+        }
+
+        /* Data flow dots animation */
+        .data-dot {
+            fill: #2196F3;
+            r: 4;
+            opacity: 0.8;
+        }
+
+        .data-dot.active {
+            fill: #4CAF50;
+        }
+
+        .data-dot.warning {
+            fill: #FF9800;
+        }
+
+        .data-dot.offline {
+            fill: #f44336;
+        }
+
+        #info-box {
+            position: fixed;
+            right: 30px;
+            top: 30px;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            border: 3px solid #333;
+            border-radius: 15px;
+            padding: 20px;
+            width: 300px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .info-item {
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .info-value {
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+
+        .control-panel {
+            position: fixed;
+            left: 30px;
+            top: 30px;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            border: 3px solid #333;
+            border-radius: 15px;
+            padding: 20px;
+            width: 250px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .control-button {
+            background: linear-gradient(145deg, #2196F3, #1976D2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            margin: 8px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .control-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+        }
+
+        .control-button.danger {
+            background: linear-gradient(145deg, #f44336, #d32f2f);
+        }
+
+        .control-button.success {
+            background: linear-gradient(145deg, #4CAF50, #388E3C);
+        }
+
+        .system-status {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 2px solid #dee2e6;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-indicator.green { background: #4CAF50; }
+        .status-indicator.orange { background: #FF9800; }
+        .status-indicator.red { background: #f44336; }
+
+        /* Responsive design */
+        @media (max-width: 1200px) {
+            #info-box, .control-panel {
+                position: relative;
+                width: 90%;
+                margin: 20px auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- SVG for connections -->
+        <svg id="links" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                        refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+                </marker>
+            </defs>
+        </svg>
+
+        <!-- Central Global Optimizer -->
+        <div class="node active" id="global" style="left: 600px; top: 100px;" onclick="showModuleInfo('global')">
+            <span class="node-icon">🌐</span>
+            <div class="node-title">Global Optimizer</div>
+            <span class="status online" id="status-global">✅ Online</span>
+        </div>
+
+        <!-- Module Nodes -->
+        <div class="node active" id="finance" style="left: 200px; top: 200px;" onclick="showModuleInfo('finance')">
+            <span class="node-icon">💰</span>
+            <div class="node-title">Finance</div>
+            <span class="status online" id="status-finance">✅ Online</span>
+        </div>
+
+        <div class="node active" id="logistics" style="left: 400px; top: 200px;" onclick="showModuleInfo('logistics')">
+            <span class="node-icon">🚚</span>
+            <div class="node-title">Logistics</div>
+            <span class="status online" id="status-logistics">✅ Online</span>
+        </div>
+
+        <div class="node warning" id="healthcare" style="left: 800px; top: 200px;" onclick="showModuleInfo('healthcare')">
+            <span class="node-icon">🏥</span>
+            <div class="node-title">Healthcare</div>
+            <span class="status warning" id="status-healthcare">⚠️ Warning</span>
+        </div>
+
+        <div class="node active" id="tourism" style="left: 1000px; top: 200px;" onclick="showModuleInfo('tourism')">
+            <span class="node-icon">🌴</span>
+            <div class="node-title">Tourism</div>
+            <span class="status online" id="status-tourism">✅ Online</span>
+        </div>
+
+        <div class="node active" id="agriculture" style="left: 300px; top: 400px;" onclick="showModuleInfo('agriculture')">
+            <span class="node-icon">🚜</span>
+            <div class="node-title">Agriculture</div>
+            <span class="status online" id="status-agriculture">✅ Online</span>
+        </div>
+
+        <div class="node loading" id="industry" style="left: 500px; top: 400px;" onclick="showModuleInfo('industry')">
+            <span class="node-icon">🏭</span>
+            <div class="node-title">Industry</div>
+            <span class="status loading" id="status-industry">🔄 Loading</span>
+        </div>
+
+        <div class="node active" id="energy" style="left: 700px; top: 400px;" onclick="showModuleInfo('energy')">
+            <span class="node-icon">⚡</span>
+            <div class="node-title">Energy</div>
+            <span class="status online" id="status-energy">✅ Online</span>
+        </div>
+
+        <div class="node offline" id="smart_home" style="left: 900px; top: 400px;" onclick="showModuleInfo('smart_home')">
+            <span class="node-icon">🏠</span>
+            <div class="node-title">Smart Home</div>
+            <span class="status offline" id="status-smart_home">❌ Offline</span>
+        </div>
+
+        <div class="node active" id="vehicles" style="left: 400px; top: 600px;" onclick="showModuleInfo('vehicles')">
+            <span class="node-icon">🚗</span>
+            <div class="node-title">Vehicles</div>
+            <span class="status online" id="status-vehicles">✅ Online</span>
+        </div>
+
+        <div class="node active" id="robotics" style="left: 600px; top: 600px;" onclick="showModuleInfo('robotics')">
+            <span class="node-icon">🤖</span>
+            <div class="node-title">Robotics</div>
+            <span class="status online" id="status-robotics">✅ Online</span>
+        </div>
+
+        <div class="node active" id="science" style="left: 800px; top: 600px;" onclick="showModuleInfo('science')">
+            <span class="node-icon">🔬</span>
+            <div class="node-title">Science</div>
+            <span class="status online" id="status-science">✅ Online</span>
+        </div>
+
+        <div class="node warning" id="communications" style="left: 600px; top: 800px;" onclick="showModuleInfo('communications')">
+            <span class="node-icon">📡</span>
+            <div class="node-title">Communications</div>
+            <span class="status warning" id="status-communications">⚠️ Warning</span>
+        </div>
+    </div>
+
+    <!-- Control Panel -->
+    <div class="control-panel">
+        <div class="info-header">🎛️ Control Panel</div>
+        <button class="control-button" onclick="refreshAllModules()">🔄 Refresh All</button>
+        <button class="control-button" onclick="toggleAutoRefresh()">⏱️ Auto Refresh</button>
+        <button class="control-button danger" onclick="restartAllModules()">🔁 Restart All</button>
+        <button class="control-button success" onclick="exportStatus()">📊 Export Status</button>
+        
+        <div class="system-status">
+            <div class="info-item">
+                <span class="info-label">Auto Refresh:</span>
+                <span class="info-value" id="auto-status">ON</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Last Update:</span>
+                <span class="info-value" id="last-update">--:--:--</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Active Modules:</span>
+                <span class="info-value" id="active-count">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Box -->
+    <div id="info-box">
+        <div class="info-header" id="info-title">🌐 Global Optimizer</div>
+        <div class="info-item">
+            <span class="info-label">Status:</span>
+            <span class="info-value" id="info-status">Online</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Performance:</span>
+            <span class="info-value" id="info-performance">98.5%</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Connections:</span>
+            <span class="info-value" id="info-connections">12</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Data Flow:</span>
+            <span class="info-value" id="info-dataflow">2.3 MB/s</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Last Update:</span>
+            <span class="info-value" id="info-timestamp">--:--:--</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Overall Status:</span>
+            <span class="info-value" id="overall-status">🟢 Operational</span>
+        </div>
+    </div>
+
+    <script>
+        // Module data with real-time information
+        const modules = {
+            global: { name: "Global Optimizer", icon: "🌐", description: "Central coordination hub managing all system modules" },
+            finance: { name: "Finance", icon: "💰", description: "Financial analysis and budget optimization" },
+            logistics: { name: "Logistics", icon: "🚚", description: "Supply chain and transportation optimization" },
+            healthcare: { name: "Healthcare", icon: "🏥", description: "Health monitoring and wellness management" },
+            tourism: { name: "Tourism", icon: "🌴", description: "Travel itineraries and tourism services" },
+            agriculture: { name: "Agriculture", icon: "🚜", description: "Crop management and agricultural optimization" },
+            industry: { name: "Industry", icon: "🏭", description: "Industrial production and manufacturing" },
+            energy: { name: "Energy", icon: "⚡", description: "Energy management and sustainability tracking" },
+            smart_home: { name: "Smart Home", icon: "🏠", description: "Smart home automation and IoT devices" },
+            vehicles: { name: "Autonomous Vehicles", icon: "🚗", description: "Autonomous vehicle coordination" },
+            robotics: { name: "Robotics", icon: "🤖", description: "Robotics and automation systems" },
+            science: { name: "Science", icon: "🔬", description: "Research and development initiatives" },
+            communications: { name: "Communications", icon: "📡", description: "Communication systems and networks" }
+        };
+
+        let autoRefresh = true;
+        let refreshInterval;
+        const linksSVG = document.getElementById("links");
+        const nodes = Object.keys(modules).filter(key => key !== 'global');
+
+        // Create connections between Global Optimizer and all modules
+        function createConnections() {
+            linksSVG.innerHTML = '<defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#333" /></marker></defs>';
+            
+            nodes.forEach(nodeId => {
+                const source = document.getElementById('global');
+                const target = document.getElementById(nodeId);
+                
+                if (!source || !target) return;
+                
+                const sourceRect = source.getBoundingClientRect();
+                const targetRect = target.getBoundingClientRect();
+                const svgRect = linksSVG.getBoundingClientRect();
+                
+                const x1 = sourceRect.left + sourceRect.width/2 - svgRect.left;
+                const y1 = sourceRect.top + sourceRect.height/2 - svgRect.top;
+                const x2 = targetRect.left + targetRect.width/2 - svgRect.left;
+                const y2 = targetRect.top + targetRect.height/2 - svgRect.top;
+
+                // Create connection line
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", x1);
+                line.setAttribute("y1", y1);
+                line.setAttribute("x2", x2);
+                line.setAttribute("y2", y2);
+                
+                // Set line class based on target status
+                const targetStatus = target.querySelector('.status').textContent;
+                let linkClass = 'link';
+                if (targetStatus.includes('✅')) linkClass += ' active';
+                else if (targetStatus.includes('⚠️')) linkClass += ' warning';
+                else if (targetStatus.includes('❌')) linkClass += ' offline';
+                
+                line.setAttribute("class", linkClass);
+                line.setAttribute("marker-end", "url(#arrowhead)");
+                linksSVG.appendChild(line);
+
+                // Create animated data flow dots
+                if (targetStatus.includes('✅')) {
+                    createDataFlowDot(x1, y1, x2, y2, 'active');
+                } else if (targetStatus.includes('⚠️')) {
+                    createDataFlowDot(x1, y1, x2, y2, 'warning');
+                }
+            });
+        }
+
+        // Create animated data flow dots
+        function createDataFlowDot(x1, y1, x2, y2, status) {
+            const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            dot.setAttribute("class", `data-dot ${status}`);
+            dot.setAttribute("r", "4");
+            
+            // Animate dot along the line
+            const animateMotion = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
+            animateMotion.setAttribute("dur", "3s");
+            animateMotion.setAttribute("repeatCount", "indefinite");
+            animateMotion.setAttribute("begin", Math.random() * 3 + "s");
+            
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttribute("d", `M ${x1} ${y1} L ${x2} ${y2}`);
+            animateMotion.appendChild(path);
+            
+            dot.appendChild(animateMotion);
+            linksSVG.appendChild(dot);
+        }
+
+        // Show module information in info box
+        function showModuleInfo(moduleId) {
+            const module = modules[moduleId];
+            if (!module) return;
+            
+            const statusEl = document.getElementById(`status-${moduleId}`);
+            const status = statusEl ? statusEl.textContent : 'Unknown';
+            
+            document.getElementById('info-title').textContent = `${module.icon} ${module.name}`;
+            document.getElementById('info-status').textContent = status.replace(/[✅⚠️❌🔄]\s*/, '');
+            document.getElementById('info-timestamp').textContent = new Date().toLocaleTimeString();
+            
+            // Simulate performance data
+            const performance = (85 + Math.random() * 15).toFixed(1) + '%';
+            const connections = Math.floor(Math.random() * 20) + 1;
+            const dataflow = (Math.random() * 5).toFixed(1) + ' MB/s';
+            
+            document.getElementById('info-performance').textContent = performance;
+            document.getElementById('info-connections').textContent = connections;
+            document.getElementById('info-dataflow').textContent = dataflow;
+            
+            // Fetch real-time data from backend
+            fetchModuleStatus(moduleId);
+        }
+
+        // Fetch module status from backend API
+        async function fetchModuleStatus(moduleId) {
+            try {
+                const response = await fetch(`http://localhost:5000/api/status/${moduleId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    updateModuleStatus(moduleId, data);
+                }
+            } catch (error) {
+                console.log(`Backend not available for ${moduleId}, using simulated data`);
+                simulateModuleUpdate(moduleId);
+            }
+        }
+
+        // Update module status with real data
+        function updateModuleStatus(moduleId, data) {
+            if (data.status) {
+                const statusEl = document.getElementById(`status-${moduleId}`);
+                const nodeEl = document.getElementById(moduleId);
+                
+                let statusText, statusClass, nodeClass;
+                switch(data.status) {
+                    case 'active':
+                        statusText = '✅ Online';
+                        statusClass = 'online';
+                        nodeClass = 'active';
+                        break;
+                    case 'warning':
+                        statusText = '⚠️ Warning';
+                        statusClass = 'warning';
+                        nodeClass = 'warning';
+                        break;
+                    case 'offline':
+                        statusText = '❌ Offline';
+                        statusClass = 'offline';
+                        nodeClass = 'offline';
+                        break;
+                    case 'loading':
+                        statusText = '🔄 Loading';
+                        statusClass = 'loading';
+                        nodeClass = 'loading';
+                        break;
+                }
+                
+                statusEl.textContent = statusText;
+                statusEl.className = `status ${statusClass}`;
+                nodeEl.className = `node ${nodeClass}`;
+            }
+            
+            if (data.performance) document.getElementById('info-performance').textContent = data.performance;
+            if (data.connections !== undefined) document.getElementById('info-connections').textContent = data.connections;
+            if (data.dataflow) document.getElementById('info-dataflow').textContent = data.dataflow;
+        }
+
+        // Simulate module updates for demo purposes
+        function simulateModuleUpdate(moduleId) {
+            const statuses = ['active', 'warning', 'offline', 'loading'];
+            const weights = [0.6, 0.2, 0.1, 0.1]; // 60% active, 20% warning, 10% offline, 10% loading
+            
+            let random = Math.random();
+            let status = statuses[0];
+            
+            if (random < weights[3]) status = statuses[3];
+            else if (random < weights[2] + weights[3]) status = statuses[2];
+            else if (random < weights[1] + weights[2] + weights[3]) status = statuses[1];
+            
+            updateModuleStatus(moduleId, { 
+                status: status,
+                performance: (85 + Math.random() * 15).toFixed(1) + '%',
+                connections: Math.floor(Math.random() * 20) + 1,
+                dataflow: (Math.random() * 5).toFixed(1) + ' MB/s'
+            });
+        }
+
+        // Refresh all modules
+        function refreshAllModules() {
+            Object.keys(modules).forEach(moduleId => {
+                fetchModuleStatus(moduleId);
+            });
+            
+            updateSystemStatus();
+            createConnections();
+        }
+
+        // Toggle auto refresh
+        function toggleAutoRefresh() {
+            autoRefresh = !autoRefresh;
+            document.getElementById('auto-status').textContent = autoRefresh ? 'ON' : 'OFF';
+            
+            if (autoRefresh) {
+                startAutoRefresh();
+            } else {
+                clearInterval(refreshInterval);
+            }
+        }
+
+        // Start auto refresh
+        function startAutoRefresh() {
+            if (refreshInterval) clearInterval(refreshInterval);
+            
+            refreshInterval = setInterval(() => {
+                if (autoRefresh) {
+                    refreshAllModules();
+                }
+            }, 3000); // Refresh every 3 seconds
+        }
+
+        // Restart all modules
+        function restartAllModules() {
+            Object.keys(modules).forEach(moduleId => {
+                const statusEl = document.getElementById(`status-${moduleId}`);
+                const nodeEl = document.getElementById(moduleId);
+                
+                statusEl.textContent = '🔄 Restarting...';
+                statusEl.className = 'status loading';
+                nodeEl.className = 'node loading';
+            });
+            
+            setTimeout(() => {
+                refreshAllModules();
+            }, 2000);
+        }
+
+        // Export status to JSON
+        function exportStatus() {
+            const statusData = {};
+            Object.keys(modules).forEach(moduleId => {
+                const statusEl = document.getElementById(`status-${moduleId}`);
+                statusData[moduleId] = {
+                    name: modules[moduleId].name,
+                    status: statusEl ? statusEl.textContent : 'Unknown',
+                    timestamp: new Date().toISOString()
+                };
+            });
+            
+            const dataStr = JSON.stringify(statusData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `omni-status-${new Date().toISOString().slice(0,10)}.json`;
+            link.click();
+        }
+
+        // Update system status
+        function updateSystemStatus() {
+            const now = new Date();
+            document.getElementById('last-update').textContent = now.toLocaleTimeString();
+            
+            const activeCount = Object.keys(modules).filter(moduleId => {
+                const statusEl = document.getElementById(`status-${moduleId}`);
+                return statusEl && statusEl.textContent.includes('✅');
+            }).length;
+            
+            document.getElementById('active-count').textContent = activeCount;
+            
+            // Update overall status
+            const totalModules = Object.keys(modules).length;
+            let overallStatus;
+            
+            if (activeCount >= totalModules * 0.8) {
+                overallStatus = '🟢 Operational';
+            } else if (activeCount >= totalModules * 0.5) {
+                overallStatus = '🟡 Partial';
+            } else {
+                overallStatus = '🔴 Critical';
+            }
+            
+            document.getElementById('overall-status').textContent = overallStatus;
+        }
+
+        // Initialize dashboard
+        function initDashboard() {
+            createConnections();
+            showModuleInfo('global');
+            updateSystemStatus();
+            startAutoRefresh();
+        }
+
+        // Responsive handling
+        window.addEventListener('resize', () => {
+            setTimeout(createConnections, 100);
+        });
+
+        // Initialize when page loads
+        window.addEventListener('load', initDashboard);
+    </script>
+</body>
+</html>

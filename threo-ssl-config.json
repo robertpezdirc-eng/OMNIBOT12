@@ -1,0 +1,49 @@
+{
+  "domains": [
+    {
+      "name": "localhost",
+      "email": "admin@localhost.com",
+      "webroot": "/var/www/html",
+      "enabled": true
+    },
+    {
+      "name": "omni-brain.local",
+      "email": "admin@omni-brain.local",
+      "webroot": "/var/www/html",
+      "enabled": false
+    },
+    {
+      "name": "threo.example.com",
+      "email": "admin@threo.example.com",
+      "webroot": "/var/www/html",
+      "enabled": false
+    }
+  ],
+  "settings": {
+    "win_acme_version": "v2.1.25.0",
+    "certbot_plugins": ["nginx", "apache", "webroot", "standalone"],
+    "auto_renewal": true,
+    "log_level": "INFO",
+    "backup_certificates": true,
+    "notification_email": true
+  },
+  "paths": {
+    "linux": {
+      "certbot_config": "/etc/letsencrypt",
+      "webroot": "/var/www/html",
+      "log_dir": "/var/log/threo-ssl"
+    },
+    "windows": {
+      "win_acme_dir": "C:/win-acme",
+      "certificates_dir": "C:/win-acme/certificates",
+      "log_dir": "C:/win-acme/logs"
+    }
+  },
+  "security": {
+    "min_key_size": 2048,
+    "cipher_suites": ["ECDHE-RSA-AES256-GCM-SHA384", "ECDHE-RSA-AES128-GCM-SHA256"],
+    "protocols": ["TLSv1.2", "TLSv1.3"],
+    "hsts_enabled": true,
+    "ocsp_stapling": true
+  }
+}

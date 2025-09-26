@@ -1,0 +1,245 @@
+{
+  "timestamp": "2025-09-21T21:22:08.097Z",
+  "duration": "1421ms",
+  "totalTests": 10,
+  "successful": 8,
+  "failed": 2,
+  "successRate": "80.0%",
+  "results": [
+    {
+      "name": "Server Connectivity",
+      "status": "USPEŠNO",
+      "result": {
+        "status": 200,
+        "data": {
+          "success": true,
+          "data": {
+            "initialized": true,
+            "uptime": 26434,
+            "modules": {
+              "iot": {
+                "id": "iot",
+                "name": "IoT Naprave",
+                "status": "active",
+                "health": 100,
+                "lastActivity": 1758489700610,
+                "metrics": {
+                  "requests": 0,
+                  "errors": 0,
+                  "avgResponseTime": 0
+                }
+              },
+              "industry": {
+                "id": "industry",
+                "name": "Industrija",
+                "status": "active",
+                "health": 100,
+                "lastActivity": 1758489700614,
+                "metrics": {
+                  "requests": 0,
+                  "errors": 0,
+                  "avgResponseTime": 0
+                }
+              },
+              "agriculture": {
+                "id": "agriculture",
+                "name": "Kmetijstvo",
+                "status": "active",
+                "health": 100,
+                "lastActivity": 1758489700614,
+                "metrics": {
+                  "requests": 0,
+                  "errors": 0,
+                  "avgResponseTime": 0
+                }
+              },
+              "healthcare": {
+                "id": "healthcare",
+                "name": "Zdravstvo",
+                "status": "active",
+                "health": 100,
+                "lastActivity": 1758489700614,
+                "metrics": {
+                  "requests": 0,
+                  "errors": 0,
+                  "avgResponseTime": 0
+                }
+              },
+              "ai": {
+                "id": "ai",
+                "name": "AI Asistent",
+                "status": "active",
+                "health": 100,
+                "lastActivity": 1758489700614,
+                "metrics": {
+                  "requests": 0,
+                  "errors": 0,
+                  "avgResponseTime": 0
+                }
+              }
+            },
+            "health": {
+              "timestamp": 1758489726778,
+              "status": "healthy",
+              "issues": [],
+              "metrics": {
+                "memory": {
+                  "usage": 0.7970824229056728,
+                  "total": 12419072,
+                  "used": 9899024
+                },
+                "uptime": 26.9330633,
+                "pid": 22320
+              }
+            },
+            "performance": [
+              {
+                "timestamp": 1758489710630,
+                "memory": {
+                  "rss": 44335104,
+                  "heapTotal": 12419072,
+                  "heapUsed": 9749408,
+                  "external": 2334905,
+                  "arrayBuffers": 18635
+                },
+                "cpu": {
+                  "user": 453000,
+                  "system": 265000
+                },
+                "uptime": 10286,
+                "activeModules": 5,
+                "requests": 0,
+                "errors": 0
+              },
+              {
+                "timestamp": 1758489720640,
+                "memory": {
+                  "rss": 44363776,
+                  "heapTotal": 12419072,
+                  "heapUsed": 9800136,
+                  "external": 2334921,
+                  "arrayBuffers": 18651
+                },
+                "cpu": {
+                  "user": 453000,
+                  "system": 265000
+                },
+                "uptime": 20296,
+                "activeModules": 5,
+                "requests": 0,
+                "errors": 0
+              }
+            ],
+            "metrics": {
+              "totalRequests": 0,
+              "totalErrors": 0,
+              "errorRate": 0
+            }
+          },
+          "timestamp": 1758489726778
+        }
+      }
+    },
+    {
+      "name": "API Endpoints",
+      "status": "USPEŠNO",
+      "result": {
+        "/api/status": {
+          "status": 200,
+          "working": true
+        },
+        "/api/modules": {
+          "status": 200,
+          "working": true
+        },
+        "/api/system/health": {
+          "status": 404,
+          "working": false
+        },
+        "/api/ai/chat": {
+          "status": 404,
+          "working": false
+        },
+        "/api/data/logs": {
+          "status": 200,
+          "working": true
+        }
+      }
+    },
+    {
+      "name": "Module Functionality",
+      "status": "USPEŠNO",
+      "result": {
+        "iot": {
+          "working": true
+        },
+        "industry": {
+          "working": true
+        },
+        "agriculture": {
+          "working": true
+        },
+        "healthcare": {
+          "working": true
+        },
+        "ai": {
+          "working": true
+        }
+      }
+    },
+    {
+      "name": "AI Integration",
+      "status": "USPEŠNO",
+      "result": {
+        "responseReceived": false,
+        "responseLength": 0,
+        "processingTime": 0
+      }
+    },
+    {
+      "name": "Data Persistence",
+      "status": "USPEŠNO",
+      "result": {
+        "saved": true,
+        "loaded": true,
+        "dataIntegrity": false
+      }
+    },
+    {
+      "name": "Real-time Features",
+      "status": "NEUSPEŠNO",
+      "error": "WebSocket napaka: socket hang up"
+    },
+    {
+      "name": "Security Features",
+      "status": "USPEŠNO",
+      "result": {
+        "rateLimiting": "POTREBUJE IZBOLJŠAVO",
+        "cors": "AKTIVNO"
+      }
+    },
+    {
+      "name": "Performance Metrics",
+      "status": "USPEŠNO",
+      "result": {
+        "responseTime": 4,
+        "metricsAvailable": true,
+        "systemLoad": 34.92538824274922,
+        "memoryUsage": 66.01919109699908
+      }
+    },
+    {
+      "name": "Error Handling",
+      "status": "USPEŠNO",
+      "result": {
+        "notFound": "DOBRO",
+        "invalidData": "DOBRO"
+      }
+    },
+    {
+      "name": "System Integration",
+      "status": "NEUSPEŠNO",
+      "error": "Request failed with status code 500"
+    }
+  ]
+}

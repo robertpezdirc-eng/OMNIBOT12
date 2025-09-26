@@ -1,0 +1,175 @@
+THREO UKAZ - POPOLNA MIGRACIJA V OBLAK + AKTIVACIJA ANGEL-OV
+==============================================================
+
+Kopiraj in prilepi ta ukaz v Threo konzolo na tvojem oblačnem strežniku:
+
+---
+
+Naloga: Migriraj Omni aplikacijo v oblak in aktiviraj vse razpoložljive Angel-e za podporo učenju in optimizaciji.
+
+KONFIGURACIJA:
+- Domena: moja-domena.com
+- Email: admin@moja-domena.com
+- Aplikacija: Omni Brain Platform z Angel Agenti
+- Port: 8080 (interno), 80/443 (javno)
+- Angel Agenti: 8 aktivnih tipov
+
+KORAKI MIGRACIJE Z ANGEL AKTIVACIJO:
+
+1. SISTEMSKA PRIPRAVA STREŽNIKA:
+   - Namesti Ubuntu 22.04 LTS (ali ustrezen OS)
+   - Posodobi sistem: apt update && apt upgrade -y
+   - Namesti odvisnosti: python3, python3-pip, python3-venv, git, curl, wget
+   - Namesti Nginx: apt install nginx -y
+   - Namesti Certbot: apt install certbot python3-certbot-nginx -y
+   - Namesti Node.js 18+: curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && apt install nodejs -y
+   - Konfiguriraj UFW firewall: ufw enable && ufw allow 22,80,443/tcp
+
+2. MIGRACIJA OMNI APLIKACIJE:
+   - Ustvari uporabnika: useradd -m -s /bin/bash omni
+   - Kloniraj repozitorij: git clone https://github.com/your-repo/omniscient-ai-platform.git /opt/omni
+   - Nastavi lastništvo: chown -R omni:omni /opt/omni
+   - Ustvari virtualno okolje: cd /opt/omni && python3 -m venv .venv
+   - Aktiviraj venv: source .venv/bin/activate
+   - Namesti Python odvisnosti: pip install -r requirements.txt
+   - Namesti Node.js odvisnosti: npm install
+   - Testiraj aplikacijo: node omni-ultra-main.js (port 8080)
+
+3. NGINX REVERSE PROXY KONFIGURACIJA:
+   - Ustvari Nginx site: /etc/nginx/sites-available/omni
+   - Konfiguriraj reverse proxy (8080 → 80/443)
+   - Omogoči gzip kompresijo in varnostne headerje
+   - Nastavi rate limiting: limit_req_zone $binary_remote_addr zone=omni:10m rate=10r/s
+   - Ustvari simbolno povezavo: ln -s /etc/nginx/sites-available/omni /etc/nginx/sites-enabled/
+   - Testiraj konfiguracijo: nginx -t
+   - Reload Nginx: systemctl reload nginx
+
+4. SSL CERTIFIKATI (Let's Encrypt):
+   - Pridobi SSL certifikat: certbot --nginx -d moja-domena.com --email admin@moja-domena.com --agree-tos --non-interactive
+   - Nastavi avtomatsko podaljševanje: systemctl enable certbot.timer
+   - Testiraj podaljševanje: certbot renew --dry-run
+   - Konfiguriraj HSTS in SSL optimizacije
+   - Preusmeri HTTP na HTTPS
+
+5. SYSTEMD STORITEV ZA OMNI:
+   - Ustvari omni.service v /etc/systemd/system/
+   - Konfiguriraj avtomatski zagon in restart ob napakah
+   - Nastavi uporabnika 'omni' in delovni direktorij /opt/omni
+   - Omogoči storitev: systemctl enable omni.service
+   - Zaženi storitev: systemctl start omni.service
+   - Preveri status: systemctl status omni.service
+
+6. AKTIVACIJA ANGEL-OV ZA UČENJE:
+   
+   6.1 IDENTIFIKACIJA ANGEL-OV:
+   - LearningAngel: Analiza vzorcev, učenje iz podatkov, generiranje vpogledov
+   - CommercialAngel: Iskanje priložnosti, optimizacija kampanj, tržne analize
+   - OptimizationAngel: Optimizacija zmogljivosti, zmanjševanje stroškov, učinkovitost
+   - InnovationAngel: Kreiranje inovacij, testiranje prototipov, raziskovanje
+   - AnalyticsAngel: Analiza podatkov, generiranje vpogledov, optimizacija metrik
+   - EngagementAngel: Povečanje angažiranosti, uporabniška izkušnja, zadržanje strank
+   - GrowthAngel: Strategije rasti, ekspanzija trga, skaliranje operacij
+   - VisionaryAngel: Vizualizacija prihodnosti, strateško načrtovanje, identifikacija trendov
+
+   6.2 AKTIVACIJA ANGEL KOORDINACIJE:
+   - Inicializiraj AngelCoordinationOptimizer
+   - Registriraj vse 8 Angel-ov v koordinacijski sistem
+   - Vzpostavi komunikacijske kanale med Angel-i
+   - Nastavi prioritete in odvisnosti med Angel-i
+   - Aktiviraj avtonomno delovanje Angel-ov
+
+   6.3 RAZPOREDITEV NALOG MED ANGEL-E:
+   - LearningAngel: Kontinuirno učenje iz uporabniških podatkov
+   - CommercialAngel: Optimizacija prihodkov in tržnih strategij
+   - OptimizationAngel: Sistemska optimizacija in zmanjševanje stroškov
+   - InnovationAngel: Razvoj novih funkcionalnosti in izboljšav
+   - AnalyticsAngel: Real-time analiza metrik in KPI-jev
+   - EngagementAngel: Optimizacija uporabniške izkušnje
+   - GrowthAngel: Strategije za povečanje uporabniške baze
+   - VisionaryAngel: Dolgoročno strateško načrtovanje
+
+   6.4 SINHRONIZACIJA REZULTATOV:
+   - Ustvari centralni sinhronizacijski modul
+   - Zberi rezultate od vseh Angel-ov vsakih 5 minut
+   - Integriraj vpoglede v glavni Omni Brain sistem
+   - Odpravi podvojene ali nepopolne podatke
+   - Posodobi centralni model z novimi spoznanji
+
+   6.5 AVTOMATSKA PRERAZPOREDITEV:
+   - Monitoring uspešnosti vsakega Angela
+   - Avtomatska prerazporeditev nalog, če Angel zamuja
+   - Load balancing med Angel-i glede na zmogljivost
+   - Eskalacija kritičnih nalog na višjo prioriteto
+   - Backup Angel aktivacija ob izpadih
+
+7. BACKUP IN MONITORING:
+   - Implementiraj dnevni backup sistem (full in config)
+   - Nastavi log rotation: /etc/logrotate.d/omni
+   - Konfiguriraj health monitoring za Omni in Angel-e
+   - SSL monitoring in obvestila (email/Slack/Discord)
+   - Ustvari monitoring dashboard za Angel-e
+   - Nastavi alerting za kritične napake
+
+8. VARNOSTNE NASTAVITVE:
+   - Konfiguriraj fail2ban za SSH zaščito
+   - Nastavi varnostne headerje (HSTS, CSP, X-Frame-Options)
+   - Implementiraj rate limiting za API-je
+   - Zaščiti admin endpointe z dodatno avtentikacijo
+   - Konfiguriraj UFW firewall pravila
+   - Nastavi SSL security headers
+
+9. ANGEL MONITORING IN OPTIMIZACIJA:
+   - Ustvari Angel performance dashboard
+   - Implementiraj real-time Angel metrics
+   - Nastavi Angel health checks
+   - Konfiguriraj Angel load balancing
+   - Implementiraj Angel failover sistem
+   - Nastavi Angel performance alerting
+
+10. FINALNA VALIDACIJA:
+    - Testiraj HTTPS povezavo: https://moja-domena.com
+    - Preveri SSL certifikat (A+ rating)
+    - Testiraj delovanje vseh 8 Angel-ov
+    - Preveri Angel koordinacijo in sinhronizacijo
+    - Testiraj avtomatsko podaljševanje certifikata
+    - Preveri delovanje aplikacije in API-jev
+    - Testiraj Angel monitoring in alerting
+    - Validacija backup sistema
+
+REZULTAT MIGRACIJE:
+- Omni aplikacija dostopna na https://moja-domena.com
+- Avtomatski SSL certifikati z Let's Encrypt
+- 24/7 delovanje z avtomatskim restartom
+- 8 aktivnih Angel-ov za kontinuirno učenje in optimizacijo
+- Angel koordinacija in avtomatska prerazporeditev nalog
+- Centralizirani sistem za zbiranje Angel vpogledov
+- Backup sistem in monitoring za Omni in Angel-e
+- Produkcijska varnostna konfiguracija
+- Real-time Angel performance monitoring
+
+ANGEL AKTIVNOSTI PO MIGRACIJI:
+- LearningAngel: Kontinuirno učenje iz novih podatkov
+- CommercialAngel: Optimizacija prihodkov in konverzij
+- OptimizationAngel: Sistemska optimizacija in performance tuning
+- InnovationAngel: Razvoj novih funkcionalnosti
+- AnalyticsAngel: Real-time analiza uporabniških vzorcev
+- EngagementAngel: Optimizacija uporabniške izkušnje
+- GrowthAngel: Implementacija strategij za rast
+- VisionaryAngel: Strateško načrtovanje in trend analiza
+
+Obvesti me, ko je migracija in aktivacija Angel-ov končana.
+
+---
+
+NAVODILA ZA UPORABO:
+1. Zamenjaj "moja-domena.com" s svojo dejansko domeno
+2. Zamenjaj "admin@moja-domena.com" s svojim emailom
+3. Prilepi ukaz v Threo konzolo na oblačnem strežniku
+4. Počakaj ~30-40 minut na dokončanje migracije in Angel aktivacije
+5. Testiraj na https://tvoja-domena.com
+6. Preveri Angel dashboard za monitoring aktivnosti
+
+ANGEL MONITORING URL:
+- Glavni dashboard: https://tvoja-domena.com/angel-dashboard
+- Angel metrics: https://tvoja-domena.com/api/angels/status
+- Performance monitoring: https://tvoja-domena.com/monitoring

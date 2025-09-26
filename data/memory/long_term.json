@@ -1,0 +1,278 @@
+[
+  {
+    "id": "mem_0_1758526484.632426",
+    "content": "Registriran nov modul: finance",
+    "timestamp": "2025-09-22T09:34:44.632647",
+    "category": "system",
+    "importance": 0.8,
+    "metadata": {
+      "module": "finance",
+      "functions": [
+        "FinanceModule"
+      ]
+    }
+  },
+  {
+    "id": "mem_1_1758526484.647766",
+    "content": "Registriran nov modul: tourism",
+    "timestamp": "2025-09-22T09:34:44.647781",
+    "category": "system",
+    "importance": 0.8,
+    "metadata": {
+      "module": "tourism",
+      "functions": [
+        "TourismModule"
+      ]
+    }
+  },
+  {
+    "id": "mem_2_1758526484.649313",
+    "content": "Registriran nov modul: devops",
+    "timestamp": "2025-09-22T09:34:44.649320",
+    "category": "system",
+    "importance": 0.8,
+    "metadata": {
+      "module": "devops",
+      "functions": [
+        "DevOpsModule"
+      ]
+    }
+  },
+  {
+    "id": "mem_3_1758526484.660104",
+    "content": "Uporabnikov vnos: Analiziraj podjetje in predlagaj optimizacijo vseh oddelkov.",
+    "timestamp": "2025-09-22T09:34:44.660115",
+    "category": "interaction",
+    "importance": 0.6,
+    "metadata": {
+      "timestamp": "2025-09-22T09:34:44.660072"
+    }
+  },
+  {
+    "id": "mem_4_1758526519.21961",
+    "content": "Registriran nov modul: finance",
+    "timestamp": "2025-09-22T09:35:19.219660",
+    "category": "system",
+    "importance": 0.8,
+    "metadata": {
+      "module": "finance",
+      "functions": [
+        "FinanceModule"
+      ]
+    }
+  },
+  {
+    "id": "mem_5_1758526519.225156",
+    "content": "Registriran nov modul: tourism",
+    "timestamp": "2025-09-22T09:35:19.225173",
+    "category": "system",
+    "importance": 0.8,
+    "metadata": {
+      "module": "tourism",
+      "functions": [
+        "TourismModule"
+      ]
+    }
+  },
+  {
+    "id": "mem_6_1758526519.228771",
+    "content": "Registriran nov modul: devops",
+    "timestamp": "2025-09-22T09:35:19.228785",
+    "category": "system",
+    "importance": 0.8,
+    "metadata": {
+      "module": "devops",
+      "functions": [
+        "DevOpsModule"
+      ]
+    }
+  },
+  {
+    "id": "mem_7_1758526519.232167",
+    "content": "Uporabnikov vnos: Analiziraj podjetje in predlagaj optimizacijo vseh oddelkov.",
+    "timestamp": "2025-09-22T09:35:19.232179",
+    "category": "interaction",
+    "importance": 0.6,
+    "metadata": {
+      "timestamp": "2025-09-22T09:35:19.232096"
+    }
+  },
+  {
+    "id": "mem_8_1758526607.096742",
+    "content": "Registriran nov modul: finance",
+    "timestamp": "2025-09-22T09:36:47.096784",
+    "category": "system",
+    "importance": 0.8,
+    "metadata": {
+      "module": "finance",
+      "functions": [
+        "FinanceModule"
+      ]
+    }
+  },
+  {
+    "id": "mem_9_1758526607.100829",
+    "content": "Registriran nov modul: tourism",
+    "timestamp": "2025-09-22T09:36:47.100841",
+    "category": "system",
+    "importance": 0.8,
+    "metadata": {
+      "module": "tourism",
+      "functions": [
+        "TourismModule"
+      ]
+    }
+  },
+  {
+    "id": "mem_10_1758526607.109614",
+    "content": "Registriran nov modul: devops",
+    "timestamp": "2025-09-22T09:36:47.109626",
+    "category": "system",
+    "importance": 0.8,
+    "metadata": {
+      "module": "devops",
+      "functions": [
+        "DevOpsModule"
+      ]
+    }
+  },
+  {
+    "id": "mem_11_1758526607.121735",
+    "content": "Uporabnikov vnos: Analiziraj podjetje in predlagaj optimizacijo vseh oddelkov.",
+    "timestamp": "2025-09-22T09:36:47.121746",
+    "category": "interaction",
+    "importance": 0.6,
+    "metadata": {
+      "timestamp": "2025-09-22T09:36:47.121712"
+    }
+  },
+  {
+    "id": "mem_12_1758526725.6738",
+    "content": "Registriran nov modul: finance",
+    "timestamp": "2025-09-22T09:38:45.673842",
+    "category": "system",
+    "importance": 0.8,
+    "metadata": {
+      "module": "finance",
+      "functions": [
+        "FinanceModule"
+      ]
+    }
+  },
+  {
+    "id": "mem_13_1758526725.686877",
+    "content": "Registriran nov modul: tourism",
+    "timestamp": "2025-09-22T09:38:45.686893",
+    "category": "system",
+    "importance": 0.8,
+    "metadata": {
+      "module": "tourism",
+      "functions": [
+        "TourismModule"
+      ]
+    }
+  },
+  {
+    "id": "mem_14_1758526725.6953",
+    "content": "Registriran nov modul: devops",
+    "timestamp": "2025-09-22T09:38:45.695312",
+    "category": "system",
+    "importance": 0.8,
+    "metadata": {
+      "module": "devops",
+      "functions": [
+        "DevOpsModule"
+      ]
+    }
+  },
+  {
+    "id": "mem_15_1758526725.69885",
+    "content": "Registrirana nova integracija: web_search",
+    "timestamp": "2025-09-22T09:38:45.698865",
+    "category": "system",
+    "importance": 0.7,
+    "metadata": {
+      "integration": "web_search"
+    }
+  },
+  {
+    "id": "mem_16_1758526725.704066",
+    "content": "Uporabnikov vnos: Kakšne so aktualne cene nepremičnin v Ljubljani?",
+    "timestamp": "2025-09-22T09:38:45.704075",
+    "category": "interaction",
+    "importance": 0.6,
+    "metadata": {
+      "timestamp": "2025-09-22T09:38:45.704049"
+    }
+  },
+  {
+    "id": "mem_17_1758526725.714842",
+    "content": "Uporabnikov vnos: Kako optimizirati finance podjetja?",
+    "timestamp": "2025-09-22T09:38:45.714849",
+    "category": "interaction",
+    "importance": 0.6,
+    "metadata": {
+      "timestamp": "2025-09-22T09:38:45.714825"
+    }
+  },
+  {
+    "id": "mem_18_1758527607.041307",
+    "content": "Registriran nov modul: iot",
+    "timestamp": "2025-09-22T09:53:27.041540",
+    "category": "system",
+    "importance": 0.8,
+    "metadata": {
+      "module": "iot",
+      "functions": [
+        "bulk_control",
+        "get_status",
+        "list_devices",
+        "restart",
+        "run",
+        "status",
+        "turn_off",
+        "turn_on"
+      ]
+    }
+  },
+  {
+    "id": "mem_19_1758527607.046792",
+    "content": "Uporabnikov vnos: Prižgi pametno TV in preveri stanje",
+    "timestamp": "2025-09-22T09:53:27.046802",
+    "category": "interaction",
+    "importance": 0.6,
+    "metadata": {
+      "timestamp": "2025-09-22T09:53:27.046761"
+    }
+  },
+  {
+    "id": "mem_20_1758527607.560367",
+    "content": "Uporabnikov vnos: IoT nadzor: ugasni vse naprave",
+    "timestamp": "2025-09-22T09:53:27.560379",
+    "category": "interaction",
+    "importance": 0.6,
+    "metadata": {
+      "timestamp": "2025-09-22T09:53:27.560341"
+    }
+  },
+  {
+    "id": "mem_21_1758527608.085022",
+    "content": "Uporabnikov vnos: Seznam IoT naprav",
+    "timestamp": "2025-09-22T09:53:28.085035",
+    "category": "interaction",
+    "importance": 0.6,
+    "metadata": {
+      "timestamp": "2025-09-22T09:53:28.084996"
+    }
+  },
+  {
+    "id": "mem_22_1758527608.594694",
+    "content": "Uporabnikov vnos: Restart stroj 1 in klimatsko napravo",
+    "timestamp": "2025-09-22T09:53:28.594708",
+    "category": "interaction",
+    "importance": 0.6,
+    "metadata": {
+      "timestamp": "2025-09-22T09:53:28.594667"
+    }
+  }
+]

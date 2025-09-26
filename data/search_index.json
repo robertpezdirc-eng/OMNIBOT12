@@ -1,0 +1,69 @@
+{
+  "documents": [
+    {
+      "id": 1,
+      "title": "Navodila za uporabo OmniCore",
+      "content": "OmniCore je napredna platforma za avtomatizacijo poslovnih procesov. Omogoča upravljanje nalog, koledarja, analitiko in iskanje.",
+      "category": "dokumentacija",
+      "tags": [
+        "omnicore",
+        "navodila",
+        "uporaba"
+      ],
+      "created": "2025-09-22T18:12:47.851384"
+    },
+    {
+      "id": 2,
+      "title": "API dokumentacija",
+      "content": "REST API endpoints za integracijo s tretjimi sistemi. Podpira JSON format in OAuth2 avtentifikacijo.",
+      "category": "tehnicna_dokumentacija",
+      "tags": [
+        "api",
+        "rest",
+        "json",
+        "oauth2"
+      ],
+      "created": "2025-09-22T18:12:47.851410"
+    },
+    {
+      "id": 3,
+      "title": "Varnostni protokoli",
+      "content": "Smernice za varno uporabo sistema. Vključuje gesla, dvosmerno avtentifikacijo in šifriranje podatkov.",
+      "category": "varnost",
+      "tags": [
+        "varnost",
+        "gesla",
+        "2fa",
+        "šifriranje"
+      ],
+      "created": "2025-09-22T18:12:47.851413"
+    },
+    {
+      "id": 4,
+      "title": "Analitični dashboard",
+      "content": "Pregled ključnih metrik in KPI-jev. Vključuje prodajne podatke, uporabniške statistike in sistemske performanse.",
+      "category": "analitika",
+      "tags": [
+        "dashboard",
+        "kpi",
+        "metrike",
+        "statistike"
+      ],
+      "created": "2025-09-22T18:12:47.851416"
+    },
+    {
+      "id": 5,
+      "title": "Mobilna aplikacija",
+      "content": "Funkcionalnosti mobilne aplikacije za iOS in Android. Sinhronizacija s spletno platformo in offline možnosti.",
+      "category": "mobilno",
+      "tags": [
+        "mobilno",
+        "ios",
+        "android",
+        "sinhronizacija"
+      ],
+      "created": "2025-09-22T18:12:47.851419"
+    }
+  ],
+  "last_updated": "2025-09-22T18:12:47.851424"
+}

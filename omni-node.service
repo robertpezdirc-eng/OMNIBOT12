@@ -1,0 +1,65 @@
+# Systemd servisna datoteka za Omni Cloud Service (Node.js verzija)
+# Datoteka: /etc/systemd/system/omni-node.service
+
+[Unit]
+Description=Omni Cloud AI Platform Service (Node.js)
+Documentation=https://github.com/your-repo/omni-brain
+After=network.target network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=omni
+Group=omni
+WorkingDirectory=/home/omni
+
+# Node.js aplikacija
+ExecStart=/usr/bin/node omni-ultra-main.js
+
+# Preload ukazi (opcijsko)
+ExecStartPre=/bin/mkdir -p /var/log/omni
+ExecStartPre=/bin/chown omni:omni /var/log/omni
+
+# Restart nastavitve
+Restart=always
+RestartSec=5
+StartLimitBurst=3
+StartLimitIntervalSec=60
+
+# Okolje za Node.js
+Environment="NODE_ENV=production"
+Environment="PORT=8080"
+Environment="HOST=127.0.0.1"
+Environment="NODE_OPTIONS=--max-old-space-size=2048"
+
+# Varnostne nastavitve
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/home/omni
+ReadWritePaths=/var/log/omni
+ReadWritePaths=/tmp
+
+# Omejitve virov za Node.js
+LimitNOFILE=65536
+LimitNPROC=4096
+MemoryMax=2G
+CPUQuota=200%
+
+# Logiranje
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=omni-node-service
+
+# Graceful shutdown za Node.js
+TimeoutStopSec=30
+KillMode=mixed
+KillSignal=SIGTERM
+
+# Health check (opcijsko)
+# ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

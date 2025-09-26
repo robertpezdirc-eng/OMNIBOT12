@@ -1,0 +1,60 @@
+# Multi-stage build za produkcijski server
+FROM node:18-alpine AS builder
+
+# Nastavi delovni direktorij
+WORKDIR /app
+
+# Kopiraj package.json in package-lock.json
+COPY server/package*.json ./
+
+# Namesti odvisnosti
+RUN npm ci --only=production && npm cache clean --force
+
+# Produkcijska faza
+FROM node:18-alpine AS production
+
+# Ustvari non-root uporabnika
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
+# Nastavi delovni direktorij
+WORKDIR /app
+
+# Namesti potrebne sistemske pakete
+RUN apk add --no-cache \
+    dumb-init \
+    curl \
+    tzdata \
+    openssl \
+    ca-certificates
+
+# Kopiraj odvisnosti iz builder faze
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
+
+# Kopiraj aplikacijske datoteke
+COPY --chown=nodejs:nodejs server/ ./
+
+# Ustvari potrebne direktorije z ustreznimi dovoljenji
+RUN mkdir -p logs backups uploads ssl data && \
+    chown -R nodejs:nodejs logs backups uploads ssl data && \
+    chmod 755 logs backups uploads ssl data
+
+# Nastavi okoljske spremenljivke
+ENV NODE_ENV=production
+ENV PORT=3002
+ENV TZ=Europe/Ljubljana
+ENV LOG_LEVEL=info
+
+# Izpostavi port
+EXPOSE 3002
+
+# Preklopi na non-root uporabnika
+USER nodejs
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -k -f https://localhost:3002/health || exit 1
+
+# Zaženi aplikacijo z dumb-init za pravilno signal handling
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["node", "complete-https-server.js"]

@@ -1,0 +1,29 @@
+# Backup Scheduler Dockerfile
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Namesti potrebne sistemske pakete
+RUN apk add --no-cache \
+    curl \
+    mongodb-tools \
+    aws-cli
+
+# Kopiraj package.json
+COPY server/package*.json ./
+
+# Namesti odvisnosti
+RUN npm ci --only=production
+
+# Kopiraj backup skripto
+COPY server/services/backupService.js ./
+COPY server/utils/ ./utils/
+
+# Ustvari backup direktorij
+RUN mkdir -p /app/backups
+
+# Nastavi okoljske spremenljivke
+ENV NODE_ENV=production
+
+# Zaženi backup scheduler
+CMD ["node", "-e", "require('./backupService.js').startScheduler()"]

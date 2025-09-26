@@ -1,0 +1,85 @@
+# OmniCore Global Platform Dependencies
+
+# Core Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+
+# Database
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9
+sqlite3
+
+# HTTP Client & Async
+aiohttp==3.9.1
+httpx==0.25.2
+requests==2.31.0
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+
+# Data Processing
+pandas==2.1.4
+numpy==1.25.2
+python-dateutil==2.8.2
+
+# Configuration & Environment
+python-dotenv==1.0.0
+pyyaml==6.0.1
+
+# Logging & Monitoring
+structlog==23.2.0
+prometheus-client==0.19.0
+
+# Task Queue & Background Jobs
+celery==5.3.4
+redis==5.0.1
+
+# Email & Notifications
+sendgrid==6.10.0
+twilio==8.11.0
+
+# File Processing
+openpyxl==3.1.2
+PyPDF2==3.0.1
+pillow==10.1.0
+
+# API Documentation
+swagger-ui-bundle==0.0.9
+
+# Development & Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+black==23.11.0
+flake8==6.1.0
+
+# Cloud & Deployment
+docker==6.1.3
+kubernetes==28.1.0
+boto3==1.34.0  # AWS
+azure-storage-blob==12.19.0  # Azure
+google-cloud-storage==2.10.0  # GCP
+
+# AI & Machine Learning (Optional)
+openai==1.3.7
+langchain==0.0.350
+transformers==4.36.0
+
+# Caching
+redis-py==5.0.1
+memcached==1.59
+
+# Message Queue
+pika==1.3.2  # RabbitMQ
+kafka-python==2.0.2
+
+# Monitoring & Observability
+sentry-sdk[fastapi]==1.38.0
+elastic-apm==6.20.0
+
+# Utilities
+click==8.1.7
+rich==13.7.0
+typer==0.9.0

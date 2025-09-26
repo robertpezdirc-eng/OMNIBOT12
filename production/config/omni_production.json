@@ -1,0 +1,75 @@
+{
+  "omni_brain": {
+    "mode": "production",
+    "debug": false,
+    "log_level": "INFO",
+    "auto_restart": true,
+    "max_memory_mb": 2048,
+    "max_cpu_percent": 80
+  },
+  "modules": {
+    "finance": {
+      "enabled": true,
+      "priority": "high"
+    },
+    "tourism": {
+      "enabled": true,
+      "priority": "high"
+    },
+    "iot": {
+      "enabled": true,
+      "priority": "medium"
+    },
+    "radio": {
+      "enabled": true,
+      "priority": "low"
+    },
+    "beekeeping": {
+      "enabled": true,
+      "priority": "medium"
+    },
+    "devops": {
+      "enabled": true,
+      "priority": "high"
+    },
+    "healthcare": {
+      "enabled": true,
+      "priority": "high"
+    }
+  },
+  "cloud_memory": {
+    "redis_enabled": true,
+    "sqlite_enabled": true,
+    "compression": true,
+    "auto_backup": true,
+    "backup_interval_hours": 6,
+    "cleanup_old_data_days": 30
+  },
+  "mobile_terminal": {
+    "enabled": true,
+    "port": 8080,
+    "ssl_enabled": false,
+    "max_connections": 10
+  },
+  "learning_optimization": {
+    "enabled": true,
+    "auto_learn": true,
+    "optimization_interval_hours": 24,
+    "model_validation": true
+  },
+  "monitoring": {
+    "enabled": true,
+    "metrics_collection": true,
+    "alert_thresholds": {
+      "cpu_percent": 90,
+      "memory_percent": 85,
+      "disk_percent": 90
+    }
+  },
+  "security": {
+    "authentication_required": true,
+    "api_key_required": true,
+    "rate_limiting": true,
+    "audit_logging": true
+  }
+}

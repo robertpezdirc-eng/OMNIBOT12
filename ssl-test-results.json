@@ -1,0 +1,15 @@
+﻿{
+    "SuccessRate":  0,
+    "RedirectWorking":  false,
+    "HTTPSResponse":  false,
+    "DNSResolution":  false,
+    "CertificateValid":  false,
+    "Port80Open":  false,
+    "CertificateExpiry":  null,
+    "TestDate":  {
+                     "value":  "\/Date(1758874001638)\/",
+                     "DisplayHint":  2,
+                     "DateTime":  "Friday, September 26, 2025 10:06:41 AM"
+                 },
+    "Port443Open":  false
+}

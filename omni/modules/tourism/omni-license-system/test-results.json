@@ -1,0 +1,61 @@
+{
+  "timestamp": "2025-09-23T13:58:40.355Z",
+  "summary": {
+    "total": 10,
+    "passed": 2,
+    "failed": 8,
+    "successRate": "20.0%"
+  },
+  "results": [
+    {
+      "test": "Valid License Validation",
+      "status": "FAILED",
+      "details": "API Error: Request failed with status code 404"
+    },
+    {
+      "test": "Invalid License Validation",
+      "status": "PASSED",
+      "details": "Invalid license correctly rejected with 400 status"
+    },
+    {
+      "test": "Missing Parameters Validation",
+      "status": "PASSED",
+      "details": "Missing parameters correctly rejected"
+    },
+    {
+      "test": "License Creation",
+      "status": "FAILED",
+      "details": "License creation error: Request failed with status code 400"
+    },
+    {
+      "test": "License Extension",
+      "status": "FAILED",
+      "details": "Cannot test extension - license creation failed"
+    },
+    {
+      "test": "License Deactivation",
+      "status": "FAILED",
+      "details": "Cannot test deactivation - license creation failed"
+    },
+    {
+      "test": "Rate Limiting",
+      "status": "FAILED",
+      "details": "Rate limiting not working - all requests passed"
+    },
+    {
+      "test": "System Info",
+      "status": "FAILED",
+      "details": "System info error: Request failed with status code 404"
+    },
+    {
+      "test": "License Statistics",
+      "status": "FAILED",
+      "details": "License statistics not available"
+    },
+    {
+      "test": "Webhook Registration",
+      "status": "FAILED",
+      "details": "Webhook registration error: Request failed with status code 404"
+    }
+  ]
+}

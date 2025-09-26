@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni-APP Enhanced Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            min-height: 100vh;
+        }
+        
+        .dashboard-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .dashboard-header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .dashboard-header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .node {
+            border: 3px solid #333;
+            border-radius: 12px;
+            padding: 15px;
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            text-align: center;
+            width: 160px;
+            height: 80px;
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            user-select: none;
+        }
+        
+        .node:hover {
+            background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            border-color: #2196f3;
+            z-index: 100;
+        }
+        
+        .node.global {
+            background: linear-gradient(145deg, #fff3e0, #ffcc02);
+            border-color: #ff9800;
+            width: 200px;
+            height: 100px;
+            font-size: 1.1em;
+        }
+        
+        .node.global:hover {
+            background: linear-gradient(145deg, #fff8e1, #ffd54f);
+            border-color: #f57c00;
+        }
+        
+        .node.active {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+            50% { box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4); }
+            100% { box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+        }
+        
+        .link {
+            stroke: #333;
+            stroke-width: 3px;
+            stroke-dasharray: 8,4;
+            animation: dash 2s linear infinite;
+            opacity: 0.7;
+            transition: all 0.3s;
+        }
+        
+        .link:hover {
+            stroke-width: 4px;
+            opacity: 1;
+            stroke: #2196f3;
+        }
+        
+        @keyframes dash {
+            to { stroke-dashoffset: 12; }
+        }
+        
+        .status-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.95);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            max-width: 300px;
+            z-index: 1000;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-online { background: #4caf50; }
+        .status-offline { background: #f44336; }
+        .status-warning { background: #ff9800; }
+        
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.95);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #1976d2;
+            transform: translateY(-2px);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            animation: modalSlideIn 0.3s;
+        }
+        
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover { color: black; }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-header">
+    <h1>🌐 Omni-APP Enhanced Dashboard</h1>
+    <p>Interaktivni nadzorni center z 17 moduli in Global Optimizer</p>
+</div>
+
+<div class="status-panel">
+    <h3>🔄 Sistemski Status</h3>
+    <div><span class="status-indicator status-online"></span>Global Optimizer: Online</div>
+    <div><span class="status-indicator status-online"></span>Moduli: 17/17 Aktivni</div>
+    <div><span class="status-indicator status-online"></span>Backend API: Povezan</div>
+    <div><span class="status-indicator status-warning"></span>Učenje: V teku</div>
+</div>
+
+<div class="controls">
+    <button class="btn" onclick="toggleConnections()">🔗 Preklopi Povezave</button>
+    <button class="btn" onclick="refreshStatus()">🔄 Osveži Status</button>
+    <button class="btn" onclick="toggleAnimation()">⏸️ Animacije</button>
+</div>
+
+<svg id="links" width="100%" height="900" style="position: absolute; top: 0; left: 0; z-index: 1;"></svg>
+
+<div id="dashboard" style="position: relative; z-index: 10;">
+    <!-- Global Optimizer -->
+    <div class="node global active" id="global" style="top: 150px; left: 600px;">
+        🌐<br>Global Optimizer
+    </div>
+
+    <!-- Prvi red modulov -->
+    <div class="node" id="finance" style="top: 300px; left: 100px;">💰<br>Finance</div>
+    <div class="node" id="logistics" style="top: 300px; left: 300px;">🚚<br>Logistics</div>
+    <div class="node" id="healthcare" style="top: 300px; left: 500px;">🏥<br>Healthcare</div>
+    <div class="node" id="tourism" style="top: 300px; left: 700px;">🌴<br>Tourism</div>
+    <div class="node" id="agriculture" style="top: 300px; left: 900px;">🚜<br>Agriculture</div>
+    <div class="node" id="industry" style="top: 300px; left: 1100px;">🏭<br>Industry</div>
+
+    <!-- Drugi red modulov -->
+    <div class="node" id="energy" style="top: 450px; left: 100px;">⚡<br>Energy</div>
+    <div class="node" id="smart_home" style="top: 450px; left: 300px;">🏠<br>Smart Home</div>
+    <div class="node" id="vehicles" style="top: 450px; left: 500px;">🚗<br>Vehicles</div>
+    <div class="node" id="robotics" style="top: 450px; left: 700px;">🤖<br>Robotics</div>
+    <div class="node" id="science" style="top: 450px; left: 900px;">🔬<br>Science</div>
+    <div class="node" id="communications" style="top: 450px; left: 1100px;">📡<br>Communications</div>
+
+    <!-- Tretji red modulov -->
+    <div class="node" id="education" style="top: 600px; left: 200px;">🎓<br>Education</div>
+    <div class="node" id="security" style="top: 600px; left: 400px;">🛡️<br>Security</div>
+    <div class="node" id="environment" style="top: 600px; left: 600px;">🌍<br>Environment</div>
+    <div class="node" id="creative" style="top: 600px; left: 800px;">🎨<br>Creative</div>
+    <div class="node" id="iot" style="top: 600px; left: 1000px;">📱<br>IoT</div>
+</div>
+
+<!-- Modal za prikaz informacij -->
+<div id="moduleModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div id="modalContent"></div>
+    </div>
+</div>
+
+<script>
+const linksSVG = document.getElementById("links");
+let connectionsVisible = true;
+let animationsEnabled = true;
+
+const nodes = [
+    "finance", "logistics", "healthcare", "tourism", "agriculture", "industry",
+    "energy", "smart_home", "vehicles", "robotics", "science", "communications",
+    "education", "security", "environment", "creative", "iot"
+];
+
+const moduleData = {
+    global: {
+        name: "Global Optimizer",
+        status: "online",
+        description: "Centralni nadzorni sistem, ki koordinira vse module in optimizira delovanje celotnega sistema.",
+        features: ["AI Koordinacija", "Samoučenje", "Optimizacija", "Monitoring"],
+        uptime: "99.9%"
+    },
+    finance: {
+        name: "Finančni Modul",
+        status: "online", 
+        description: "Upravljanje financ, proračunov, investicij in finančnih analiz.",
+        features: ["Proračuni", "Investicije", "Analitika", "Poročila"],
+        uptime: "99.7%"
+    },
+    logistics: {
+        name: "Logistični Modul",
+        status: "online",
+        description: "Optimizacija transporta, skladiščenja in dobavnih verig.",
+        features: ["Transport", "Skladišče", "Dobavne verige", "Optimizacija poti"],
+        uptime: "99.5%"
+    },
+    healthcare: {
+        name: "Zdravstveni Modul", 
+        status: "online",
+        description: "Zdravstveno spremljanje, diagnostika in wellness programi.",
+        features: ["Diagnostika", "Monitoring", "Wellness", "Preventiva"],
+        uptime: "99.8%"
+    },
+    tourism: {
+        name: "Turistični Modul",
+        status: "online",
+        description: "Upravljanje turizma, rezervacij in gostinskih storitev.",
+        features: ["Rezervacije", "Itinerarji", "Gostinstvo", "Marketing"],
+        uptime: "99.6%"
+    },
+    agriculture: {
+        name: "Kmetijski Modul",
+        status: "online", 
+        description: "Pametno kmetijstvo, pridelava in živinoreja.",
+        features: ["Pridelava", "Živinoreja", "IoT senzorji", "Optimizacija"],
+        uptime: "99.4%"
+    },
+    industry: {
+        name: "Industrijski Modul",
+        status: "online",
+        description: "Industrija 4.0, avtomatizacija in proizvodnja.",
+        features: ["Avtomatizacija", "Proizvodnja", "Kakovost", "Vzdrževanje"],
+        uptime: "99.3%"
+    },
+    energy: {
+        name: "Energetski Modul",
+        status: "online",
+        description: "Upravljanje energije, obnovljivi viri in učinkovitost.",
+        features: ["Obnovljivi viri", "Učinkovitost", "Shranjevanje", "Distribucija"],
+        uptime: "99.9%"
+    },
+    smart_home: {
+        name: "Pametni Dom",
+        status: "online",
+        description: "Avtomatizacija doma, varnost in udobje.",
+        features: ["Avtomatizacija", "Varnost", "Klimatizacija", "Osvetlitev"],
+        uptime: "99.2%"
+    },
+    vehicles: {
+        name: "Avtonomna Vozila",
+        status: "online",
+        description: "Samovozeča vozila, navigacija in prometna optimizacija.",
+        features: ["Avtonomija", "Navigacija", "Varnost", "Optimizacija"],
+        uptime: "99.1%"
+    },
+    robotics: {
+        name: "Robotika",
+        status: "online",
+        description: "Robotski sistemi, AI asistenti in avtomatizacija.",
+        features: ["AI Asistenti", "Avtomatizacija", "Učenje", "Interakcija"],
+        uptime: "99.0%"
+    },
+    science: {
+        name: "Znanstveni Modul",
+        status: "online",
+        description: "Raziskave, eksperimenti in znanstvene analize.",
+        features: ["Raziskave", "Eksperimenti", "Analize", "Publikacije"],
+        uptime: "99.7%"
+    },
+    communications: {
+        name: "Komunikacijski Modul",
+        status: "online",
+        description: "Komunikacijske mreže, IoT in povezljivost.",
+        features: ["5G/6G", "IoT", "Sateliti", "Mesh mreže"],
+        uptime: "99.8%"
+    },
+    education: {
+        name: "Izobraževalni Modul",
+        status: "online",
+        description: "E-učenje, mentorstvo in izobraževalne platforme.",
+        features: ["E-učenje", "Mentorstvo", "Certifikati", "Personalizacija"],
+        uptime: "99.5%"
+    },
+    security: {
+        name: "Varnostni Modul",
+        status: "online",
+        description: "Kibernetska varnost, nadzor in zaščita podatkov.",
+        features: ["Kibernetska varnost", "Nadzor", "Zaščita", "Analitika"],
+        uptime: "99.9%"
+    },
+    environment: {
+        name: "Okoljski Modul",
+        status: "online",
+        description: "Okoljski monitoring, trajnostni razvoj in ekologija.",
+        features: ["Monitoring", "Trajnostnost", "Ekologija", "Klima"],
+        uptime: "99.6%"
+    },
+    creative: {
+        name: "Kreativni Modul",
+        status: "online",
+        description: "Umetnost, glasba, video produkcija in kreativne tehnologije.",
+        features: ["AI Umetnost", "Glasba", "Video", "Dizajn"],
+        uptime: "99.3%"
+    },
+    iot: {
+        name: "IoT Modul",
+        status: "online",
+        description: "Internet stvari, senzorji in pametne naprave.",
+        features: ["Senzorji", "Pametne naprave", "Edge computing", "Analitika"],
+        uptime: "99.4%"
+    }
+};
+
+// Funkcija za povezovanje modulov z Global Optimizer
+function connectNodes(sourceId, targetId) {
+    const source = document.getElementById(sourceId);
+    const target = document.getElementById(targetId);
+    
+    if (!source || !target) return;
+    
+    const x1 = source.offsetLeft + source.offsetWidth / 2;
+    const y1 = source.offsetTop + source.offsetHeight / 2;
+    const x2 = target.offsetLeft + target.offsetWidth / 2;
+    const y2 = target.offsetTop + target.offsetHeight / 2;
+
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", x1);
+    line.setAttribute("y1", y1);
+    line.setAttribute("x2", x2);
+    line.setAttribute("y2", y2);
+    line.setAttribute("class", "link");
+    line.setAttribute("id", `link-${sourceId}-${targetId}`);
+
+    linksSVG.appendChild(line);
+}
+
+// Povežemo Global Optimizer z vsemi moduli
+function updateConnections() {
+    if (!connectionsVisible) return;
+    
+    linksSVG.innerHTML = '';
+    nodes.forEach(node => {
+        connectNodes("global", node);
+    });
+}
+
+// Funkcija za prikaz informacij o modulu
+function showModuleInfo(nodeId) {
+    const modal = document.getElementById("moduleModal");
+    const modalContent = document.getElementById("modalContent");
+    const data = moduleData[nodeId];
+    
+    if (!data) return;
+    
+    // Poskusi pridobiti podatke iz backend API
+    fetch(`/api/status/${nodeId}`)
+        .then(res => res.json())
+        .then(backendData => {
+            // Uporabi backend podatke, če so na voljo
+            Object.assign(data, backendData);
+        })
+        .catch(() => {
+            // Uporabi lokalne podatke, če backend ni dosegljiv
+            console.log(`Backend ni dosegljiv za ${nodeId}, uporabljam lokalne podatke`);
+        })
+        .finally(() => {
+            modalContent.innerHTML = `
+                <h2>${data.name}</h2>
+                <p><strong>Status:</strong> <span class="status-indicator status-${data.status}"></span>${data.status.toUpperCase()}</p>
+                <p><strong>Opis:</strong> ${data.description}</p>
+                <p><strong>Funkcionalnosti:</strong></p>
+                <ul>
+                    ${data.features.map(feature => `<li>${feature}</li>`).join('')}
+                </ul>
+                <p><strong>Razpoložljivost:</strong> ${data.uptime}</p>
+                <div style="margin-top: 20px;">
+                    <button class="btn" onclick="restartModule('${nodeId}')">🔄 Ponovno zaženi</button>
+                    <button class="btn" onclick="configureModule('${nodeId}')">⚙️ Konfiguriraj</button>
+                </div>
+            `;
+            modal.style.display = "block";
+        });
+}
+
+// Funkcije za upravljanje modulov
+function restartModule(nodeId) {
+    alert(`🔄 Ponovno zaganjam modul: ${moduleData[nodeId].name}`);
+    // Tukaj bi bil klic na backend API za restart
+    fetch(`/api/restart/${nodeId}`, { method: 'POST' })
+        .catch(() => console.log(`Restart ${nodeId} - backend ni dosegljiv`));
+}
+
+function configureModule(nodeId) {
+    alert(`⚙️ Odpiranje konfiguracije za: ${moduleData[nodeId].name}`);
+    // Tukaj bi bil klic na konfiguracijski vmesnik
+}
+
+// Kontrolne funkcije
+function toggleConnections() {
+    connectionsVisible = !connectionsVisible;
+    if (connectionsVisible) {
+        updateConnections();
+    } else {
+        linksSVG.innerHTML = '';
+    }
+}
+
+function refreshStatus() {
+    // Simulacija osvežitve statusa
+    nodes.forEach(node => {
+        const element = document.getElementById(node);
+        element.style.opacity = '0.5';
+        setTimeout(() => {
+            element.style.opacity = '1';
+            element.classList.add('active');
+            setTimeout(() => element.classList.remove('active'), 2000);
+        }, Math.random() * 1000);
+    });
+}
+
+function toggleAnimation() {
+    animationsEnabled = !animationsEnabled;
+    const links = document.querySelectorAll('.link');
+    links.forEach(link => {
+        link.style.animationPlayState = animationsEnabled ? 'running' : 'paused';
+    });
+}
+
+// Event listenerji
+document.addEventListener('DOMContentLoaded', function() {
+    // Dodamo event listenerje za module
+    [...nodes, "global"].forEach(node => {
+        const element = document.getElementById(node);
+        if (element) {
+            element.onclick = () => showModuleInfo(node);
+        }
+    });
+    
+    // Modal zapiranje
+    document.querySelector('.close').onclick = function() {
+        document.getElementById("moduleModal").style.display = "none";
+    };
+    
+    window.onclick = function(event) {
+        const modal = document.getElementById("moduleModal");
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    };
+    
+    // Začetno povezovanje
+    updateConnections();
+    
+    // Periodično osvežitev povezav (opcijsko)
+    setInterval(() => {
+        if (connectionsVisible) {
+            updateConnections();
+        }
+    }, 5000);
+});
+
+// Funkcija za dodajanje novega modula (za prihodnje razširitve)
+function addModule(id, name, x, y) {
+    const dashboard = document.getElementById('dashboard');
+    const newNode = document.createElement('div');
+    newNode.className = 'node';
+    newNode.id = id;
+    newNode.style.top = y + 'px';
+    newNode.style.left = x + 'px';
+    newNode.innerHTML = name;
+    newNode.onclick = () => showModuleInfo(id);
+    
+    dashboard.appendChild(newNode);
+    nodes.push(id);
+    updateConnections();
+}
+
+console.log("🌐 Omni-APP Enhanced Dashboard naložen - 17 modulov pripravljen!");
+</script>
+
+</body>
+</html>

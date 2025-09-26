@@ -1,0 +1,146 @@
+{
+  "angel_api_gateway": {
+    "host": "localhost",
+    "port": 3001,
+    "base_url": "http://localhost:3001",
+    "endpoints": {
+      "health": "/health",
+      "angels_list": "/api/angels",
+      "angel_status": "/api/angel/{angel_name}",
+      "metrics": "/metrics",
+      "brain_status": "/api/brain/status"
+    }
+  },
+  "angels": {
+    "LearningAngel": {
+      "name": "Learning Angel",
+      "description": "AI u\u010dni sistem za kontinuirano izbolj\u0161anje",
+      "capabilities": [
+        "machine_learning",
+        "pattern_recognition",
+        "adaptive_learning"
+      ],
+      "status": "active",
+      "last_activity": "2025-09-26T14:02:12.220455",
+      "performance_metrics": {
+        "accuracy": 98.5,
+        "learning_rate": 0.95,
+        "processed_data": 1250000
+      }
+    },
+    "CommercialAngel": {
+      "name": "Commercial Angel",
+      "description": "Poslovni optimizacijski sistem",
+      "capabilities": [
+        "market_analysis",
+        "revenue_optimization",
+        "customer_insights"
+      ],
+      "status": "active",
+      "last_activity": "2025-09-26T14:02:12.220718",
+      "performance_metrics": {
+        "roi_improvement": 34.2,
+        "conversion_rate": 12.8,
+        "revenue_impact": 2850000
+      }
+    },
+    "OptimizationAngel": {
+      "name": "Optimization Angel",
+      "description": "Sistemski optimizacijski modul",
+      "capabilities": [
+        "performance_tuning",
+        "resource_optimization",
+        "efficiency_analysis"
+      ],
+      "status": "active",
+      "last_activity": "2025-09-26T14:02:12.220723",
+      "performance_metrics": {
+        "cpu_optimization": 45.3,
+        "memory_efficiency": 78.9,
+        "response_time_improvement": 67.2
+      }
+    },
+    "InnovationAngel": {
+      "name": "Innovation Angel",
+      "description": "Kreativni in inovacijski sistem",
+      "capabilities": [
+        "creative_solutions",
+        "innovation_tracking",
+        "trend_analysis"
+      ],
+      "status": "active",
+      "last_activity": "2025-09-26T14:02:12.220727",
+      "performance_metrics": {
+        "innovation_score": 92.1,
+        "creative_solutions": 156,
+        "trend_accuracy": 89.4
+      }
+    },
+    "AnalyticsAngel": {
+      "name": "Analytics Angel",
+      "description": "Napredni analiti\u010dni sistem",
+      "capabilities": [
+        "data_analysis",
+        "predictive_modeling",
+        "statistical_insights"
+      ],
+      "status": "active",
+      "last_activity": "2025-09-26T14:02:12.220731",
+      "performance_metrics": {
+        "prediction_accuracy": 94.7,
+        "data_processed_gb": 45.8,
+        "insights_generated": 2341
+      }
+    },
+    "EngagementAngel": {
+      "name": "Engagement Angel",
+      "description": "Uporabni\u0161ki engagement sistem",
+      "capabilities": [
+        "user_engagement",
+        "interaction_optimization",
+        "experience_enhancement"
+      ],
+      "status": "active",
+      "last_activity": "2025-09-26T14:02:12.220734",
+      "performance_metrics": {
+        "engagement_rate": 87.3,
+        "user_satisfaction": 9.2,
+        "interaction_quality": 95.6
+      }
+    },
+    "GrowthAngel": {
+      "name": "Growth Angel",
+      "description": "Rastni in razvojni sistem",
+      "capabilities": [
+        "growth_analysis",
+        "scaling_optimization",
+        "expansion_planning"
+      ],
+      "status": "active",
+      "last_activity": "2025-09-26T14:02:12.220737",
+      "performance_metrics": {
+        "growth_rate": 23.8,
+        "scaling_efficiency": 91.2,
+        "expansion_success": 78.5
+      }
+    },
+    "VisionaryAngel": {
+      "name": "Visionary Angel",
+      "description": "Strate\u0161ki vizijski sistem",
+      "capabilities": [
+        "strategic_planning",
+        "future_forecasting",
+        "vision_alignment"
+      ],
+      "status": "active",
+      "last_activity": "2025-09-26T14:02:12.220741",
+      "performance_metrics": {
+        "vision_clarity": 96.8,
+        "strategic_alignment": 93.4,
+        "forecast_accuracy": 88.9
+      }
+    }
+  },
+  "created_at": "2025-09-26T14:02:12.225181",
+  "version": "1.0.0"
+}

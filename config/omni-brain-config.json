@@ -1,0 +1,294 @@
+{
+  "environment": "development",
+  "logLevel": "info",
+  "dataPath": "./data",
+  
+  "omniSystem": {
+    "apiEndpoint": "http://localhost:3000",
+    "wsEndpoint": "ws://localhost:8080",
+    "syncEnabled": true,
+    "realTimeUpdates": true,
+    "syncInterval": 5000,
+    "retryAttempts": 3,
+    "timeout": 30000
+  },
+  
+  "componentConfig": {
+    "brain": {
+      "enabled": true,
+      "priority": 1,
+      "config": {
+        "learningRate": 0.01,
+        "memorySize": 10000,
+        "decisionThreshold": 0.7,
+        "autonomyLevel": "high"
+      }
+    },
+    "multiAgent": {
+      "enabled": true,
+      "priority": 2,
+      "config": {
+        "maxAgents": 10,
+        "coordinationInterval": 1000,
+        "resourceAllocation": "dynamic"
+      }
+    },
+    "monitoring": {
+      "enabled": true,
+      "priority": 3,
+      "config": {
+        "realTimeTracking": true,
+        "metricsInterval": 5000,
+        "alertThresholds": {
+          "errorRate": 0.05,
+          "responseTime": 2000,
+          "memoryUsage": 0.8
+        }
+      }
+    },
+    "automation": {
+      "enabled": true,
+      "priority": 4,
+      "config": {
+        "premiumPointsRules": {
+          "dailyLogin": 10,
+          "taskCompletion": 25,
+          "referral": 100,
+          "premiumUpgrade": 500
+        },
+        "upgradeThresholds": {
+          "basic": 100,
+          "premium": 500,
+          "enterprise": 1000
+        }
+      }
+    },
+    "analytics": {
+      "enabled": true,
+      "priority": 5,
+      "config": {
+        "behaviorTracking": true,
+        "segmentationEnabled": true,
+        "predictiveModeling": true,
+        "cohortAnalysis": true
+      }
+    },
+    "upsell": {
+      "enabled": true,
+      "priority": 6,
+      "config": {
+        "personalizationLevel": "high",
+        "campaignFrequency": "optimal",
+        "abTestingEnabled": true,
+        "loyaltyProgram": true
+      }
+    },
+    "websocket": {
+      "enabled": true,
+      "priority": 7,
+      "config": {
+        "port": 8080,
+        "maxConnections": 1000,
+        "heartbeatInterval": 30000,
+        "compression": true
+      }
+    }
+  },
+  
+  "performance": {
+    "maxMemoryUsage": 1073741824,
+    "maxCpuUsage": 80,
+    "alertThresholds": {
+      "memory": 0.8,
+      "cpu": 0.7,
+      "errors": 10,
+      "responseTime": 2000
+    },
+    "optimization": {
+      "autoGarbageCollection": true,
+      "cacheSize": 100000,
+      "batchProcessing": true,
+      "parallelProcessing": true
+    }
+  },
+  
+  "database": {
+    "type": "sqlite",
+    "path": "./data/omni-brain.db",
+    "backup": {
+      "enabled": true,
+      "interval": 3600000,
+      "retention": 7
+    },
+    "optimization": {
+      "indexing": true,
+      "compression": true,
+      "vacuumInterval": 86400000
+    }
+  },
+  
+  "logging": {
+    "level": "info",
+    "file": "./logs/omni-brain.log",
+    "maxSize": "10MB",
+    "maxFiles": 5,
+    "format": "json",
+    "console": true
+  },
+  
+  "security": {
+    "encryption": {
+      "enabled": true,
+      "algorithm": "aes-256-gcm"
+    },
+    "authentication": {
+      "required": true,
+      "tokenExpiry": 3600
+    },
+    "rateLimit": {
+      "enabled": true,
+      "maxRequests": 1000,
+      "windowMs": 900000
+    }
+  },
+  
+  "ai": {
+    "models": {
+      "personalization": {
+        "type": "neural_network",
+        "layers": [128, 64, 32],
+        "activation": "relu",
+        "optimizer": "adam"
+      },
+      "prediction": {
+        "type": "ensemble",
+        "algorithms": ["random_forest", "gradient_boosting", "neural_network"],
+        "weights": [0.3, 0.4, 0.3]
+      },
+      "optimization": {
+        "type": "genetic_algorithm",
+        "populationSize": 100,
+        "generations": 50,
+        "mutationRate": 0.1
+      }
+    },
+    "training": {
+      "autoRetraining": true,
+      "retrainingInterval": 86400000,
+      "minDataPoints": 1000,
+      "validationSplit": 0.2
+    }
+  },
+  
+  "business": {
+    "kpis": {
+      "revenueGrowth": {
+        "target": 0.1,
+        "measurement": "monthly"
+      },
+      "userRetention": {
+        "target": 0.8,
+        "measurement": "monthly"
+      },
+      "conversionRate": {
+        "target": 0.05,
+        "measurement": "weekly"
+      },
+      "premiumUpgrades": {
+        "target": 0.1,
+        "measurement": "monthly"
+      }
+    },
+    "strategies": {
+      "upselling": {
+        "enabled": true,
+        "frequency": "optimal",
+        "personalization": "high"
+      },
+      "retention": {
+        "enabled": true,
+        "campaigns": ["welcome", "engagement", "winback"],
+        "automation": true
+      },
+      "acquisition": {
+        "enabled": true,
+        "channels": ["referral", "social", "content"],
+        "tracking": true
+      }
+    }
+  },
+  
+  "notifications": {
+    "email": {
+      "enabled": true,
+      "smtp": {
+        "host": "smtp.gmail.com",
+        "port": 587,
+        "secure": false
+      }
+    },
+    "push": {
+      "enabled": true,
+      "service": "firebase"
+    },
+    "webhook": {
+      "enabled": true,
+      "endpoints": []
+    }
+  },
+  
+  "integration": {
+    "apis": {
+      "analytics": {
+        "google": {
+          "enabled": false,
+          "trackingId": ""
+        },
+        "mixpanel": {
+          "enabled": false,
+          "token": ""
+        }
+      },
+      "payment": {
+        "stripe": {
+          "enabled": false,
+          "publicKey": "",
+          "secretKey": ""
+        },
+        "paypal": {
+          "enabled": false,
+          "clientId": "",
+          "clientSecret": ""
+        }
+      },
+      "communication": {
+        "slack": {
+          "enabled": false,
+          "webhook": ""
+        },
+        "discord": {
+          "enabled": false,
+          "webhook": ""
+        }
+      }
+    }
+  },
+  
+  "development": {
+    "debug": true,
+    "hotReload": true,
+    "mockData": true,
+    "testMode": false,
+    "profiling": true
+  },
+  
+  "production": {
+    "debug": false,
+    "hotReload": false,
+    "mockData": false,
+    "testMode": false,
+    "profiling": false,
+    "clustering": true,
+    "workers": 4
+  }
+}

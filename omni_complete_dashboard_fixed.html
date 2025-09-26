@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni-APP Real-time Smart Dashboard - Popolna Verzija</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .header {
+            background: rgba(0,0,0,0.3);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 300;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+        }
+
+        .btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .main-container {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+
+        .dashboard-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #dashboard {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 0%, transparent 70%);
+        }
+
+        #links {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .link {
+            stroke: rgba(255,255,255,0.4);
+            stroke-width: 2;
+            stroke-dasharray: 5,5;
+            animation: dash 2s linear infinite;
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: -10; }
+        }
+
+        .node {
+            position: absolute;
+            background: linear-gradient(145deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 15px;
+            padding: 15px 20px;
+            cursor: move;
+            user-select: none;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            z-index: 10;
+            min-width: 120px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .node:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+            border-color: rgba(255,255,255,0.6);
+        }
+
+        .node.global {
+            background: linear-gradient(145deg, #ff6b6b, #ee5a24);
+            border-color: #ff9ff3;
+            font-size: 18px;
+            min-width: 160px;
+        }
+
+        .status {
+            display: block;
+            font-size: 10px;
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(15px);
+            border-left: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-panel {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        #info-box {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            min-height: 100px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .stats-panel {
+            padding: 20px;
+            flex: 1;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .connection-status {
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.3);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #27ae60;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00ff88;
+            z-index: 5;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 12px;
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .shortcuts {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: 200px;
+            }
+            .header h1 {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 Omni-APP Real-time Smart Dashboard</h1>
+        <div class="controls">
+            <button class="btn" onclick="addModule()">➕ Dodaj Modul</button>
+            <button class="btn" onclick="addSubmodule()">🔗 Dodaj Submodul</button>
+            <button class="btn" onclick="autoLayout()">📐 Auto Layout</button>
+            <button class="btn" onclick="toggleAnimation()">🎬 Animacije</button>
+            <button class="btn" onclick="resetDashboard()">🔄 Reset</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="dashboard-container">
+            <div id="dashboard">
+                <svg id="links"></svg>
+                <div class="node global" id="global" style="top: 50px; left: 600px;">
+                    🌐 Global Optimizer
+                    <span class="status" id="status-global">⏳ Loading...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="info-panel">
+                <h3>📊 Info Panel</h3>
+                <div id="info-box">
+                    Kliknite na modul za prikaz podrobnosti...
+                </div>
+            </div>
+
+            <div class="stats-panel">
+                <h3>📈 Real-time Statistike</h3>
+                <div class="stat-item">
+                    <span>Aktivni moduli:</span>
+                    <span id="active-modules">1</span>
+                </div>
+                <div class="stat-item">
+                    <span>Povezave:</span>
+                    <span id="connections">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Flow rate:</span>
+                    <span id="flow-rate">0/s</span>
+                </div>
+                <div class="stat-item">
+                    <span>Uptime:</span>
+                    <span id="uptime">00:00:00</span>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="module-name" placeholder="Ime modula...">
+                    <button class="btn" onclick="addCustomModule()">Dodaj</button>
+                </div>
+            </div>
+
+            <div class="connection-status">
+                <div class="status-indicator"></div>
+                <span>WebSocket: Povezan</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="shortcuts">
+        <strong>Tipkovne bližnjice:</strong><br>
+        A - Dodaj modul | S - Dodaj submodul | L - Auto layout | R - Reset
+    </div>
+
+    <script>
+        const linksSVG = document.getElementById("links");
+        const dashboard = document.getElementById("dashboard");
+        const infoBox = document.getElementById("info-box");
+
+        let nodes = [{id: "global", icon: "🌐", top: 50, left: 600, parent: null}];
+        let lines = [];
+        let nodeStatuses = {global: "✅ Aktiven"};
+        let animationEnabled = true;
+        let flowCounter = 0;
+        let startTime = Date.now();
+
+        // Kreiranje node-a
+        function createNode(id, icon, top = null, left = null, parent = null) {
+            const div = document.createElement("div");
+            div.className = "node";
+            div.id = id;
+            div.style.top = (top || 200) + "px";
+            div.style.left = (left || 100) + "px";
+            div.innerHTML = `${icon} ${id}<span class="status" id="status-${id}">⏳ Loading...</span>`;
+            dashboard.appendChild(div);
+            nodes.push({id, icon, top, left, parent});
+            nodeStatuses[id] = "✅ Aktiven";
+            attachNodeClick(div);
+            makeDraggable(div);
+            
+            // Posodobi status po kratkem času
+            setTimeout(() => {
+                const statusEl = document.getElementById(`status-${id}`);
+                if (statusEl) statusEl.textContent = "✅ Aktiven";
+            }, 1000);
+            
+            autoLayout();
+            updateStats();
+        }
+
+        // Odstranjevanje node-a
+        function removeNode(id) {
+            if (id === "global") return alert("Global Optimizer ne more biti odstranjen!");
+            const div = document.getElementById(id);
+            if (div) dashboard.removeChild(div);
+            
+            // Odstrani tudi vse submodule
+            nodes.filter(n => n.id === id || n.parent === id).forEach(n => {
+                const d = document.getElementById(n.id);
+                if (d && d !== div) dashboard.removeChild(d);
+                delete nodeStatuses[n.id];
+            });
+            
+            nodes = nodes.filter(n => n.id !== id && n.parent !== id);
+            delete nodeStatuses[id];
+            autoLayout();
+            updateStats();
+        }
+
+        // Povezovanje node-ov
+        function updateConnections() {
+            lines.forEach(l => {
+                if (l.line && l.line.parentNode) {
+                    linksSVG.removeChild(l.line);
+                }
+            });
+            lines = [];
+            
+            nodes.filter(n => n.id !== "global").forEach(n => {
+                const parentId = n.parent || "global";
+                const source = document.getElementById(parentId);
+                const target = document.getElementById(n.id);
+                
+                if (source && target) {
+                    const x1 = source.offsetLeft + source.offsetWidth / 2;
+                    const y1 = source.offsetTop + source.offsetHeight / 2;
+                    const x2 = target.offsetLeft + target.offsetWidth / 2;
+                    const y2 = target.offsetTop + target.offsetHeight / 2;
+                    
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", x1);
+                    line.setAttribute("y1", y1);
+                    line.setAttribute("x2", x2);
+                    line.setAttribute("y2", y2);
+                    line.setAttribute("class", "link");
+                    linksSVG.appendChild(line);
+                    lines.push({line: line, target: n.id});
+                }
+            });
+            
+            document.getElementById("connections").textContent = lines.length;
+        }
+
+        // Info-box
+        function attachNodeClick(div) {
+            div.onclick = () => {
+                const id = div.id;
+                const status = nodeStatuses[id] || "⏳ Loading...";
+                const node = nodes.find(n => n.id === id);
+                const submodules = nodes.filter(n => n.parent === id);
+                
+                infoBox.innerHTML = `
+                    <strong>${id.toUpperCase()}</strong><br>
+                    Status: ${status}<br>
+                    Tip: ${id === 'global' ? 'Global Optimizer' : 'Modul'}<br>
+                    Submoduli: ${submodules.length}<br>
+                    <button class="btn" onclick="removeNode('${id}')" style="margin-top: 10px;">🗑️ Odstrani</button>
+                `;
+            }
+        }
+
+        // Drag & Drop
+        function makeDraggable(el) {
+            let offsetX, offsetY;
+            el.onmousedown = (e) => {
+                offsetX = e.clientX - el.offsetLeft;
+                offsetY = e.clientY - el.offsetTop;
+                
+                function moveHandler(e) {
+                    el.style.left = (e.clientX - offsetX) + "px";
+                    el.style.top = (e.clientY - offsetY) + "px";
+                    updateConnections();
+                    if (animationEnabled) createFlowDot();
+                }
+                
+                function upHandler() {
+                    document.removeEventListener("mousemove", moveHandler);
+                    document.removeEventListener("mouseup", upHandler);
+                }
+                
+                document.addEventListener("mousemove", moveHandler);
+                document.addEventListener("mouseup", upHandler);
+            }
+        }
+
+        // Smart Auto-Layout - DOKONČANA FUNKCIJA
+        function autoLayout() {
+            const global = document.getElementById("global");
+            const marginX = 50, marginY = 150;
+            const topGlobal = 50, leftGlobal = 600;
+            
+            // Pozicioniraj Global Optimizer
+            global.style.top = topGlobal + "px";
+            global.style.left = leftGlobal + "px";
+
+            const mainModules = nodes.filter(n => n.parent === null && n.id !== "global");
+            const spacingX = 200;
+            const startX = leftGlobal - ((mainModules.length - 1) / 2) * spacingX;
+
+            // Pozicioniraj glavne module
+            mainModules.forEach((mod, i) => {
+                mod.top = topGlobal + marginY;
+                mod.left = startX + i * spacingX;
+                const el = document.getElementById(mod.id);
+                if (el) {
+                    el.style.top = mod.top + "px";
+                    el.style.left = mod.left + "px";
+                }
+
+                // Pozicioniraj submodule
+                const submodules = nodes.filter(n => n.parent === mod.id);
+                submodules.forEach((sub, j) => {
+                    sub.top = mod.top + marginY;
+                    sub.left = mod.left + (j - (submodules.length - 1) / 2) * 120;
+                    const subEl = document.getElementById(sub.id);
+                    if (subEl) {
+                        subEl.style.top = sub.top + "px";
+                        subEl.style.left = sub.left + "px";
+                    }
+                });
+            });
+
+            updateConnections();
+        }
+
+        // Dodajanje modulov
+        function addModule() {
+            const icons = ["🔧", "⚙️", "🛠️", "🔩", "⚡", "🎯", "🚀", "💎", "🔮", "⭐"];
+            const names = ["Engine", "Core", "System", "Network", "Power", "Target", "Boost", "Crystal", "Magic", "Star"];
+            
+            const icon = icons[Math.floor(Math.random() * icons.length)];
+            const name = names[Math.floor(Math.random() * names.length)] + Math.floor(Math.random() * 100);
+            
+            createNode(name, icon, null, null, null);
+        }
+
+        function addSubmodule() {
+            const mainModules = nodes.filter(n => n.parent === null && n.id !== "global");
+            if (mainModules.length === 0) return alert("Najprej dodajte glavni modul!");
+            
+            const parent = mainModules[Math.floor(Math.random() * mainModules.length)];
+            const icons = ["🔸", "🔹", "💠", "🔺", "🔻", "◆", "◇"];
+            const icon = icons[Math.floor(Math.random() * icons.length)];
+            const name = "Sub" + Math.floor(Math.random() * 100);
+            
+            createNode(name, icon, null, null, parent.id);
+        }
+
+        function addCustomModule() {
+            const name = document.getElementById("module-name").value.trim();
+            if (!name) return alert("Vnesite ime modula!");
+            
+            createNode(name, "🎯", null, null, null);
+            document.getElementById("module-name").value = "";
+        }
+
+        // Flow animacije
+        function createFlowDot() {
+            if (!animationEnabled) return;
+            
+            const dot = document.createElement("div");
+            dot.className = "dot";
+            
+            const colors = ["#00ff88", "#ff6b6b", "#4ecdc4", "#45b7d1", "#f9ca24"];
+            dot.style.background = colors[Math.floor(Math.random() * colors.length)];
+            dot.style.boxShadow = `0 0 10px ${dot.style.background}`;
+            
+            // Začni pri Global node
+            const global = document.getElementById("global");
+            dot.style.left = (global.offsetLeft + global.offsetWidth / 2) + "px";
+            dot.style.top = (global.offsetTop + global.offsetHeight / 2) + "px";
+            
+            dashboard.appendChild(dot);
+            
+            // Animiraj do naključnega modula
+            const targetNodes = nodes.filter(n => n.id !== "global");
+            if (targetNodes.length > 0) {
+                const target = targetNodes[Math.floor(Math.random() * targetNodes.length)];
+                const targetEl = document.getElementById(target.id);
+                
+                if (targetEl) {
+                    const targetX = targetEl.offsetLeft + targetEl.offsetWidth / 2;
+                    const targetY = targetEl.offsetTop + targetEl.offsetHeight / 2;
+                    
+                    dot.style.transition = "all 2s ease-in-out";
+                    setTimeout(() => {
+                        dot.style.left = targetX + "px";
+                        dot.style.top = targetY + "px";
+                        dot.style.opacity = "0";
+                    }, 100);
+                    
+                    setTimeout(() => {
+                        if (dot.parentNode) dashboard.removeChild(dot);
+                    }, 2100);
+                    
+                    flowCounter++;
+                }
+            }
+        }
+
+        // Ostale funkcije
+        function toggleAnimation() {
+            animationEnabled = !animationEnabled;
+            document.querySelector('button[onclick="toggleAnimation()"]').textContent = 
+                animationEnabled ? "🎬 Animacije" : "⏸️ Animacije";
+        }
+
+        function resetDashboard() {
+            if (confirm("Ali ste prepričani, da želite resetirati dashboard?")) {
+                nodes.filter(n => n.id !== "global").forEach(n => {
+                    const el = document.getElementById(n.id);
+                    if (el) dashboard.removeChild(el);
+                });
+                nodes = [{id: "global", icon: "🌐", top: 50, left: 600, parent: null}];
+                nodeStatuses = {global: "✅ Aktiven"};
+                updateConnections();
+                updateStats();
+                infoBox.innerHTML = "Kliknite na modul za prikaz podrobnosti...";
+            }
+        }
+
+        function updateStats() {
+            document.getElementById("active-modules").textContent = nodes.length;
+            document.getElementById("flow-rate").textContent = Math.floor(flowCounter / ((Date.now() - startTime) / 1000)) + "/s";
+            
+            const uptime = new Date(Date.now() - startTime);
+            const hours = String(uptime.getUTCHours()).padStart(2, '0');
+            const minutes = String(uptime.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(uptime.getUTCSeconds()).padStart(2, '0');
+            document.getElementById("uptime").textContent = `${hours}:${minutes}:${seconds}`;
+        }
+
+        // WebSocket simulacija
+        function simulateWebSocket() {
+            setInterval(() => {
+                if (animationEnabled && nodes.length > 1) {
+                    createFlowDot();
+                }
+                
+                // Posodobi statuse
+                nodes.forEach(node => {
+                    const statusEl = document.getElementById(`status-${node.id}`);
+                    if (statusEl && Math.random() > 0.95) {
+                        const statuses = ["✅ Aktiven", "⚡ Procesiranje", "🔄 Sinhronizacija"];
+                        statusEl.textContent = statuses[Math.floor(Math.random() * statuses.length)];
+                        nodeStatuses[node.id] = statusEl.textContent;
+                    }
+                });
+            }, 1000);
+        }
+
+        // Tipkovne bližnjice
+        document.addEventListener("keydown", (e) => {
+            if (e.target.tagName === "INPUT") return;
+            
+            switch(e.key.toLowerCase()) {
+                case 'a': addModule(); break;
+                case 's': addSubmodule(); break;
+                case 'l': autoLayout(); break;
+                case 'r': resetDashboard(); break;
+            }
+        });
+
+        // Inicializacija
+        attachNodeClick(document.getElementById("global"));
+        makeDraggable(document.getElementById("global"));
+        simulateWebSocket();
+        
+        // Posodobi statistike vsako sekundo
+        setInterval(updateStats, 1000);
+        
+        // Dodaj nekaj začetnih modulov
+        setTimeout(() => {
+            addModule();
+            addModule();
+            setTimeout(() => {
+                addSubmodule();
+                addSubmodule();
+            }, 1000);
+        }, 2000);
+
+        console.log("🚀 Omni-APP Dashboard inicializiran!");
+    </script>
+</body>
+</html>

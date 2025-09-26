@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omnia AI Platform - Popolna Integracija</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #f093fb;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --dark-color: #343a40;
+            --light-color: #f8f9fa;
+            --border-radius: 12px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 50%, var(--accent-color) 100%);
+            min-height: 100vh;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-color);
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary-color);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 100px 20px 20px;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .prompt-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            transition: var(--transition);
+        }
+
+        .prompt-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .control-group .btn {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: var(--dark-color);
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .output-box {
+            width: 100%;
+            min-height: 200px;
+            padding: 20px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius);
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            overflow-y: auto;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .status-online {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-offline {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger-color);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .network-info {
+            margin-top: 10px;
+        }
+
+        .network-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: rgba(0, 123, 255, 0.1);
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .shareable-urls {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .url-item {
+            margin: 5px 0;
+            padding: 5px;
+            background: white;
+            border-radius: 3px;
+            border-left: 3px solid #007bff;
+        }
+
+        .url-item.lan {
+            border-left-color: #28a745;
+        }
+
+        .url-item strong {
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .url-item small {
+            color: #6c757d;
+        }
+
+        .knowledge-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .category-btn {
+            padding: 10px;
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .category-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .category-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .prompt-suggestions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .suggestion-btn {
+            padding: 8px 12px;
+            background: rgba(248, 249, 250, 0.8);
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: left;
+            font-size: 0.85rem;
+        }
+
+        .suggestion-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .test-results {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+        }
+
+        .test-success {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid rgba(40, 167, 69, 0.2);
+            color: var(--success-color);
+        }
+
+        .test-error {
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid rgba(220, 53, 69, 0.2);
+            color: var(--danger-color);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: linear-gradient(135deg, #138496, #117a8b);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .loading {
+            display: none;
+        }
+
+        .loading.active {
+            display: inline-flex;
+        }
+
+        .search-results-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .search-results-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .search-results-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .search-results-content::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        .search-results-content::-webkit-scrollbar-thumb:hover {
+            background: #5a6fd8;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                padding: 90px 10px 10px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">🧠 Omnia AI</a>
+            <ul class="nav-links">
+                <li><a href="#main">Domov</a></li>
+                <li><a href="#knowledge">Baza Znanja</a></li>
+                <li><a href="#testing">Testiranje</a></li>
+                <li><a href="multimodal.html">Multi-Modal</a></li>
+                <li><a href="personalization.html">Personalizacija</a></li>
+                <li><a href="global.html">Global</a></li>
+                <li><a href="versatility.html">Versatility</a></li>
+                <li><a href="simplicity.html">Simplicity</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Main Content -->
+        <main class="main-content">
+            <h1>🤖 Omnia AI Platform - Popolna Integracija</h1>
+            <p>Testirajte vse funkcionalnosti, prompte in vsebine iz baze znanja</p>
+            
+            <div class="status-indicator" id="connectionStatus">
+                <span class="status-dot"></span>
+                <span id="statusText">Connecting...</span>
+            </div>
+
+            <div style="margin: 30px 0;">
+                <label for="promptInput" class="section-title">
+                    ✍️ Vnesite vaš prompt:
+                </label>
+                <textarea 
+                    id="promptInput" 
+                    class="prompt-input"
+                    placeholder="Vnesite vaš prompt tukaj... Poskusite:
+• 'Povej mi o aplikacijah za produktivnost'
+• 'Kako naredim palačinke?'
+• 'Razloži mi o planetu Mars'
+• 'Katere programske jezike naj se naučim?'
+• 'Deli kozmične resnice o vesolju'"
+                ></textarea>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <button id="generateBtn" class="btn btn-primary">
+                            <span class="btn-text">🚀 Generiraj Odgovor</span>
+                            <span class="loading">⏳ Generiram...</span>
+                        </button>
+                        <button id="testLiveBtn" class="btn btn-success">🧪 Test Naključni Prompt</button>
+                    </div>
+                    <div class="control-group">
+                        <button id="clearBtn" class="btn btn-secondary">🗑️ Počisti Vse</button>
+                        <button id="copyResponseBtn" class="btn btn-info" style="display: none;">📋 Kopiraj Odgovor</button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin: 30px 0;">
+                <label for="outputBox" class="section-title">
+                    💬 AI Odgovor:
+                </label>
+                <div id="outputBox" class="output-box">
+                    Tukaj se bo prikazal AI odgovor...
+                </div>
+            </div>
+        </main>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- Knowledge Categories -->
+            <div class="sidebar-section">
+                <h3 class="section-title">📚 Kategorije Znanja</h3>
+                
+                <!-- Knowledge Search -->
+                <div style="margin-bottom: 15px;">
+                    <input 
+                        type="text" 
+                        id="knowledgeSearchInput" 
+                        class="prompt-input" 
+                        style="min-height: 40px; padding: 10px; font-size: 0.9rem;"
+                        placeholder="Poiščite v bazi znanja..."
+                    />
+                    <button id="searchKnowledgeBtn" class="btn btn-primary" style="margin-top: 10px; width: 100%;">
+                        🔍 Poišči
+                    </button>
+                </div>
+                
+                <div class="knowledge-categories" id="knowledgeCategories">
+                    <div class="category-btn" data-category="apps">📱 Aplikacije</div>
+                    <div class="category-btn" data-category="cookbook">🍳 Recepti</div>
+                    <div class="category-btn" data-category="science">🌌 Znanost</div>
+                    <div class="category-btn" data-category="technology">💻 Tehnologija</div>
+                    <div class="category-btn" data-category="cosmic_truths">✨ Kozmične Resnice</div>
+                </div>
+                
+                <!-- Search Results -->
+                <div id="searchResults" style="display: none; margin-top: 15px;">
+                    <h4 style="color: var(--primary-color); margin-bottom: 10px;">🔍 Rezultati iskanja:</h4>
+                    <div id="searchResultsContent" class="search-results-content"></div>
+                </div>
+            </div>
+
+            <!-- Prompt Suggestions -->
+            <div class="sidebar-section">
+                <h3 class="section-title">💡 Predlogi Promptov</h3>
+                <div class="prompt-suggestions" id="promptSuggestions">
+                    <div class="suggestion-btn">Povej mi o najboljših brezplačnih aplikacijah</div>
+                    <div class="suggestion-btn">Kako naredim enostavno paradižnikovo juho?</div>
+                    <div class="suggestion-btn">Razloži mi zanimivosti o Marsu</div>
+                    <div class="suggestion-btn">Kateri programski jezik naj se naučim prvi?</div>
+                    <div class="suggestion-btn">Deli kozmične resnice o perspektivi</div>
+                </div>
+            </div>
+
+            <!-- API Testing -->
+            <div class="sidebar-section">
+                <h3 class="section-title">🔧 API Testiranje</h3>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <button id="testApiBtn" class="btn btn-warning">Test API</button>
+                    <button id="testKnowledgeBtn" class="btn btn-warning">Test Baza Znanja</button>
+                    <button id="healthCheckBtn" class="btn btn-warning">Health Check</button>
+                </div>
+                <div id="testResults" class="test-results" style="display: none;"></div>
+            </div>
+
+            <!-- Network Info Section -->
+            <div class="sidebar-section" id="network-section">
+                <h3 class="section-title">🌍 Network & Sharing</h3>
+                <div class="network-info">
+                    <div class="network-status">
+                        <span class="status-indicator" id="network-status">🔄</span>
+                        <span id="network-text">Loading network info...</span>
+                    </div>
+                    <div class="shareable-urls" id="shareable-urls"></div>
+                    <button class="btn btn-secondary" onclick="refreshNetworkInfo()">🔄 Refresh Network Info</button>
+                    <button class="btn btn-primary" onclick="copyShareableLink()">📋 Copy LAN Link</button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE_URL = 'http://localhost:3001';
+        
+        // DOM Elements
+        const promptInput = document.getElementById('promptInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const testLiveBtn = document.getElementById('testLiveBtn');
+        const outputBox = document.getElementById('outputBox');
+        const connectionStatus = document.getElementById('connectionStatus');
+        const statusText = document.getElementById('statusText');
+        const knowledgeCategories = document.getElementById('knowledgeCategories');
+        const promptSuggestions = document.getElementById('promptSuggestions');
+        const testApiBtn = document.getElementById('testApiBtn');
+        const testKnowledgeBtn = document.getElementById('testKnowledgeBtn');
+        const healthCheckBtn = document.getElementById('healthCheckBtn');
+        const testResults = document.getElementById('testResults');
+        const localUrl = document.getElementById('localUrl');
+        const knowledgeSearchInput = document.getElementById('knowledgeSearchInput');
+        const searchKnowledgeBtn = document.getElementById('searchKnowledgeBtn');
+        const searchResults = document.getElementById('searchResults');
+        const searchResultsContent = document.getElementById('searchResultsContent');
+        const copyResponseBtn = document.getElementById('copyResponseBtn');
+
+        // State
+        let isConnected = false;
+        let currentCategory = null;
+        let knowledgeData = {};
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupEventListeners();
+            checkConnection();
+            loadKnowledgeData();
+        });
+
+        function initializeApp() {
+            console.log('🚀 Initializing Omnia AI Platform...');
+            updateConnectionStatus(false, 'Connecting...');
+            
+            if (localUrl) {
+                localUrl.textContent = window.location.origin;
+            }
+        }
+
+        function setupEventListeners() {
+            // Main functionality
+            generateBtn?.addEventListener('click', handleGenerate);
+            clearBtn?.addEventListener('click', handleClear);
+            testLiveBtn?.addEventListener('click', handleTestLive);
+            
+            // Testing
+            testApiBtn?.addEventListener('click', testAPI);
+            testKnowledgeBtn?.addEventListener('click', testKnowledgeBase);
+            healthCheckBtn?.addEventListener('click', healthCheck);
+            
+            // Knowledge categories
+            knowledgeCategories?.addEventListener('click', handleCategoryClick);
+            
+            // Prompt suggestions
+            promptSuggestions?.addEventListener('click', handleSuggestionClick);
+            
+            // Knowledge search
+            searchKnowledgeBtn?.addEventListener('click', handleKnowledgeSearch);
+            knowledgeSearchInput?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleKnowledgeSearch();
+                }
+            });
+            
+            // Copy response functionality
+            copyResponseBtn?.addEventListener('click', handleCopyResponse);
+            
+            // Keyboard shortcuts
+            promptInput?.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'Enter') {
+                    handleGenerate();
+                }
+            });
+        }
+
+        async function checkConnection() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/health`);
+                const data = await response.json();
+                updateConnectionStatus(true, 'Connected');
+                isConnected = true;
+            } catch (error) {
+                updateConnectionStatus(false, 'Disconnected');
+                isConnected = false;
+            }
+        }
+
+        function updateConnectionStatus(connected, message) {
+            if (connectionStatus && statusText) {
+                connectionStatus.className = `status-indicator ${connected ? 'status-online' : 'status-offline'}`;
+                statusText.textContent = message;
+            }
+        }
+
+        async function handleGenerate() {
+            const prompt = promptInput?.value?.trim();
+            if (!prompt) {
+                alert('Prosim vnesite prompt!');
+                return;
+            }
+
+            setLoading(true);
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt })
+                });
+
+                const data = await response.json();
+                
+                if (data.response) {
+                    outputBox.textContent = data.response;
+                    // Show copy button when there's a response
+                    if (copyResponseBtn) {
+                        copyResponseBtn.style.display = 'inline-block';
+                    }
+                } else {
+                    outputBox.textContent = 'Napaka: ' + (data.error || 'Neznana napaka');
+                }
+            } catch (error) {
+                outputBox.textContent = 'Napaka pri povezavi: ' + error.message;
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function handleClear() {
+            if (promptInput) promptInput.value = '';
+            if (outputBox) outputBox.textContent = 'Tukaj se bo prikazal AI odgovor...';
+            // Hide copy button when clearing
+            if (copyResponseBtn) {
+                copyResponseBtn.style.display = 'none';
+            }
+            // Hide search results when clearing
+            if (searchResults) {
+                searchResults.style.display = 'none';
+            }
+        }
+
+        async function handleTestLive() {
+            const testPrompts = [
+                'Test osnovne funkcionalnosti',
+                'Povej mi o aplikacijah',
+                'Kako naredim palačinke?',
+                'Razloži mi o planetu Mars'
+            ];
+            
+            const randomPrompt = testPrompts[Math.floor(Math.random() * testPrompts.length)];
+            promptInput.value = randomPrompt;
+            await handleGenerate();
+        }
+
+        function handleCategoryClick(e) {
+            if (e.target.classList.contains('category-btn')) {
+                const category = e.target.dataset.category;
+                selectCategory(category);
+                loadCategoryPrompts(category);
+            }
+        }
+
+        function handleSuggestionClick(e) {
+            if (e.target.classList.contains('suggestion-btn')) {
+                promptInput.value = e.target.textContent;
+            }
+        }
+
+        function selectCategory(category) {
+            // Update UI
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-category="${category}"]`)?.classList.add('active');
+            
+            currentCategory = category;
+        }
+
+        async function loadCategoryPrompts(category) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/prompts/${category}`);
+                const data = await response.json();
+                
+                if (data.success && data.prompts) {
+                    updatePromptSuggestions(data.prompts);
+                }
+            } catch (error) {
+                console.error('Error loading category prompts:', error);
+            }
+        }
+
+        function updatePromptSuggestions(prompts) {
+            if (!promptSuggestions) return;
+            
+            promptSuggestions.innerHTML = '';
+            prompts.forEach(prompt => {
+                const btn = document.createElement('div');
+                btn.className = 'suggestion-btn';
+                btn.textContent = prompt;
+                promptSuggestions.appendChild(btn);
+            });
+        }
+
+        async function loadKnowledgeData() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/knowledge`);
+                const data = await response.json();
+                knowledgeData = data;
+            } catch (error) {
+                console.error('Error loading knowledge data:', error);
+            }
+        }
+
+        async function testAPI() {
+            showTestResult('Testing API...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/test`);
+                const data = await response.json();
+                
+                showTestResult(`✅ API Test Successful\nMessage: ${data.message}`, 'success');
+            } catch (error) {
+                showTestResult(`❌ API Test Failed\nError: ${error.message}`, 'error');
+            }
+        }
+
+        async function testKnowledgeBase() {
+            showTestResult('Testing Knowledge Base...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/knowledge`);
+                const data = await response.json();
+                
+                const categories = Object.keys(data);
+                showTestResult(`✅ Knowledge Base Test Successful\nCategories: ${categories.join(', ')}`, 'success');
+            } catch (error) {
+                showTestResult(`❌ Knowledge Base Test Failed\nError: ${error.message}`, 'error');
+            }
+        }
+
+        async function healthCheck() {
+            showTestResult('Checking health...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/health`);
+                const data = await response.json();
+                
+                showTestResult(`✅ Health Check Successful\nStatus: ${data.status}\nUptime: ${data.uptime}`, 'success');
+            } catch (error) {
+                showTestResult(`❌ Health Check Failed\nError: ${error.message}`, 'error');
+            }
+        }
+
+        function showTestResult(message, type) {
+            if (!testResults) return;
+            
+            testResults.style.display = 'block';
+            testResults.className = `test-results test-${type === 'success' ? 'success' : 'error'}`;
+            testResults.innerHTML = message.replace(/\n/g, '<br>');
+        }
+
+        function setLoading(loading) {
+            if (generateBtn) {
+                const btnText = generateBtn.querySelector('.btn-text');
+                const loadingSpan = generateBtn.querySelector('.loading');
+                
+                if (loading) {
+                    btnText.style.display = 'none';
+                    loadingSpan.style.display = 'inline-flex';
+                    generateBtn.disabled = true;
+                } else {
+                    btnText.style.display = 'inline-flex';
+                    loadingSpan.style.display = 'none';
+                    generateBtn.disabled = false;
+                }
+            }
+        }
+
+        // Copy response function
+        function handleCopyResponse() {
+            const responseText = outputBox?.textContent;
+            
+            if (!responseText || responseText === 'Tukaj se bo prikazal AI odgovor...') {
+                alert('Ni odgovora za kopiranje!');
+                return;
+            }
+            
+            navigator.clipboard.writeText(responseText).then(() => {
+                // Temporary feedback
+                const originalText = copyResponseBtn.innerHTML;
+                copyResponseBtn.innerHTML = '✅ Kopirano!';
+                copyResponseBtn.disabled = true;
+                
+                setTimeout(() => {
+                    copyResponseBtn.innerHTML = originalText;
+                    copyResponseBtn.disabled = false;
+                }, 2000);
+            }).catch(err => {
+                console.error('Napaka pri kopiranju:', err);
+                alert('Napaka pri kopiranju v odložišče');
+            });
+        }
+
+        // Knowledge search function
+        async function handleKnowledgeSearch() {
+            const query = knowledgeSearchInput?.value?.trim();
+            
+            if (!query) {
+                alert('Prosimo, vnesite iskalni pojem.');
+                return;
+            }
+            
+            // Show loading state
+            searchKnowledgeBtn.disabled = true;
+            searchKnowledgeBtn.innerHTML = '🔄 Iščem...';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/search?q=${encodeURIComponent(query)}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success && data.results && data.results.length > 0) {
+                    displaySearchResults(data.results, query);
+                } else {
+                    displaySearchResults([], query);
+                }
+                
+            } catch (error) {
+                console.error('Search error:', error);
+                searchResultsContent.innerHTML = `
+                    <div style="color: #dc3545; padding: 10px; background: #f8d7da; border-radius: 5px;">
+                        ❌ Napaka pri iskanju: ${error.message}
+                    </div>
+                `;
+                searchResults.style.display = 'block';
+            } finally {
+                // Reset button state
+                searchKnowledgeBtn.disabled = false;
+                searchKnowledgeBtn.innerHTML = '🔍 Poišči';
+            }
+        }
+
+        function displaySearchResults(results, query) {
+            if (results.length === 0) {
+                searchResultsContent.innerHTML = `
+                    <div style="color: #856404; padding: 10px; background: #fff3cd; border-radius: 5px;">
+                        🔍 Ni rezultatov za "${query}"
+                    </div>
+                `;
+            } else {
+                const resultsHtml = results.map(result => `
+                    <div style="margin-bottom: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; border-left: 3px solid var(--primary-color);">
+                        <div style="font-weight: 600; color: var(--primary-color); margin-bottom: 5px;">
+                            ${result.category || 'Splošno'}
+                        </div>
+                        <div style="font-size: 0.9rem; line-height: 1.4;">
+                            ${result.content || result.text || 'Ni vsebine'}
+                        </div>
+                        ${result.score ? `<div style="font-size: 0.8rem; color: #6c757d; margin-top: 5px;">Relevantnost: ${Math.round(result.score * 100)}%</div>` : ''}
+                    </div>
+                `).join('');
+                
+                searchResultsContent.innerHTML = `
+                    <div style="margin-bottom: 10px; font-size: 0.9rem; color: #6c757d;">
+                        Najdenih ${results.length} rezultatov za "${query}"
+                    </div>
+                    ${resultsHtml}
+                `;
+            }
+            
+            searchResults.style.display = 'block';
+        }
+
+        // Network info functions
+        let networkData = null;
+
+        async function refreshNetworkInfo() {
+             try {
+                 const response = await fetch(`${API_BASE_URL}/api/network`);
+                 
+                 if (!response.ok) {
+                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                 }
+                 
+                 const data = await response.json();
+                 
+                 if (data.success) {
+                     networkData = data;
+                     displayNetworkInfo(data);
+                     updateNetworkStatus('✅ Network info loaded', 'online');
+                 } else {
+                     updateNetworkStatus('❌ Failed to load network info', 'offline');
+                 }
+             } catch (error) {
+                 console.error('Network info error:', error);
+                 updateNetworkStatus('❌ Network error', 'offline');
+                 
+                 // Fallback: show basic local info
+                 const fallbackData = {
+                     hostname: 'localhost',
+                     platform: 'unknown',
+                     urls: [
+                         { type: 'localhost', url: 'http://localhost:3001', description: 'Local development' },
+                         { type: 'integrated', url: 'http://localhost:3001/integrated', description: 'Integrated testing app' }
+                     ]
+                 };
+                 displayNetworkInfo(fallbackData);
+             }
+         }
+
+        function displayNetworkInfo(data) {
+            const urlsContainer = document.getElementById('shareable-urls');
+            if (!urlsContainer) return;
+
+            let html = `<div class="url-item">
+                <strong>Hostname:</strong> ${data.hostname}
+                <small>Platform: ${data.platform}</small>
+            </div>`;
+
+            // Local URLs
+            const localUrls = data.urls.filter(u => u.type === 'localhost' || u.type === 'integrated');
+            if (localUrls.length > 0) {
+                html += '<div style="margin: 10px 0; font-weight: bold;">📱 Local Access:</div>';
+                localUrls.forEach(url => {
+                    html += `<div class="url-item">
+                        <strong>${url.description}</strong>
+                        <small>${url.url}</small>
+                    </div>`;
+                });
+            }
+
+            // LAN URLs
+            const lanUrls = data.urls.filter(u => u.type === 'lan' || u.type === 'lan-integrated');
+            if (lanUrls.length > 0) {
+                html += '<div style="margin: 10px 0; font-weight: bold;">🌍 LAN Access (Share with colleagues):</div>';
+                lanUrls.forEach(url => {
+                    html += `<div class="url-item lan">
+                        <strong>${url.description}</strong>
+                        <small>${url.url}</small>
+                    </div>`;
+                });
+            }
+
+            urlsContainer.innerHTML = html;
+        }
+
+        function updateNetworkStatus(text, status) {
+            const statusEl = document.getElementById('network-status');
+            const textEl = document.getElementById('network-text');
+            
+            if (statusEl && textEl) {
+                statusEl.textContent = status === 'online' ? '🟢' : '🔴';
+                textEl.textContent = text;
+            }
+        }
+
+        function copyShareableLink() {
+            if (!networkData || !networkData.urls) {
+                alert('Network info not loaded yet. Please refresh first.');
+                return;
+            }
+
+            // Find the first LAN integrated URL
+            const lanUrl = networkData.urls.find(u => u.type === 'lan-integrated');
+            if (lanUrl) {
+                navigator.clipboard.writeText(lanUrl.url).then(() => {
+                    alert(`LAN link copied to clipboard: ${lanUrl.url}`);
+                }).catch(() => {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = lanUrl.url;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    alert(`LAN link copied: ${lanUrl.url}`);
+                });
+            } else {
+                alert('No LAN URL available. Make sure you are connected to a network.');
+            }
+        }
+
+        // Initialize app when page loads
+         document.addEventListener('DOMContentLoaded', function() {
+             checkConnection();
+             loadKnowledgeData(); // Fixed function name
+             refreshNetworkInfo(); // Load network info
+             
+             // Auto-refresh connection status every 30 seconds
+             setInterval(checkConnection, 30000);
+         });
+    </script>
+</body>
+</html>

@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni Analytics - Nadzorna plošča</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .stat-change.positive {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .stat-change.negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .chart {
+            height: 300px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reports-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .reports-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .reports-header h2 {
+            color: #2c3e50;
+        }
+
+        .report-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .report-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .report-card h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .report-meta {
+            color: #6c757d;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .report-summary {
+            color: #495057;
+            line-height: 1.5;
+        }
+
+        .alerts-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .alert-item.high {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+
+        .alert-item.medium {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+
+        .alert-item.low {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .alert-icon {
+            font-size: 20px;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .alert-time {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-online {
+            background: #28a745;
+        }
+
+        .status-offline {
+            background: #dc3545;
+        }
+
+        .status-warning {
+            background: #ffc107;
+        }
+
+        .refresh-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                📊 Omni Analytics
+                <span class="status-indicator status-online"></span>
+                <span style="font-size: 14px; color: #7f8c8d;">Sistem aktiven</span>
+            </h1>
+            <p>Napredna analitika in poročila za Omni sistem</p>
+        </div>
+
+        <!-- Statistike -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Skupaj naprav</h3>
+                <div class="stat-value" id="totalDevices">-</div>
+                <span class="stat-change positive" id="devicesChange">+0%</span>
+            </div>
+            <div class="stat-card">
+                <h3>Aktivni uporabniki</h3>
+                <div class="stat-value" id="activeUsers">-</div>
+                <span class="stat-change positive" id="usersChange">+0%</span>
+            </div>
+            <div class="stat-card">
+                <h3>Dogodki/min</h3>
+                <div class="stat-value" id="eventsPerMin">-</div>
+                <span class="stat-change" id="eventsChange">0%</span>
+            </div>
+            <div class="stat-card">
+                <h3>Zdravje sistema</h3>
+                <div class="stat-value" id="systemHealth">-</div>
+                <span class="stat-change positive" id="healthChange">Odlično</span>
+            </div>
+        </div>
+
+        <!-- Grafi -->
+        <div class="charts-grid">
+            <div class="chart-container">
+                <div class="chart-title">Aktivnost naprav (zadnjih 24 ur)</div>
+                <div class="chart" id="deviceActivityChart">
+                    <canvas id="activityCanvas" width="600" height="300"></canvas>
+                </div>
+            </div>
+            <div class="chart-container">
+                <div class="chart-title">Razporeditev tipov naprav</div>
+                <div class="chart" id="deviceTypesChart">
+                    <canvas id="typesCanvas" width="300" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Poročila -->
+        <div class="reports-section">
+            <div class="reports-header">
+                <h2>📋 Poročila</h2>
+                <div class="report-controls">
+                    <select id="reportType" class="btn btn-secondary">
+                        <option value="device_summary">Povzetek naprav</option>
+                        <option value="user_activity">Aktivnost uporabnikov</option>
+                        <option value="system_performance">Zmogljivost sistema</option>
+                        <option value="trends">Trendi</option>
+                        <option value="anomalies">Anomalije</option>
+                    </select>
+                    <select id="reportPeriod" class="btn btn-secondary">
+                        <option value="1h">Zadnja ura</option>
+                        <option value="1d">Zadnji dan</option>
+                        <option value="7d">Zadnji teden</option>
+                        <option value="30d">Zadnji mesec</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="generateReport()">
+                        📊 Generiraj poročilo
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportData()">
+                        💾 Izvozi podatke
+                    </button>
+                </div>
+            </div>
+            <div class="reports-grid" id="reportsGrid">
+                <!-- Poročila se bodo prikazala tukaj -->
+            </div>
+        </div>
+
+        <!-- Opozorila -->
+        <div class="alerts-section">
+            <h2>🚨 Opozorila</h2>
+            <div id="alertsList">
+                <!-- Opozorila se bodo prikazala tukaj -->
+            </div>
+        </div>
+    </div>
+
+    <button class="refresh-btn" onclick="refreshData()" title="Osveži podatke">
+        🔄
+    </button>
+
+    <script>
+        class AnalyticsDashboard {
+            constructor() {
+                this.ws = null;
+                this.data = {
+                    stats: {},
+                    reports: [],
+                    alerts: []
+                };
+                this.charts = {};
+                
+                this.init();
+            }
+
+            async init() {
+                await this.connectWebSocket();
+                await this.loadInitialData();
+                this.setupCharts();
+                this.startPeriodicUpdates();
+            }
+
+            async connectWebSocket() {
+                try {
+                    this.ws = new WebSocket('ws://localhost:3001');
+                    
+                    this.ws.onopen = () => {
+                        console.log('📡 WebSocket povezan');
+                        this.showNotification('Povezano s sistemom', 'success');
+                    };
+                    
+                    this.ws.onmessage = (event) => {
+                        const data = JSON.parse(event.data);
+                        this.handleWebSocketMessage(data);
+                    };
+                    
+                    this.ws.onclose = () => {
+                        console.log('📡 WebSocket prekinjen');
+                        this.showNotification('Povezava prekinjena', 'warning');
+                        // Poskusi ponovno povezavo čez 5 sekund
+                        setTimeout(() => this.connectWebSocket(), 5000);
+                    };
+                } catch (error) {
+                    console.error('Napaka pri WebSocket povezavi:', error);
+                }
+            }
+
+            handleWebSocketMessage(data) {
+                switch (data.type) {
+                    case 'analytics_update':
+                        this.updateStats(data.stats);
+                        break;
+                    case 'new_alert':
+                        this.addAlert(data.alert);
+                        break;
+                    case 'device_update':
+                        this.updateDeviceData(data.device);
+                        break;
+                }
+            }
+
+            async loadInitialData() {
+                try {
+                    // Naloži statistike
+                    const statsResponse = await fetch('/api/analytics/stats');
+                    if (statsResponse.ok) {
+                        this.data.stats = await statsResponse.json();
+                        this.updateStats(this.data.stats);
+                    }
+
+                    // Naloži nedavna opozorila
+                    const alertsResponse = await fetch('/api/analytics/alerts');
+                    if (alertsResponse.ok) {
+                        this.data.alerts = await alertsResponse.json();
+                        this.updateAlerts();
+                    }
+
+                    // Naloži zadnja poročila
+                    const reportsResponse = await fetch('/api/analytics/reports');
+                    if (reportsResponse.ok) {
+                        this.data.reports = await reportsResponse.json();
+                        this.updateReports();
+                    }
+                } catch (error) {
+                    console.error('Napaka pri nalaganju podatkov:', error);
+                    this.showNotification('Napaka pri nalaganju podatkov', 'error');
+                }
+            }
+
+            updateStats(stats) {
+                document.getElementById('totalDevices').textContent = stats.totalDevices || 0;
+                document.getElementById('activeUsers').textContent = stats.activeUsers || 0;
+                document.getElementById('eventsPerMin').textContent = (stats.eventsPerMinute || 0).toFixed(1);
+                document.getElementById('systemHealth').textContent = ((stats.systemHealth || 0) * 100).toFixed(0) + '%';
+
+                // Posodobi spremembe (simulacija)
+                this.updateStatChanges(stats);
+            }
+
+            updateStatChanges(stats) {
+                const changes = {
+                    devices: Math.random() * 10 - 5,
+                    users: Math.random() * 20 - 10,
+                    events: Math.random() * 30 - 15,
+                    health: 'Odlično'
+                };
+
+                this.updateChangeIndicator('devicesChange', changes.devices);
+                this.updateChangeIndicator('usersChange', changes.users);
+                this.updateChangeIndicator('eventsChange', changes.events);
+                document.getElementById('healthChange').textContent = changes.health;
+            }
+
+            updateChangeIndicator(elementId, change) {
+                const element = document.getElementById(elementId);
+                const isPositive = change >= 0;
+                element.textContent = (isPositive ? '+' : '') + change.toFixed(1) + '%';
+                element.className = 'stat-change ' + (isPositive ? 'positive' : 'negative');
+            }
+
+            setupCharts() {
+                this.setupActivityChart();
+                this.setupTypesChart();
+            }
+
+            setupActivityChart() {
+                const canvas = document.getElementById('activityCanvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Simulacija podatkov za graf aktivnosti
+                const hours = [];
+                const data = [];
+                
+                for (let i = 23; i >= 0; i--) {
+                    const hour = new Date();
+                    hour.setHours(hour.getHours() - i);
+                    hours.push(hour.getHours() + ':00');
+                    data.push(Math.floor(Math.random() * 100) + 20);
+                }
+
+                this.drawLineChart(ctx, hours, data, canvas.width, canvas.height);
+            }
+
+            setupTypesChart() {
+                const canvas = document.getElementById('typesCanvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Simulacija podatkov za graf tipov naprav
+                const types = ['Senzorji', 'Pametne luči', 'Varnost', 'Klima', 'Energija'];
+                const data = [35, 25, 20, 15, 5];
+                const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe'];
+
+                this.drawPieChart(ctx, types, data, colors, canvas.width, canvas.height);
+            }
+
+            drawLineChart(ctx, labels, data, width, height) {
+                ctx.clearRect(0, 0, width, height);
+                
+                const padding = 40;
+                const chartWidth = width - 2 * padding;
+                const chartHeight = height - 2 * padding;
+                
+                const maxValue = Math.max(...data);
+                const minValue = Math.min(...data);
+                const range = maxValue - minValue || 1;
+
+                // Nariši osi
+                ctx.strokeStyle = '#e9ecef';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(padding, padding);
+                ctx.lineTo(padding, height - padding);
+                ctx.lineTo(width - padding, height - padding);
+                ctx.stroke();
+
+                // Nariši podatke
+                ctx.strokeStyle = '#667eea';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+
+                data.forEach((value, index) => {
+                    const x = padding + (index / (data.length - 1)) * chartWidth;
+                    const y = height - padding - ((value - minValue) / range) * chartHeight;
+                    
+                    if (index === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+
+                ctx.stroke();
+
+                // Dodaj točke
+                ctx.fillStyle = '#667eea';
+                data.forEach((value, index) => {
+                    const x = padding + (index / (data.length - 1)) * chartWidth;
+                    const y = height - padding - ((value - minValue) / range) * chartHeight;
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, 2 * Math.PI);
+                    ctx.fill();
+                });
+            }
+
+            drawPieChart(ctx, labels, data, colors, width, height) {
+                ctx.clearRect(0, 0, width, height);
+                
+                const centerX = width / 2;
+                const centerY = height / 2;
+                const radius = Math.min(width, height) / 2 - 20;
+                
+                const total = data.reduce((sum, value) => sum + value, 0);
+                let currentAngle = -Math.PI / 2;
+
+                data.forEach((value, index) => {
+                    const sliceAngle = (value / total) * 2 * Math.PI;
+                    
+                    ctx.fillStyle = colors[index];
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY);
+                    ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    // Dodaj besedilo
+                    const textAngle = currentAngle + sliceAngle / 2;
+                    const textX = centerX + Math.cos(textAngle) * (radius * 0.7);
+                    const textY = centerY + Math.sin(textAngle) * (radius * 0.7);
+                    
+                    ctx.fillStyle = 'white';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(value + '%', textX, textY);
+                    
+                    currentAngle += sliceAngle;
+                });
+            }
+
+            updateAlerts() {
+                const alertsList = document.getElementById('alertsList');
+                alertsList.innerHTML = '';
+
+                if (this.data.alerts.length === 0) {
+                    alertsList.innerHTML = '<p style="text-align: center; color: #6c757d;">Ni aktivnih opozoril</p>';
+                    return;
+                }
+
+                this.data.alerts.forEach(alert => {
+                    const alertElement = document.createElement('div');
+                    alertElement.className = `alert-item ${alert.severity}`;
+                    alertElement.innerHTML = `
+                        <div class="alert-icon">${this.getAlertIcon(alert.type)}</div>
+                        <div class="alert-content">
+                            <div class="alert-title">${this.getAlertTitle(alert.type)}</div>
+                            <div class="alert-time">${new Date(alert.timestamp).toLocaleString('sl-SI')}</div>
+                        </div>
+                    `;
+                    alertsList.appendChild(alertElement);
+                });
+            }
+
+            getAlertIcon(type) {
+                const icons = {
+                    'device_offline': '📴',
+                    'high_usage': '⚡',
+                    'error_rate': '❌',
+                    'anomaly': '⚠️'
+                };
+                return icons[type] || '🔔';
+            }
+
+            getAlertTitle(type) {
+                const titles = {
+                    'device_offline': 'Naprava ni dosegljiva',
+                    'high_usage': 'Visoka uporaba',
+                    'error_rate': 'Visoka stopnja napak',
+                    'anomaly': 'Zaznana anomalija'
+                };
+                return titles[type] || 'Neznano opozorilo';
+            }
+
+            addAlert(alert) {
+                this.data.alerts.unshift(alert);
+                if (this.data.alerts.length > 10) {
+                    this.data.alerts = this.data.alerts.slice(0, 10);
+                }
+                this.updateAlerts();
+                this.showNotification(this.getAlertTitle(alert.type), 'warning');
+            }
+
+            updateReports() {
+                const reportsGrid = document.getElementById('reportsGrid');
+                reportsGrid.innerHTML = '';
+
+                if (this.data.reports.length === 0) {
+                    reportsGrid.innerHTML = '<p style="text-align: center; color: #6c757d;">Ni razpoložljivih poročil</p>';
+                    return;
+                }
+
+                this.data.reports.forEach(report => {
+                    const reportElement = document.createElement('div');
+                    reportElement.className = 'report-card';
+                    reportElement.innerHTML = `
+                        <h4>${this.getReportTitle(report.type)}</h4>
+                        <div class="report-meta">
+                            Generirano: ${new Date(report.generated).toLocaleString('sl-SI')}
+                        </div>
+                        <div class="report-summary">
+                            ${this.getReportSummary(report)}
+                        </div>
+                    `;
+                    reportsGrid.appendChild(reportElement);
+                });
+            }
+
+            getReportTitle(type) {
+                const titles = {
+                    'device_summary': 'Povzetek naprav',
+                    'user_activity': 'Aktivnost uporabnikov',
+                    'system_performance': 'Zmogljivost sistema',
+                    'trends': 'Analiza trendov',
+                    'anomalies': 'Zaznane anomalije'
+                };
+                return titles[type] || 'Neznano poročilo';
+            }
+
+            getReportSummary(report) {
+                if (!report.data) return 'Ni podatkov';
+                
+                switch (report.type) {
+                    case 'device_summary':
+                        return `Skupaj naprav: ${report.data.totalDevices}, Aktivnih: ${report.data.activeDevices}`;
+                    case 'user_activity':
+                        return `Aktivnih uporabnikov: ${report.data.activeUsers}, Povprečen čas seje: ${report.data.averageSessionTime}min`;
+                    case 'system_performance':
+                        return `Dogodki/min: ${report.data.eventsPerMinute}, Stopnja napak: ${(report.data.errorRate * 100).toFixed(1)}%`;
+                    default:
+                        return 'Poročilo je pripravljeno';
+                }
+            }
+
+            startPeriodicUpdates() {
+                // Posodobi podatke vsakih 30 sekund
+                setInterval(() => {
+                    this.loadInitialData();
+                }, 30000);
+
+                // Posodobi grafe vsakih 60 sekund
+                setInterval(() => {
+                    this.setupCharts();
+                }, 60000);
+            }
+
+            showNotification(message, type = 'info') {
+                // Enostavno obvestilo (lahko bi uporabili toast knjižnico)
+                console.log(`${type.toUpperCase()}: ${message}`);
+            }
+        }
+
+        // Globalne funkcije
+        async function generateReport() {
+            const type = document.getElementById('reportType').value;
+            const period = document.getElementById('reportPeriod').value;
+            
+            try {
+                const response = await fetch('/api/analytics/generate-report', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ type, period })
+                });
+                
+                if (response.ok) {
+                    const report = await response.json();
+                    dashboard.data.reports.unshift(report);
+                    dashboard.updateReports();
+                    dashboard.showNotification('Poročilo generirano', 'success');
+                } else {
+                    throw new Error('Napaka pri generiranju poročila');
+                }
+            } catch (error) {
+                console.error('Napaka:', error);
+                dashboard.showNotification('Napaka pri generiranju poročila', 'error');
+            }
+        }
+
+        async function exportData() {
+            try {
+                const response = await fetch('/api/analytics/export');
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `omni-analytics-${new Date().toISOString().split('T')[0]}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    dashboard.showNotification('Podatki izvoženi', 'success');
+                } else {
+                    throw new Error('Napaka pri izvozu');
+                }
+            } catch (error) {
+                console.error('Napaka:', error);
+                dashboard.showNotification('Napaka pri izvozu podatkov', 'error');
+            }
+        }
+
+        function refreshData() {
+            const btn = document.querySelector('.refresh-btn');
+            btn.innerHTML = '<div class="loading"></div>';
+            
+            dashboard.loadInitialData().then(() => {
+                btn.innerHTML = '🔄';
+                dashboard.showNotification('Podatki osveženi', 'success');
+            });
+        }
+
+        // Inicializacija
+        let dashboard;
+        document.addEventListener('DOMContentLoaded', () => {
+            dashboard = new AnalyticsDashboard();
+        });
+    </script>
+</body>
+</html>

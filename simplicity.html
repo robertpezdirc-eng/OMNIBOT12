@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omnia App - Preprostost & Dostopnost</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #f093fb;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --dark-color: #343a40;
+            --light-color: #f8f9fa;
+            --border-radius: 12px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 50%, var(--accent-color) 100%);
+            min-height: 100vh;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-top: 100px; /* Account for fixed nav */
+        }
+
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: var(--dark-color);
+            opacity: 0.8;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* Workflow Builder */
+        .workflow-builder {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .builder-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .builder-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .builder-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn-secondary {
+            background: var(--light-color);
+            color: var(--dark-color);
+            border: 2px solid #e9ecef;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        /* Drop Zone */
+        .drop-zone {
+            min-height: 400px;
+            border: 3px dashed #e9ecef;
+            border-radius: var(--border-radius);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+            margin-bottom: 25px;
+            transition: var(--transition);
+            position: relative;
+            background: #fafafa;
+        }
+
+        .drop-zone.drag-over {
+            border-color: var(--primary-color);
+            background: rgba(102, 126, 234, 0.05);
+            transform: scale(1.02);
+        }
+
+        .drop-zone.has-items {
+            border-style: solid;
+            border-color: var(--success-color);
+            background: rgba(40, 167, 69, 0.05);
+            justify-content: flex-start;
+            align-items: stretch;
+            padding: 20px;
+        }
+
+        .drop-zone-placeholder {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        .drop-zone-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* Workflow Items */
+        .workflow-items {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .workflow-item {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: move;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .workflow-item:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .workflow-item.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+
+        .workflow-item-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .workflow-item-content {
+            flex: 1;
+        }
+
+        .workflow-item-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--dark-color);
+        }
+
+        .workflow-item-description {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .workflow-item-remove {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .workflow-item-remove:hover {
+            background: #c82333;
+            transform: scale(1.1);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* Industry Templates */
+        .industry-templates {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .templates-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+        }
+
+        .template-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .template-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .template-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .template-card.active {
+            border-color: var(--success-color);
+            background: rgba(40, 167, 69, 0.05);
+        }
+
+        .template-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .template-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--dark-color);
+        }
+
+        .template-description {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        /* Available Components */
+        .available-components {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .components-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+        }
+
+        .component-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .component-item {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            cursor: grab;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .component-item:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .component-item:active {
+            cursor: grabbing;
+        }
+
+        .component-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .component-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--dark-color);
+        }
+
+        /* Live Preview */
+        .live-preview {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-top: 30px;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .preview-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .preview-content {
+            min-height: 300px;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            background: #fafafa;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #6c757d;
+            text-align: center;
+        }
+
+        .preview-placeholder-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                flex-direction: row;
+            }
+            
+            .industry-templates,
+            .available-components {
+                flex: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .sidebar {
+                flex-direction: column;
+            }
+            
+            .builder-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .builder-controls {
+                justify-content: center;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: var(--border-radius);
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: var(--transition);
+            max-width: 350px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: var(--success-color);
+        }
+
+        .notification.error {
+            background: var(--danger-color);
+        }
+
+        .notification.info {
+            background: var(--primary-color);
+        }
+
+        /* Pulse Animation */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">🌟 Omnia AI</a>
+            <div class="nav-links">
+                <a href="/">Domov</a>
+                <a href="/multimodal">Multi-Modal</a>
+                <a href="/personalization">Personalizacija</a>
+                <a href="/global">Globalno</a>
+                <a href="/versatility">Vsestranskost</a>
+                <a href="/simplicity">Enostavnost</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <!-- Header -->
+        <div class="header fade-in">
+            <h1>🎯 Preprostost & Dostopnost</h1>
+            <p>Drag & drop vmesnik za hitro ustvarjanje AI workflow-ov brez tehničnega znanja</p>
+        </div>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Workflow Builder -->
+            <div class="workflow-builder fade-in">
+                <div class="builder-header">
+                    <h2 class="builder-title">🔧 Workflow Builder</h2>
+                    <div class="builder-controls">
+                        <button class="btn btn-secondary" onclick="clearWorkflow()">
+                            🗑️ Počisti
+                        </button>
+                        <button class="btn btn-success" onclick="saveWorkflow()">
+                            💾 Shrani
+                        </button>
+                        <button class="btn btn-primary" onclick="runWorkflow()">
+                            ▶️ Zaženi
+                        </button>
+                    </div>
+                </div>
+
+                <div class="drop-zone" id="dropZone">
+                    <div class="drop-zone-icon">📋</div>
+                    <div class="drop-zone-placeholder">
+                        <strong>Povlecite komponente sem</strong><br>
+                        Sestavite svoj AI workflow z enostavnim drag & drop
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Industry Templates -->
+                <div class="industry-templates slide-in">
+                    <h3 class="templates-title">🏢 Predloge po Panogah</h3>
+                    <div class="template-grid">
+                        <div class="template-card" onclick="loadTemplate('tourism')">
+                            <div class="template-icon">🏖️</div>
+                            <div class="template-name">Turizem</div>
+                            <div class="template-description">Rezervacije, priporočila, vodniki</div>
+                        </div>
+                        <div class="template-card" onclick="loadTemplate('retail')">
+                            <div class="template-icon">🛍️</div>
+                            <div class="template-name">Trgovina</div>
+                            <div class="template-description">Inventar, prodaja, analitika</div>
+                        </div>
+                        <div class="template-card" onclick="loadTemplate('it')">
+                            <div class="template-icon">💻</div>
+                            <div class="template-name">IT</div>
+                            <div class="template-description">Avtomatizacija, monitoring</div>
+                        </div>
+                        <div class="template-card" onclick="loadTemplate('hospitality')">
+                            <div class="template-icon">🍽️</div>
+                            <div class="template-name">Gostinstvo</div>
+                            <div class="template-description">Naročila, meni, rezervacije</div>
+                        </div>
+                        <div class="template-card" onclick="loadTemplate('healthcare')">
+                            <div class="template-icon">🏥</div>
+                            <div class="template-name">Zdravstvo</div>
+                            <div class="template-description">Termini, diagnoze, poročila</div>
+                        </div>
+                        <div class="template-card" onclick="loadTemplate('education')">
+                            <div class="template-icon">🎓</div>
+                            <div class="template-name">Izobraževanje</div>
+                            <div class="template-description">Učni načrti, ocenjevanje</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Available Components -->
+                <div class="available-components slide-in">
+                    <h3 class="components-title">🧩 Komponente</h3>
+                    <div class="component-list">
+                        <div class="component-item" draggable="true" data-component="data-input">
+                            <div class="component-icon" style="background: var(--primary-color);">📊</div>
+                            <div class="component-name">Vnos Podatkov</div>
+                        </div>
+                        <div class="component-item" draggable="true" data-component="ai-analysis">
+                            <div class="component-icon" style="background: var(--secondary-color);">🧠</div>
+                            <div class="component-name">AI Analiza</div>
+                        </div>
+                        <div class="component-item" draggable="true" data-component="text-generation">
+                            <div class="component-icon" style="background: var(--accent-color);">✍️</div>
+                            <div class="component-name">Generiranje Besedila</div>
+                        </div>
+                        <div class="component-item" draggable="true" data-component="image-creation">
+                            <div class="component-icon" style="background: var(--success-color);">🖼️</div>
+                            <div class="component-name">Ustvarjanje Slik</div>
+                        </div>
+                        <div class="component-item" draggable="true" data-component="decision-logic">
+                            <div class="component-icon" style="background: var(--warning-color);">🔀</div>
+                            <div class="component-name">Odločitvena Logika</div>
+                        </div>
+                        <div class="component-item" draggable="true" data-component="notification">
+                            <div class="component-icon" style="background: var(--danger-color);">📢</div>
+                            <div class="component-name">Obvestila</div>
+                        </div>
+                        <div class="component-item" draggable="true" data-component="data-export">
+                            <div class="component-icon" style="background: var(--dark-color);">📤</div>
+                            <div class="component-name">Izvoz Podatkov</div>
+                        </div>
+                        <div class="component-item" draggable="true" data-component="api-integration">
+                            <div class="component-icon" style="background: #17a2b8;">🔗</div>
+                            <div class="component-name">API Integracija</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Preview -->
+        <div class="live-preview fade-in">
+            <div class="preview-header">
+                <h2 class="preview-title">👁️ Live Preview</h2>
+                <div class="builder-controls">
+                    <button class="btn btn-secondary" onclick="togglePreview()">
+                        🔄 Osveži
+                    </button>
+                    <button class="btn btn-primary" onclick="fullscreenPreview()">
+                        🔍 Celozaslonski Prikaz
+                    </button>
+                </div>
+            </div>
+            <div class="preview-content" id="previewContent">
+                <div class="preview-placeholder">
+                    <div class="preview-placeholder-icon">👁️</div>
+                    <div>
+                        <strong>Live Preview</strong><br>
+                        Tukaj se bo prikazal vaš workflow v realnem času
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentWorkflow = [];
+        let draggedElement = null;
+        let activeTemplate = null;
+
+        // Industry templates data
+        const industryTemplates = {
+            tourism: {
+                name: 'Turizem',
+                components: [
+                    { type: 'data-input', title: 'Vnos Destinacije', description: 'Uporabnik vnese želeno destinacijo' },
+                    { type: 'ai-analysis', title: 'Analiza Preferenc', description: 'AI analizira uporabnikove preference' },
+                    { type: 'text-generation', title: 'Priporočila', description: 'Generiranje personaliziranih priporočil' },
+                    { type: 'image-creation', title: 'Vizualizacija', description: 'Ustvarjanje slik destinacij' },
+                    { type: 'notification', title: 'Pošiljanje Ponudbe', description: 'Pošiljanje ponudbe uporabniku' }
+                ]
+            },
+            retail: {
+                name: 'Trgovina',
+                components: [
+                    { type: 'data-input', title: 'Skeniranje Produkta', description: 'Vnos podatkov o produktu' },
+                    { type: 'ai-analysis', title: 'Analiza Zaloge', description: 'Preverjanje razpoložljivosti' },
+                    { type: 'decision-logic', title: 'Cenovna Strategija', description: 'Določitev optimalne cene' },
+                    { type: 'text-generation', title: 'Opis Produkta', description: 'Generiranje privlačnega opisa' },
+                    { type: 'data-export', title: 'Posodobitev Sistema', description: 'Izvoz v trgovinski sistem' }
+                ]
+            },
+            it: {
+                name: 'IT',
+                components: [
+                    { type: 'api-integration', title: 'Monitoring API', description: 'Povezava s sistemskimi API-ji' },
+                    { type: 'ai-analysis', title: 'Analiza Performanc', description: 'Preverjanje sistemskih metrik' },
+                    { type: 'decision-logic', title: 'Avtomatsko Skaliranje', description: 'Odločitve o skaliranju' },
+                    { type: 'notification', title: 'Opozorila', description: 'Pošiljanje opozoril administratorjem' },
+                    { type: 'data-export', title: 'Poročila', description: 'Generiranje sistemskih poročil' }
+                ]
+            },
+            hospitality: {
+                name: 'Gostinstvo',
+                components: [
+                    { type: 'data-input', title: 'Naročilo Stranke', description: 'Vnos naročila' },
+                    { type: 'ai-analysis', title: 'Analiza Preferenc', description: 'Prepoznavanje okusov' },
+                    { type: 'text-generation', title: 'Priporočila Jedi', description: 'Predlaganje dodatnih jedi' },
+                    { type: 'decision-logic', title: 'Optimizacija Kuhinje', description: 'Razporeditev naročil' },
+                    { type: 'notification', title: 'Obvestilo Kuhinji', description: 'Pošiljanje naročila v kuhinjo' }
+                ]
+            },
+            healthcare: {
+                name: 'Zdravstvo',
+                components: [
+                    { type: 'data-input', title: 'Vnos Simptomov', description: 'Beleženje pacientovih simptomov' },
+                    { type: 'ai-analysis', title: 'Preliminarna Diagnoza', description: 'AI analiza simptomov' },
+                    { type: 'decision-logic', title: 'Triažna Odločitev', description: 'Določitev prioritete' },
+                    { type: 'text-generation', title: 'Poročilo', description: 'Generiranje medicinskega poročila' },
+                    { type: 'notification', title: 'Obvestilo Zdravniku', description: 'Pošiljanje podatkov zdravniku' }
+                ]
+            },
+            education: {
+                name: 'Izobraževanje',
+                components: [
+                    { type: 'data-input', title: 'Vnos Učne Snovi', description: 'Definiranje učnih ciljev' },
+                    { type: 'ai-analysis', title: 'Analiza Znanja', description: 'Ocenjevanje trenutnega znanja' },
+                    { type: 'text-generation', title: 'Personalizirani Načrt', description: 'Ustvarjanje učnega načrta' },
+                    { type: 'image-creation', title: 'Vizualne Pomoči', description: 'Generiranje diagramov in slik' },
+                    { type: 'data-export', title: 'Izvoz Gradiva', description: 'Priprava učnih materialov' }
+                ]
+            }
+        };
+
+        // Component configurations
+        const componentConfigs = {
+            'data-input': { icon: '📊', color: 'var(--primary-color)', title: 'Vnos Podatkov' },
+            'ai-analysis': { icon: '🧠', color: 'var(--secondary-color)', title: 'AI Analiza' },
+            'text-generation': { icon: '✍️', color: 'var(--accent-color)', title: 'Generiranje Besedila' },
+            'image-creation': { icon: '🖼️', color: 'var(--success-color)', title: 'Ustvarjanje Slik' },
+            'decision-logic': { icon: '🔀', color: 'var(--warning-color)', title: 'Odločitvena Logika' },
+            'notification': { icon: '📢', color: 'var(--danger-color)', title: 'Obvestila' },
+            'data-export': { icon: '📤', color: 'var(--dark-color)', title: 'Izvoz Podatkov' },
+            'api-integration': { icon: '🔗', color: '#17a2b8', title: 'API Integracija' }
+        };
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎯 Simplicity & Accessibility interface initialized');
+            setupDragAndDrop();
+            updatePreview();
+        });
+
+        // Drag and Drop Setup
+        function setupDragAndDrop() {
+            const dropZone = document.getElementById('dropZone');
+            const componentItems = document.querySelectorAll('.component-item');
+
+            // Setup draggable components
+            componentItems.forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+            });
+
+            // Setup drop zone
+            dropZone.addEventListener('dragover', handleDragOver);
+            dropZone.addEventListener('dragenter', handleDragEnter);
+            dropZone.addEventListener('dragleave', handleDragLeave);
+            dropZone.addEventListener('drop', handleDrop);
+        }
+
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'copy';
+            e.dataTransfer.setData('text/html', e.target.outerHTML);
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            draggedElement = null;
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+        }
+
+        function handleDragEnter(e) {
+            e.preventDefault();
+            document.getElementById('dropZone').classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            if (!e.currentTarget.contains(e.relatedTarget)) {
+                document.getElementById('dropZone').classList.remove('drag-over');
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const dropZone = document.getElementById('dropZone');
+            dropZone.classList.remove('drag-over');
+
+            if (draggedElement) {
+                const componentType = draggedElement.getAttribute('data-component');
+                addComponentToWorkflow(componentType);
+            }
+        }
+
+        // Workflow Management
+        function addComponentToWorkflow(componentType, customData = null) {
+            const config = componentConfigs[componentType];
+            if (!config) return;
+
+            const component = customData || {
+                id: Date.now(),
+                type: componentType,
+                title: config.title,
+                description: `Komponenta za ${config.title.toLowerCase()}`
+            };
+
+            currentWorkflow.push(component);
+            renderWorkflow();
+            updatePreview();
+            showNotification(`Dodana komponenta: ${config.title}`, 'success');
+        }
+
+        function removeComponentFromWorkflow(componentId) {
+            currentWorkflow = currentWorkflow.filter(comp => comp.id !== componentId);
+            renderWorkflow();
+            updatePreview();
+            showNotification('Komponenta odstranjena', 'info');
+        }
+
+        function renderWorkflow() {
+            const dropZone = document.getElementById('dropZone');
+            
+            if (currentWorkflow.length === 0) {
+                dropZone.classList.remove('has-items');
+                dropZone.innerHTML = `
+                    <div class="drop-zone-icon">📋</div>
+                    <div class="drop-zone-placeholder">
+                        <strong>Povlecite komponente sem</strong><br>
+                        Sestavite svoj AI workflow z enostavnim drag & drop
+                    </div>
+                `;
+                return;
+            }
+
+            dropZone.classList.add('has-items');
+            const workflowHTML = `
+                <div class="workflow-items">
+                    ${currentWorkflow.map((component, index) => {
+                        const config = componentConfigs[component.type];
+                        return `
+                            <div class="workflow-item" data-id="${component.id}">
+                                <div class="workflow-item-icon" style="background: ${config.color};">
+                                    ${config.icon}
+                                </div>
+                                <div class="workflow-item-content">
+                                    <div class="workflow-item-title">${component.title}</div>
+                                    <div class="workflow-item-description">${component.description}</div>
+                                </div>
+                                <button class="workflow-item-remove" onclick="removeComponentFromWorkflow(${component.id})">
+                                    ✕
+                                </button>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+            dropZone.innerHTML = workflowHTML;
+        }
+
+        // Template Management
+        function loadTemplate(templateKey) {
+            const template = industryTemplates[templateKey];
+            if (!template) return;
+
+            // Clear current workflow
+            currentWorkflow = [];
+
+            // Add template components
+            template.components.forEach((comp, index) => {
+                setTimeout(() => {
+                    addComponentToWorkflow(comp.type, {
+                        id: Date.now() + index,
+                        type: comp.type,
+                        title: comp.title,
+                        description: comp.description
+                    });
+                }, index * 200);
+            });
+
+            // Update active template
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            event.target.closest('.template-card').classList.add('active');
+            activeTemplate = templateKey;
+
+            showNotification(`Naložena predloga: ${template.name}`, 'success');
+        }
+
+        // Workflow Actions
+        function clearWorkflow() {
+            currentWorkflow = [];
+            renderWorkflow();
+            updatePreview();
+            
+            // Clear active template
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            activeTemplate = null;
+            
+            showNotification('Workflow počiščen', 'info');
+        }
+
+        function saveWorkflow() {
+            if (currentWorkflow.length === 0) {
+                showNotification('Ni workflow-a za shranjevanje!', 'error');
+                return;
+            }
+
+            const workflowData = {
+                id: Date.now(),
+                name: activeTemplate ? industryTemplates[activeTemplate].name : 'Custom Workflow',
+                template: activeTemplate,
+                components: currentWorkflow,
+                created: new Date().toISOString()
+            };
+
+            // Save to localStorage
+            const savedWorkflows = JSON.parse(localStorage.getItem('omnia_workflows') || '[]');
+            savedWorkflows.push(workflowData);
+            localStorage.setItem('omnia_workflows', JSON.stringify(savedWorkflows));
+
+            showNotification('Workflow shranjen!', 'success');
+        }
+
+        function runWorkflow() {
+            if (currentWorkflow.length === 0) {
+                showNotification('Ni workflow-a za zagon!', 'error');
+                return;
+            }
+
+            showNotification('Zaganjam workflow...', 'info');
+            
+            // Simulate workflow execution
+            let step = 0;
+            const executeStep = () => {
+                if (step < currentWorkflow.length) {
+                    const component = currentWorkflow[step];
+                    showNotification(`Izvajam: ${component.title}`, 'info');
+                    
+                    // Highlight current step in preview
+                    updatePreviewWithExecution(step);
+                    
+                    step++;
+                    setTimeout(executeStep, 1500);
+                } else {
+                    showNotification('Workflow uspešno izvršen!', 'success');
+                    updatePreview(); // Reset preview
+                }
+            };
+            
+            executeStep();
+        }
+
+        // Preview Management
+        function updatePreview() {
+            const previewContent = document.getElementById('previewContent');
+            
+            if (currentWorkflow.length === 0) {
+                previewContent.innerHTML = `
+                    <div class="preview-placeholder">
+                        <div class="preview-placeholder-icon">👁️</div>
+                        <div>
+                            <strong>Live Preview</strong><br>
+                            Tukaj se bo prikazal vaš workflow v realnem času
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const previewHTML = `
+                <div style="padding: 20px;">
+                    <h3 style="margin-bottom: 20px; color: var(--primary-color);">
+                        🔄 Workflow Preview
+                        ${activeTemplate ? `- ${industryTemplates[activeTemplate].name}` : ''}
+                    </h3>
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        ${currentWorkflow.map((component, index) => {
+                            const config = componentConfigs[component.type];
+                            return `
+                                <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid ${config.color};">
+                                    <div style="font-size: 1.5rem;">${config.icon}</div>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600; margin-bottom: 5px;">${index + 1}. ${component.title}</div>
+                                        <div style="font-size: 0.9rem; color: #6c757d;">${component.description}</div>
+                                    </div>
+                                    <div style="color: var(--success-color); font-size: 1.2rem;">✓</div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(40, 167, 69, 0.1); border-radius: 8px; border: 2px solid var(--success-color);">
+                        <strong style="color: var(--success-color);">✅ Workflow pripravljen za izvršitev</strong><br>
+                        <span style="font-size: 0.9rem; color: #6c757d;">
+                            ${currentWorkflow.length} komponent | Predvideni čas izvršitve: ${currentWorkflow.length * 1.5}s
+                        </span>
+                    </div>
+                </div>
+            `;
+            
+            previewContent.innerHTML = previewHTML;
+        }
+
+        function updatePreviewWithExecution(currentStep) {
+            const previewContent = document.getElementById('previewContent');
+            
+            const previewHTML = `
+                <div style="padding: 20px;">
+                    <h3 style="margin-bottom: 20px; color: var(--primary-color);">
+                        ⚡ Izvajanje Workflow-a
+                        ${activeTemplate ? `- ${industryTemplates[activeTemplate].name}` : ''}
+                    </h3>
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        ${currentWorkflow.map((component, index) => {
+                            const config = componentConfigs[component.type];
+                            const isActive = index === currentStep;
+                            const isCompleted = index < currentStep;
+                            
+                            return `
+                                <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: ${isActive ? 'rgba(102, 126, 234, 0.1)' : 'white'}; border-radius: 8px; border-left: 4px solid ${config.color}; ${isActive ? 'transform: scale(1.02); box-shadow: 0 4px 20px rgba(0,0,0,0.1);' : ''}">
+                                    <div style="font-size: 1.5rem;">${config.icon}</div>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600; margin-bottom: 5px;">${index + 1}. ${component.title}</div>
+                                        <div style="font-size: 0.9rem; color: #6c757d;">${component.description}</div>
+                                    </div>
+                                    <div style="color: ${isCompleted ? 'var(--success-color)' : isActive ? 'var(--warning-color)' : '#e9ecef'}; font-size: 1.2rem;">
+                                        ${isCompleted ? '✓' : isActive ? '⏳' : '○'}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+            
+            previewContent.innerHTML = previewHTML;
+        }
+
+        function togglePreview() {
+            updatePreview();
+            showNotification('Preview osvežen', 'info');
+        }
+
+        function fullscreenPreview() {
+            const previewContent = document.getElementById('previewContent');
+            if (previewContent.requestFullscreen) {
+                previewContent.requestFullscreen();
+            } else if (previewContent.webkitRequestFullscreen) {
+                previewContent.webkitRequestFullscreen();
+            } else if (previewContent.msRequestFullscreen) {
+                previewContent.msRequestFullscreen();
+            }
+        }
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            // Hide notification
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + S to save
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveWorkflow();
+            }
+            
+            // Ctrl/Cmd + R to run
+            if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+                e.preventDefault();
+                runWorkflow();
+            }
+            
+            // Ctrl/Cmd + L to clear
+            if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
+                e.preventDefault();
+                clearWorkflow();
+            }
+        });
+
+        // Auto-save workflow every 30 seconds
+        setInterval(() => {
+            if (currentWorkflow.length > 0) {
+                const autoSaveData = {
+                    workflow: currentWorkflow,
+                    template: activeTemplate,
+                    timestamp: new Date().toISOString()
+                };
+                localStorage.setItem('omnia_autosave', JSON.stringify(autoSaveData));
+            }
+        }, 30000);
+
+        // Load auto-saved workflow on page load
+        window.addEventListener('load', () => {
+            const autoSave = localStorage.getItem('omnia_autosave');
+            if (autoSave) {
+                try {
+                    const data = JSON.parse(autoSave);
+                    if (data.workflow && data.workflow.length > 0) {
+                        const shouldRestore = confirm('Najden je avtomatsko shranjen workflow. Ga želite obnoviti?');
+                        if (shouldRestore) {
+                            currentWorkflow = data.workflow;
+                            activeTemplate = data.template;
+                            renderWorkflow();
+                            updatePreview();
+                            showNotification('Workflow obnovljen iz avtomatskega shranjevanja', 'success');
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error loading auto-save:', e);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

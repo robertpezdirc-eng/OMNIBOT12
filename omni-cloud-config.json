@@ -1,0 +1,174 @@
+{
+  "general": {
+    "domain": "omni.mydomain.com",
+    "email": "admin@mydomain.com",
+    "omni_version": "1.0.0",
+    "github_repo": "https://github.com/your-repo/omniscient-ai-platform.git",
+    "install_dir": "/opt/omni-brain",
+    "service_user": "omni",
+    "node_version": "18",
+    "python_version": "3.10"
+  },
+  "providers": {
+    "aws": {
+      "region": "eu-west-1",
+      "instance_type": "t3.medium",
+      "ami_id": "ami-0c02fb55956c7d316",
+      "key_name": "omni-keypair",
+      "security_group": "omni-sg",
+      "subnet_id": "",
+      "vpc_id": "",
+      "storage_size": 20,
+      "storage_type": "gp3",
+      "tags": {
+        "Project": "Omni-Brain",
+        "Environment": "Production",
+        "Owner": "Admin"
+      }
+    },
+    "gcp": {
+      "project_id": "my-omni-project",
+      "zone": "europe-west1-b",
+      "machine_type": "e2-medium",
+      "image_family": "ubuntu-2204-lts",
+      "image_project": "ubuntu-os-cloud",
+      "network": "default",
+      "subnet": "",
+      "disk_size": 20,
+      "disk_type": "pd-standard",
+      "labels": {
+        "project": "omni-brain",
+        "environment": "production"
+      }
+    },
+    "azure": {
+      "resource_group": "omni-rg",
+      "location": "West Europe",
+      "vm_size": "Standard_B2s",
+      "image": "Canonical:0001-com-ubuntu-server-jammy:22_04-lts:latest",
+      "admin_username": "omni",
+      "disk_size": 20,
+      "disk_type": "Standard_LRS",
+      "vnet_name": "omni-vnet",
+      "subnet_name": "omni-subnet",
+      "nsg_name": "omni-nsg",
+      "tags": {
+        "Project": "Omni-Brain",
+        "Environment": "Production"
+      }
+    },
+    "digitalocean": {
+      "region": "fra1",
+      "size": "s-2vcpu-4gb",
+      "image": "ubuntu-22-04-x64",
+      "ssh_keys": [],
+      "vpc_uuid": "",
+      "monitoring": true,
+      "backups": true,
+      "tags": [
+        "omni-brain",
+        "production"
+      ]
+    }
+  },
+  "ssl": {
+    "use_threo": true,
+    "auto_renew": true,
+    "backup_certs": true,
+    "cert_email": "ssl@mydomain.com",
+    "staging": false,
+    "key_size": 4096,
+    "protocols": ["TLSv1.2", "TLSv1.3"],
+    "ciphers": [
+      "ECDHE-ECDSA-AES128-GCM-SHA256",
+      "ECDHE-RSA-AES128-GCM-SHA256",
+      "ECDHE-ECDSA-AES256-GCM-SHA384",
+      "ECDHE-RSA-AES256-GCM-SHA384"
+    ]
+  },
+  "nginx": {
+    "worker_processes": "auto",
+    "worker_connections": 1024,
+    "client_max_body_size": "50M",
+    "proxy_timeout": 60,
+    "gzip_compression": true,
+    "rate_limiting": {
+      "api_requests_per_second": 10,
+      "login_requests_per_minute": 5,
+      "burst_size": 20
+    },
+    "security_headers": {
+      "hsts_max_age": 31536000,
+      "frame_options": "SAMEORIGIN",
+      "content_type_options": "nosniff",
+      "xss_protection": "1; mode=block",
+      "referrer_policy": "strict-origin-when-cross-origin"
+    }
+  },
+  "monitoring": {
+    "enable_health_checks": true,
+    "health_check_interval": 300,
+    "enable_logging": true,
+    "log_level": "info",
+    "enable_backups": true,
+    "backup_retention_days": 7,
+    "backup_schedule": "0 2 * * *",
+    "enable_fail2ban": true,
+    "enable_ufw": true,
+    "monitoring_endpoints": [
+      "/health",
+      "/api/status",
+      "/nginx-status"
+    ]
+  },
+  "performance": {
+    "node_env": "production",
+    "pm2_instances": "max",
+    "pm2_max_memory_restart": "1G",
+    "nginx_cache": true,
+    "nginx_cache_duration": "1h",
+    "static_files_cache": "1y",
+    "api_cache_duration": "10m"
+  },
+  "security": {
+    "disable_root_login": true,
+    "change_ssh_port": false,
+    "ssh_port": 22,
+    "fail2ban_bantime": 3600,
+    "fail2ban_maxretry": 5,
+    "ufw_default_policy": "deny",
+    "allowed_ips": [],
+    "block_countries": [],
+    "enable_intrusion_detection": true
+  },
+  "database": {
+    "type": "sqlite",
+    "host": "localhost",
+    "port": 5432,
+    "name": "omni_brain",
+    "user": "omni",
+    "password": "",
+    "backup_enabled": true,
+    "backup_schedule": "0 3 * * *"
+  },
+  "notifications": {
+    "email_enabled": false,
+    "email_smtp_host": "",
+    "email_smtp_port": 587,
+    "email_username": "",
+    "email_password": "",
+    "slack_webhook": "",
+    "discord_webhook": "",
+    "notify_on_deployment": true,
+    "notify_on_errors": true,
+    "notify_on_ssl_renewal": true
+  },
+  "deployment": {
+    "auto_update": false,
+    "update_schedule": "0 4 * * 0",
+    "rollback_enabled": true,
+    "health_check_before_deployment": true,
+    "zero_downtime_deployment": true,
+    "pre_deployment_backup": true
+  }
+}

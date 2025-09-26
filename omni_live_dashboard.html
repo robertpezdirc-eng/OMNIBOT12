@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni Live Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .live-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #00ff00;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        #dashboard {
+            position: relative;
+            width: 1400px;
+            height: 800px;
+            margin: 20px auto;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            overflow: hidden;
+        }
+
+        .node {
+            position: absolute;
+            background: linear-gradient(145deg, #ffffff, #e6e6e6);
+            color: #333;
+            padding: 15px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 2px solid rgba(255,255,255,0.3);
+            min-width: 180px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .node:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            background: linear-gradient(145deg, #f0f0f0, #d0d0d0);
+        }
+
+        .node.active {
+            background: linear-gradient(145deg, #4CAF50, #45a049);
+            color: white;
+            border-color: #2E7D32;
+        }
+
+        .node.warning {
+            background: linear-gradient(145deg, #FF9800, #F57C00);
+            color: white;
+            border-color: #E65100;
+        }
+
+        .node.offline {
+            background: linear-gradient(145deg, #F44336, #D32F2F);
+            color: white;
+            border-color: #B71C1C;
+        }
+
+        .node.loading {
+            background: linear-gradient(145deg, #2196F3, #1976D2);
+            color: white;
+            border-color: #0D47A1;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .status {
+            display: block;
+            font-size: 0.8em;
+            margin-top: 5px;
+            font-weight: normal;
+        }
+
+        #links {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .link {
+            stroke: rgba(255,255,255,0.6);
+            stroke-width: 2;
+            stroke-dasharray: 10,5;
+            animation: flow 3s linear infinite;
+        }
+
+        @keyframes flow {
+            0% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: 15; }
+        }
+
+        #info-box {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.9);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            min-width: 300px;
+            max-width: 400px;
+            color: white;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 1200px) {
+            #dashboard {
+                width: 95%;
+                transform: scale(0.8);
+            }
+        }
+
+        .control-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            min-width: 250px;
+        }
+
+        .control-panel h3 {
+            margin-bottom: 15px;
+            color: #00ff00;
+        }
+
+        .control-btn {
+            background: linear-gradient(145deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .info-display {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+
+        .global-optimizer {
+            background: linear-gradient(145deg, #6a11cb, #2575fc) !important;
+            color: white;
+            border-color: #4a0e4e;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .data-flow {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #4CAF50;
+            border-radius: 50%;
+            animation: flow 3s linear infinite;
+            opacity: 0.8;
+        }
+
+        @keyframes flow {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><span class="live-indicator"></span>Omni Live Dashboard</h1>
+        <p>Real-time sistem za upravljanje vseh modulov</p>
+    </div>
+
+    <div class="control-panel">
+        <h3>🎛️ Live Control Panel</h3>
+        <button class="control-btn" onclick="restartAllModules()">🔄 Restart All</button>
+        <button class="control-btn" onclick="toggleUpdates()">⏸️ Pause Updates</button>
+        <button class="control-btn" onclick="exportStatus()">📊 Export Status</button>
+        
+        <div class="info-display" id="system-info">
+            <strong>System Status:</strong><br>
+            <span id="system-status">🟢 All Systems Operational</span><br>
+            <span id="last-update">Last Update: --:--:--</span>
+        </div>
+    </div>
+
+    <svg id="links" xmlns="http://www.w3.org/2000/svg">
+        <!-- SVG povezave se bodo generirale dinamično -->
+    </svg>
+
+    <div id="dashboard">
+        
+        <!-- Global Optimizer -->
+        <div class="node" id="global" style="top: 50px; left: 600px;">
+            🌐 Global Optimizer
+            <span class="status" id="status-global">⏳ Loading...</span>
+        </div>
+        
+        <!-- Tier 1 Modules -->
+        <div class="node" id="finance" style="top: 200px; left: 100px;">
+            💰 Finance
+            <span class="status" id="status-finance">⏳ Loading...</span>
+        </div>
+        <div class="node" id="logistics" style="top: 200px; left: 350px;">
+            🚚 Logistics
+            <span class="status" id="status-logistics">⏳ Loading...</span>
+        </div>
+        <div class="node" id="healthcare" style="top: 200px; left: 600px;">
+            🏥 Healthcare
+            <span class="status" id="status-healthcare">⏳ Loading...</span>
+        </div>
+        <div class="node" id="tourism" style="top: 200px; left: 850px;">
+            🌴 Tourism
+            <span class="status" id="status-tourism">⏳ Loading...</span>
+        </div>
+        <div class="node" id="agriculture" style="top: 200px; left: 1100px;">
+            🚜 Agriculture
+            <span class="status" id="status-agriculture">⏳ Loading...</span>
+        </div>
+        
+        <!-- Tier 2 Modules -->
+        <div class="node" id="industry" style="top: 400px; left: 100px;">
+            🏭 Industry
+            <span class="status" id="status-industry">⏳ Loading...</span>
+        </div>
+        <div class="node" id="energy" style="top: 400px; left: 350px;">
+            ⚡ Energy
+            <span class="status" id="status-energy">⏳ Loading...</span>
+        </div>
+        <div class="node" id="smart_home" style="top: 400px; left: 600px;">
+            🏠 Smart Home
+            <span class="status" id="status-smart_home">⏳ Loading...</span>
+        </div>
+        <div class="node" id="vehicles" style="top: 400px; left: 850px;">
+            🚗 Autonomous Vehicles
+            <span class="status" id="status-vehicles">⏳ Loading...</span>
+        </div>
+        <div class="node" id="robotics" style="top: 400px; left: 1100px;">
+            🤖 Robotics
+            <span class="status" id="status-robotics">⏳ Loading...</span>
+        </div>
+        
+        <!-- Tier 3 Modules -->
+        <div class="node" id="science" style="top: 600px; left: 300px;">
+            🔬 Science
+            <span class="status" id="status-science">⏳ Loading...</span>
+        </div>
+        <div class="node" id="communications" style="top: 600px; left: 900px;">
+            📡 Communications
+            <span class="status" id="status-communications">⏳ Loading...</span>
+        </div>
+    </div>
+
+    <div id="info-box">
+        <strong>📊 Live Info Panel</strong><br><br>
+        <div id="selected-module">Klikni na modul za podrobnosti</div>
+        <hr style="margin: 10px 0; border: 1px solid rgba(255,255,255,0.3);">
+        <div><strong>System Status:</strong> <span id="overall-status">🟢 Operational</span></div>
+        <div><strong>Active Connections:</strong> <span id="active-connections">13</span></div>
+        <div><strong>Last Update:</strong> <span id="last-update-time">--:--:--</span></div>
+    </div>
+
+<script>
+// Module data with real-time information
+const modules = {
+    global: { name: "Global Optimizer", icon: "🌐", description: "Centralni sistem za optimizacijo vseh modulov" },
+    finance: { name: "Finance", icon: "💰", description: "Finančno upravljanje in analitika" },
+    logistics: { name: "Logistics", icon: "🚚", description: "Upravljanje logistike in transporta" },
+    healthcare: { name: "Healthcare", icon: "🏥", description: "Zdravstveni sistem in wellness" },
+    tourism: { name: "Tourism", icon: "🌴", description: "Turistični sektor in gostinstvo" },
+    agriculture: { name: "Agriculture", icon: "🚜", description: "Kmetijstvo in pridelava hrane" },
+    industry: { name: "Industry", icon: "🏭", description: "Industrijska proizvodnja" },
+    energy: { name: "Energy", icon: "⚡", description: "Energetski sistem in obnovljivi viri" },
+    smart_home: { name: "Smart Home", icon: "🏠", description: "Pametni dom in IoT naprave" },
+    vehicles: { name: "Autonomous Vehicles", icon: "🚗", description: "Avtonomna vozila in transport" },
+    robotics: { name: "Robotics", icon: "🤖", description: "Robotika in avtomatizacija" },
+    science: { name: "Science", icon: "🔬", description: "Znanstvene raziskave in razvoj" },
+    communications: { name: "Communications", icon: "📡", description: "Komunikacijski sistemi" }
+};
+
+const linksSVG = document.getElementById("links");
+const nodes = Object.keys(modules).filter(key => key !== 'global');
+let updatesPaused = false;
+
+// Funkcija za povezovanje modulov z Global Optimizer
+function connectNodes(sourceId, targetId) {
+    const source = document.getElementById(sourceId);
+    const target = document.getElementById(targetId);
+    
+    if (!source || !target) return;
+    
+    const x1 = source.offsetLeft + source.offsetWidth / 2;
+    const y1 = source.offsetTop + source.offsetHeight / 2;
+    const x2 = target.offsetLeft + target.offsetWidth / 2;
+    const y2 = target.offsetTop + target.offsetHeight / 2;
+
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", x1);
+    line.setAttribute("y1", y1);
+    line.setAttribute("x2", x2);
+    line.setAttribute("y2", y2);
+    line.setAttribute("class", "link");
+
+    linksSVG.appendChild(line);
+}
+
+// Povežemo Global Optimizer z vsemi moduli
+function createConnections() {
+    linksSVG.innerHTML = '';
+    nodes.forEach(node => connectNodes("global", node));
+}
+
+// Info box funkcionalnost
+function updateStatus(nodeId, status, description) {
+    const statusEl = document.getElementById(`status-${nodeId}`);
+    if (!statusEl) return;
+    
+    statusEl.textContent = status;
+    
+    // Barvni indikatorji
+    switch(status) {
+        case "✅ Online": 
+            statusEl.style.color = "#00ff00"; 
+            statusEl.style.fontWeight = "bold";
+            break;
+        case "⚠️ Warning": 
+            statusEl.style.color = "#ff9800"; 
+            statusEl.style.fontWeight = "bold";
+            break;
+        case "❌ Offline": 
+            statusEl.style.color = "#ff4444"; 
+            statusEl.style.fontWeight = "bold";
+            break;
+        default: 
+            statusEl.style.color = "#666"; 
+    }
+    
+    // Dodaj click handler za info box
+    document.getElementById(nodeId).onclick = () => {
+        const module = modules[nodeId];
+        document.getElementById('selected-module').innerHTML = `
+            <strong>${module.icon} ${module.name}</strong><br>
+            <small>Status: ${status}</small><br>
+            <small>${description || module.description}</small>
+        `;
+    };
+}
+
+// Simulacija backend fetch
+function fetchStatus(nodeId) {
+    const statuses = ["✅ Online", "⚠️ Warning", "❌ Offline"];
+    const weights = [0.7, 0.2, 0.1]; // 70% online, 20% warning, 10% offline
+    
+    let random = Math.random();
+    let status = statuses[0];
+    
+    if (random < weights[2]) status = statuses[2];
+    else if (random < weights[1] + weights[2]) status = statuses[1];
+    
+    const module = modules[nodeId];
+    const description = `${module.description} - Performance: ${(85 + Math.random() * 15).toFixed(1)}%`;
+    
+    updateStatus(nodeId, status, description);
+}
+
+// Periodic update funkcionalnost
+function updateAllStatuses() {
+    if (updatesPaused) return;
+    
+    Object.keys(modules).forEach(nodeId => fetchStatus(nodeId));
+    
+    // Posodobi system info
+    const now = new Date();
+    document.getElementById('last-update-time').textContent = now.toLocaleTimeString();
+    document.getElementById('last-update').textContent = now.toLocaleTimeString();
+    
+    // Posodobi active connections
+    const activeCount = Object.keys(modules).filter(nodeId => {
+        const statusEl = document.getElementById(`status-${nodeId}`);
+        return statusEl && statusEl.textContent.includes('✅');
+    }).length;
+    
+    document.getElementById('active-connections').textContent = activeCount;
+    
+    // Posodobi overall status
+    const overallStatusEl = document.getElementById('overall-status');
+    const systemStatusEl = document.getElementById('system-status');
+    
+    if (activeCount >= Object.keys(modules).length * 0.8) {
+        overallStatusEl.textContent = '🟢 Operational';
+        systemStatusEl.textContent = '🟢 All Systems Operational';
+    } else if (activeCount >= Object.keys(modules).length * 0.5) {
+        overallStatusEl.textContent = '🟡 Partial';
+        systemStatusEl.textContent = '🟡 Some Systems Warning';
+    } else {
+        overallStatusEl.textContent = '🔴 Critical';
+        systemStatusEl.textContent = '🔴 System Critical';
+    }
+}
+
+// Control panel funkcije
+function restartAllModules() {
+    Object.keys(modules).forEach(nodeId => {
+        const statusEl = document.getElementById(`status-${nodeId}`);
+        if (statusEl) {
+            statusEl.textContent = '🔄 Restarting...';
+            statusEl.style.color = '#2196F3';
+        }
+    });
+    
+    setTimeout(() => {
+        updateAllStatuses();
+    }, 2000);
+}
+
+function toggleUpdates() {
+    updatesPaused = !updatesPaused;
+    const btn = event.target;
+    btn.textContent = updatesPaused ? '▶️ Resume Updates' : '⏸️ Pause Updates';
+    btn.style.background = updatesPaused ? 'linear-gradient(145deg, #f44336, #d32f2f)' : 'linear-gradient(145deg, #4CAF50, #45a049)';
+}
+
+function exportStatus() {
+    const statusData = {};
+    Object.keys(modules).forEach(nodeId => {
+        const statusEl = document.getElementById(`status-${nodeId}`);
+        statusData[nodeId] = {
+            name: modules[nodeId].name,
+            status: statusEl ? statusEl.textContent : 'Unknown',
+            timestamp: new Date().toISOString()
+        };
+    });
+    
+    const dataStr = JSON.stringify(statusData, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `omni-status-${new Date().toISOString().slice(0,10)}.json`;
+    link.click();
+}
+
+// Inicializacija
+window.addEventListener('load', () => {
+    createConnections();
+    updateAllStatuses();
+    
+    // Zaženi periodic updates vsako sekundo
+    setInterval(updateAllStatuses, 1000);
+});
+
+// Responsive handling
+window.addEventListener('resize', () => {
+    setTimeout(createConnections, 100);
+});
+</script>
+
+</body>
+</html>

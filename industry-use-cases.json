@@ -1,0 +1,294 @@
+{
+  "title": "Omnia App - Panožni Primeri Uporabe",
+  "version": "1.0",
+  "industries": {
+    "turizem": {
+      "name": "Turizem & Potovanja",
+      "icon": "🏖️",
+      "description": "Avtomatizacija turističnih storitev in načrtovanja potovanj",
+      "use_cases": [
+        {
+          "title": "Pametno Načrtovanje Itinerarjev",
+          "description": "Ustvari personalizirane potovalne načrte z aktualnimi informacijami",
+          "input_example": "Načrtuj 7-dnevno potovanje po Sloveniji za družino s 2 otroka, proračun 1500€",
+          "output_features": [
+            "Dnevni itinerarji z aktivnostmi",
+            "Rezervacije nastanitev in restavracij",
+            "Vremenske napovedi in prilagoditve",
+            "Lokalne znamenitosti in skrite perle",
+            "Kalkulacija stroškov po dnevih"
+          ],
+          "time_saved": "8 ur raziskovanja → 5 minut",
+          "roi": "Prihranek 200€ na optimiziranih rezervacijah"
+        },
+        {
+          "title": "Avtomatski Rezervacijski Sistem",
+          "description": "Upravljanje rezervacij z AI chatbot-om",
+          "input_example": "Integriraj rezervacijski sistem za hotel s 50 sobami",
+          "output_features": [
+            "24/7 AI recepcionist",
+            "Avtomatsko preverjanje razpoložljivosti",
+            "Dinamično prilagajanje cen",
+            "Večjezična podpora",
+            "Integracija s PMS sistemi"
+          ],
+          "time_saved": "Zmanjšanje administrativnega dela za 70%",
+          "roi": "Povečanje zasedenosti za 25%"
+        }
+      ]
+    },
+    "gostinstvo": {
+      "name": "Gostinstvo & Restavracije",
+      "icon": "🍽️",
+      "description": "Optimizacija gostinskih storitev in upravljanja",
+      "use_cases": [
+        {
+          "title": "Pametno Upravljanje Menijev",
+          "description": "Dinamično prilagajanje menijev glede na sezonske sestavine in stroške",
+          "input_example": "Optimiziraj meni za restavracijo z 40 jedmi glede na aktualne cene sestavin",
+          "output_features": [
+            "Kalkulacija stroškov v realnem času",
+            "Predlogi sezonskih jedi",
+            "Analiza priljubljenosti jedi",
+            "Avtomatsko posodabljanje cen",
+            "Alergeni in prehranske informacije"
+          ],
+          "time_saved": "Dnevno upravljanje menijev: 3 ure → 15 minut",
+          "roi": "Povečanje marže za 15% z optimizacijo"
+        },
+        {
+          "title": "AI Kuhar Asistent",
+          "description": "Pomoč pri pripravi jedi in upravljanju kuhinje",
+          "input_example": "Potrebujem recept za 50 oseb z uporabo razpoložljivih sestavin",
+          "output_features": [
+            "Prilagojeni recepti za različne količine",
+            "Optimizacija uporabe sestavin",
+            "Časovno načrtovanje priprave",
+            "Nadomestki za manjkajoče sestavine",
+            "Prehranske vrednosti in kalkulacije"
+          ],
+          "time_saved": "Načrtovanje menijev: 2 uri → 10 minut",
+          "roi": "Zmanjšanje odpadkov za 30%"
+        }
+      ]
+    },
+    "kmetijstvo": {
+      "name": "Kmetijstvo & Živinoreja",
+      "icon": "🚜",
+      "description": "Pametno kmetovanje z AI analitiko",
+      "use_cases": [
+        {
+          "title": "Optimizacija Pridelave",
+          "description": "Načrtovanje setve in gnojenja na podlagi vremenskih napovedi",
+          "input_example": "Načrtuj setev koruze na 10 hektarjih za maksimalen pridelek",
+          "output_features": [
+            "Analiza tal in priporočila gnojil",
+            "Optimalni časi setve in spravila",
+            "Vremenske napovedi in prilagoditve",
+            "Kalkulacija stroškov in donosnosti",
+            "Sledenje rasti in zdravja rastlin"
+          ],
+          "time_saved": "Načrtovanje sezone: 1 teden → 2 uri",
+          "roi": "Povečanje pridelka za 20%"
+        },
+        {
+          "title": "Upravljanje Živine",
+          "description": "Spremljanje zdravja in produktivnosti živali",
+          "input_example": "Upravljaj čredo 100 krav z optimizacijo prehrane",
+          "output_features": [
+            "Individualno spremljanje živali",
+            "Optimizacija prehrane po potrebah",
+            "Napovedovanje bolezni",
+            "Načrtovanje parjenja",
+            "Analiza produktivnosti mleka"
+          ],
+          "time_saved": "Dnevni pregledi: 4 ure → 1 ura",
+          "roi": "Povečanje proizvodnje mleka za 15%"
+        }
+      ]
+    },
+    "zdravstvo": {
+      "name": "Zdravstvo & Wellness",
+      "icon": "🏥",
+      "description": "Podpora pri zdravstvenih storitvah in preventivi",
+      "use_cases": [
+        {
+          "title": "Personalizirani Wellness Načrti",
+          "description": "Ustvarjanje individualnih programov za zdravje",
+          "input_example": "Ustvari 30-dnevni wellness program za 35-letno žensko z diabetesom",
+          "output_features": [
+            "Prilagojeni jedilniki",
+            "Vaje glede na zmožnosti",
+            "Spremljanje vitalnih znakov",
+            "Opomniki za zdravila",
+            "Napredek in prilagoditve"
+          ],
+          "time_saved": "Priprava programa: 3 ure → 15 minut",
+          "roi": "Boljši rezultati zdravljenja za 40%"
+        },
+        {
+          "title": "Analiza Zdravstvenih Podatkov",
+          "description": "Obdelava in interpretacija medicinskih podatkov",
+          "input_example": "Analiziraj laboratorijske izvide in predlagaj nadaljnje korake",
+          "output_features": [
+            "Interpretacija rezultatov",
+            "Identifikacija trendov",
+            "Priporočila za nadaljnje preiskave",
+            "Opozorila na kritične vrednosti",
+            "Poročila za zdravnike"
+          ],
+          "time_saved": "Analiza podatkov: 2 uri → 5 minut",
+          "roi": "Hitrejša diagnoza in zdravljenje"
+        }
+      ]
+    },
+    "it_programiranje": {
+      "name": "IT & Programiranje",
+      "icon": "💻",
+      "description": "Avtomatizacija razvoja in sistemske administracije",
+      "use_cases": [
+        {
+          "title": "Avtomatsko Generiranje Kode",
+          "description": "Ustvarjanje kode na podlagi specifikacij",
+          "input_example": "Ustvari REST API za upravljanje uporabnikov z avtentikacijo",
+          "output_features": [
+            "Popolna koda z dokumentacijo",
+            "Testi in validacije",
+            "Varnostni standardi",
+            "Database migracije",
+            "API dokumentacija"
+          ],
+          "time_saved": "Razvoj API-ja: 2 dni → 2 uri",
+          "roi": "Povečanje produktivnosti za 300%"
+        },
+        {
+          "title": "Sistemska Diagnostika",
+          "description": "Avtomatska analiza in reševanje sistemskih težav",
+          "input_example": "Analiziraj server logs in identificiraj vzroke počasnosti",
+          "output_features": [
+            "Analiza log datotek",
+            "Identifikacija ozkih grl",
+            "Predlogi optimizacij",
+            "Monitoring in opozorila",
+            "Avtomatsko popravljanje"
+          ],
+          "time_saved": "Diagnostika: 4 ure → 10 minut",
+          "roi": "Zmanjšanje downtime za 80%"
+        }
+      ]
+    },
+    "marketing": {
+      "name": "Marketing & Prodaja",
+      "icon": "📈",
+      "description": "Optimizacija marketinških kampanj in prodajnih procesov",
+      "use_cases": [
+        {
+          "title": "Avtomatske Social Media Kampanje",
+          "description": "Ustvarjanje in objavljanje vsebin na družbenih omrežjih",
+          "input_example": "Ustvari 30-dnevno kampanjo za promocijo novega produkta",
+          "output_features": [
+            "Vsebine za vse platforme",
+            "Optimalni časi objavljanja",
+            "Hashtag raziskave",
+            "A/B testiranje",
+            "Analitika uspešnosti"
+          ],
+          "time_saved": "Priprava kampanje: 1 teden → 2 uri",
+          "roi": "Povečanje engagement za 150%"
+        },
+        {
+          "title": "Analiza Konkurence",
+          "description": "Spremljanje in analiza konkurenčnih aktivnosti",
+          "input_example": "Analiziraj konkurenco v segmentu pametnih telefonov",
+          "output_features": [
+            "Cenovna analiza",
+            "Funkcionalnosti produktov",
+            "Marketinške strategije",
+            "Tržni deleži",
+            "Priložnosti in grožnje"
+          ],
+          "time_saved": "Raziskava trga: 3 dni → 1 ura",
+          "roi": "Boljše pozicioniranje produkta"
+        }
+      ]
+    },
+    "izobrazevanje": {
+      "name": "Izobraževanje & Mentoring",
+      "icon": "🎓",
+      "description": "Personalizirano učenje in izobraževalne vsebine",
+      "use_cases": [
+        {
+          "title": "Prilagojeni Učni Načrti",
+          "description": "Ustvarjanje individualnih izobraževalnih programov",
+          "input_example": "Ustvari 6-mesečni program za učenje Python programiranja",
+          "output_features": [
+            "Stopenjski učni načrt",
+            "Interaktivne vaje",
+            "Projekti in izzivi",
+            "Spremljanje napredka",
+            "Prilagoditve glede na tempo"
+          ],
+          "time_saved": "Priprava kurikula: 2 tedna → 1 dan",
+          "roi": "Boljši učni rezultati za 60%"
+        },
+        {
+          "title": "Avtomatsko Ocenjevanje",
+          "description": "AI ocenjevanje nalog in testov",
+          "input_example": "Oceni 50 esejev o podnebnih spremembah",
+          "output_features": [
+            "Objektivno ocenjevanje",
+            "Podrobne povratne informacije",
+            "Predlogi za izboljšave",
+            "Analiza pogostih napak",
+            "Statistike razreda"
+          ],
+          "time_saved": "Ocenjevanje: 8 ur → 30 minut",
+          "roi": "Več časa za poučevanje"
+        }
+      ]
+    },
+    "finance": {
+      "name": "Finančno Svetovanje",
+      "icon": "💰",
+      "description": "Optimizacija finančnih procesov in naložb",
+      "use_cases": [
+        {
+          "title": "Personalizirani Finančni Načrti",
+          "description": "Ustvarjanje individualnih investicijskih strategij",
+          "input_example": "Ustvari investicijski načrt za 30-letnika z dohodkom 3000€/mesec",
+          "output_features": [
+            "Analiza finančnega stanja",
+            "Investicijske priložnosti",
+            "Upravljanje tveganj",
+            "Davčne optimizacije",
+            "Dolgoročni cilji"
+          ],
+          "time_saved": "Finančna analiza: 4 ure → 20 minut",
+          "roi": "Optimizacija donosnosti za 25%"
+        },
+        {
+          "title": "Avtomatsko Knjigovodstvo",
+          "description": "AI obdelava računov in finančnih dokumentov",
+          "input_example": "Obdelaj 200 računov in ustvari mesečno poročilo",
+          "output_features": [
+            "OCR prepoznavanje dokumentov",
+            "Avtomatska kategorizacija",
+            "DPH kalkulacije",
+            "Finančna poročila",
+            "Opozorila na nepravilnosti"
+          ],
+          "time_saved": "Mesečno knjigovodstvo: 2 dni → 2 uri",
+          "roi": "Zmanjšanje stroškov za 70%"
+        }
+      ]
+    }
+  },
+  "cross_industry_features": {
+    "automation": "Avtomatizacija rutinskih nalog v vseh panogah",
+    "analytics": "Napredna analitika podatkov z AI",
+    "personalization": "Prilagajanje potrebam posamezne panoge",
+    "integration": "Integracija z obstoječimi sistemi",
+    "scalability": "Skalabilnost od malih do velikih organizacij",
+    "multilingual": "Večjezična podpora za globalne trge"
+  }
+}

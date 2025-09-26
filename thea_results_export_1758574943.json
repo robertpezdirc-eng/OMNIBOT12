@@ -1,0 +1,59 @@
+{
+  "export_timestamp": 1758574943.6211715,
+  "total_results": 4,
+  "results": [
+    {
+      "id": "2068a3ad-b25a-4c9e-9259-38c279c1d372",
+      "content": "Analiziraj prodajne podatke za zadnji mesec",
+      "result": "🤖 Thea AI Odgovor na: 'Analiziraj prodajne podatke za zadnji mesec...'\n⏱️ Obdelano v 0.02s\n🔧 Uporabljeni viri: ",
+      "timestamp": 1758574934.2589571,
+      "processing_time": 0.03207755088806152,
+      "resources_loaded": [],
+      "priority": "HIGH",
+      "status": "merged"
+    },
+    {
+      "id": "e4fd51d9-9af9-45e5-8c98-640adc452ac2",
+      "content": "Pripravi finančno poročilo",
+      "result": "🤖 Thea AI Odgovor na: 'Pripravi finančno poročilo...'\n⏱️ Obdelano v 0.50s\n🔧 Uporabljeni viri: ",
+      "timestamp": 1758574935.7250302,
+      "processing_time": 0.5043394565582275,
+      "resources_loaded": [],
+      "priority": "MEDIUM",
+      "status": "merged"
+    },
+    {
+      "id": "69366aa0-2d78-4d3b-b4e1-14f25f14ddb8",
+      "content": "Preveri IoT senzorje v skladišču",
+      "result": "🤖 Thea AI Odgovor na: 'Preveri IoT senzorje v skladišču...'\n🌡️ IoT: 156 naprav, 22.5°C\n⏱️ Obdelano v 0.32s\n🔧 Uporabljeni viri: iot",
+      "timestamp": 1758574936.5051343,
+      "processing_time": 0.3154258728027344,
+      "resources_loaded": [
+        "iot"
+      ],
+      "priority": "LOW",
+      "status": "merged"
+    },
+    {
+      "id": "61ef6140-6998-46d2-917e-76743bfc2c10",
+      "content": "Optimiziraj turistične pakete",
+      "result": "🤖 Thea AI Odgovor na: 'Optimiziraj turistične pakete...'\n⏱️ Obdelano v 0.00s\n🔧 Uporabljeni viri: ",
+      "timestamp": 1758574936.8394105,
+      "processing_time": 0.0036144256591796875,
+      "resources_loaded": [],
+      "priority": "HIGH",
+      "status": "merged"
+    }
+  ],
+  "stats": {
+    "total_prompts": 4,
+    "processed_prompts": 4,
+    "failed_prompts": 0,
+    "merge_operations": 1,
+    "cache_hits": 0,
+    "cache_misses": 1,
+    "queue_size": 4,
+    "cache_efficiency": 0.0,
+    "success_rate": 1.0
+  }
+}

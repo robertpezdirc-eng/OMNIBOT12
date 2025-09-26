@@ -1,0 +1,306 @@
+# IoT Production Configuration
+# Omni AI Platform - Produkcijska konfiguracija za IoT sistem
+# Verzija: 1.0
+
+# Splošne nastavitve
+app:
+  name: "Omni IoT Platform"
+  version: "1.0.0"
+  environment: "production"
+  debug: false
+  log_level: "INFO"
+
+# MQTT Broker nastavitve
+mqtt:
+  # Produkcijski MQTT broker
+  broker: "mqtt.omni-platform.com"  # Zamenjaj z dejanskim brokerjem
+  port: 8883  # TLS port
+  
+  # Varnostne nastavitve
+  use_tls: true
+  tls_version: "TLSv1.2"
+  ca_certs: "/etc/ssl/certs/mqtt-ca.pem"
+  certfile: "/etc/ssl/certs/mqtt-client.pem"
+  keyfile: "/etc/ssl/private/mqtt-client.key"
+  
+  # Avtentikacija
+  username: "${MQTT_USERNAME}"  # Iz environment variable
+  password: "${MQTT_PASSWORD}"  # Iz environment variable
+  
+  # Povezava
+  keepalive: 60
+  clean_session: true
+  reconnect_delay: 5
+  max_reconnect_attempts: 10
+  
+  # QoS nastavitve
+  default_qos: 1
+  retain_messages: false
+
+# Varnostne nastavitve
+security:
+  enabled: true
+  
+  # JWT nastavitve
+  jwt:
+    secret_key: "${JWT_SECRET_KEY}"
+    algorithm: "HS256"
+    expiration_hours: 24
+    refresh_expiration_days: 7
+  
+  # API ključi
+  api_keys:
+    enabled: true
+    default_permissions: ["read"]
+    admin_key: "${API_ADMIN_KEY}"
+  
+  # Enkripcija
+  encryption:
+    enabled: true
+    algorithm: "AES-256-GCM"
+    key: "${ENCRYPTION_KEY}"
+  
+  # Rate limiting
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 100
+    burst_limit: 20
+  
+  # IP whitelist (opcijsko)
+  ip_whitelist:
+    enabled: false
+    allowed_ips: []
+
+# Audit logging
+audit:
+  enabled: true
+  log_file: "/var/log/omni/iot_audit.json"
+  max_file_size: 50MB
+  backup_count: 10
+  
+  # Kaj logirati
+  log_levels:
+    - "INFO"
+    - "WARNING"
+    - "ERROR"
+    - "CRITICAL"
+  
+  # Retention policy
+  retention_days: 90
+  
+  # Integriteta
+  integrity_check: true
+  hash_algorithm: "SHA-256"
+
+# Database nastavitve
+database:
+  # Glavna baza
+  primary:
+    type: "postgresql"
+    host: "${DB_HOST}"
+    port: 5432
+    database: "${DB_NAME}"
+    username: "${DB_USERNAME}"
+    password: "${DB_PASSWORD}"
+    ssl_mode: "require"
+    pool_size: 20
+    max_overflow: 30
+  
+  # Redis za cache
+  redis:
+    host: "${REDIS_HOST}"
+    port: 6379
+    password: "${REDIS_PASSWORD}"
+    db: 0
+    ssl: true
+    pool_size: 10
+
+# Web server nastavitve
+web:
+  host: "0.0.0.0"
+  port: 5000
+  workers: 4
+  
+  # HTTPS
+  ssl:
+    enabled: true
+    cert_file: "/etc/ssl/certs/omni-iot.pem"
+    key_file: "/etc/ssl/private/omni-iot.key"
+  
+  # CORS
+  cors:
+    enabled: true
+    origins:
+      - "https://iot.omni-platform.com"
+      - "https://dashboard.omni-platform.com"
+  
+  # Session
+  session:
+    secret_key: "${SESSION_SECRET_KEY}"
+    cookie_secure: true
+    cookie_httponly: true
+    cookie_samesite: "Strict"
+
+# Monitoring in alerting
+monitoring:
+  enabled: true
+  
+  # Metrics
+  metrics:
+    enabled: true
+    endpoint: "/metrics"
+    port: 9090
+  
+  # Health check
+  health_check:
+    enabled: true
+    endpoint: "/health"
+    interval: 30
+  
+  # Alerting
+  alerts:
+    enabled: true
+    email:
+      smtp_server: "${SMTP_SERVER}"
+      smtp_port: 587
+      username: "${SMTP_USERNAME}"
+      password: "${SMTP_PASSWORD}"
+      from_email: "alerts@omni-platform.com"
+      to_emails:
+        - "admin@omni-platform.com"
+        - "ops@omni-platform.com"
+  
+  # Thresholds
+  thresholds:
+    cpu_usage: 80
+    memory_usage: 85
+    disk_usage: 90
+    response_time: 2000  # ms
+    error_rate: 5  # %
+
+# Device management
+devices:
+  # Auto-discovery
+  auto_discovery:
+    enabled: true
+    scan_interval: 300  # sekund
+    protocols:
+      - "mqtt"
+      - "coap"
+      - "http"
+  
+  # Device registry
+  registry:
+    enabled: true
+    cache_ttl: 3600  # sekund
+    max_devices: 10000
+  
+  # Heartbeat
+  heartbeat:
+    enabled: true
+    interval: 60  # sekund
+    timeout: 180  # sekund
+  
+  # Firmware updates
+  firmware:
+    enabled: true
+    update_server: "https://firmware.omni-platform.com"
+    auto_update: false
+    check_interval: 86400  # 24 ur
+
+# Backup in recovery
+backup:
+  enabled: true
+  
+  # Lokacije
+  local:
+    enabled: true
+    path: "/var/backups/omni-iot"
+    retention_days: 30
+  
+  # Cloud backup
+  cloud:
+    enabled: true
+    provider: "aws_s3"  # ali "azure_blob", "gcp_storage"
+    bucket: "${BACKUP_BUCKET}"
+    region: "${BACKUP_REGION}"
+    encryption: true
+  
+  # Schedule
+  schedule:
+    full_backup: "0 2 * * 0"  # Nedeljsko ob 2:00
+    incremental: "0 2 * * 1-6"  # Dnevno ob 2:00
+
+# Performance tuning
+performance:
+  # Connection pooling
+  connection_pool:
+    min_connections: 5
+    max_connections: 50
+    idle_timeout: 300
+  
+  # Caching
+  cache:
+    enabled: true
+    ttl: 3600
+    max_size: 1000
+  
+  # Compression
+  compression:
+    enabled: true
+    algorithm: "gzip"
+    level: 6
+  
+  # Async processing
+  async:
+    enabled: true
+    worker_count: 4
+    queue_size: 1000
+
+# Development overrides (samo za dev/staging)
+development:
+  # Te nastavitve se uporabijo samo če environment != "production"
+  mqtt:
+    broker: "localhost"
+    port: 1883
+    use_tls: false
+  
+  security:
+    jwt:
+      expiration_hours: 168  # 7 dni
+    rate_limiting:
+      enabled: false
+  
+  web:
+    ssl:
+      enabled: false
+  
+  audit:
+    log_file: "logs/iot_audit_dev.json"
+    retention_days: 7
+
+# Environment variables template
+# Ustvari .env datoteko z naslednjimi spremenljivkami:
+environment_variables:
+  required:
+    - MQTT_USERNAME
+    - MQTT_PASSWORD
+    - JWT_SECRET_KEY
+    - API_ADMIN_KEY
+    - ENCRYPTION_KEY
+    - DB_HOST
+    - DB_NAME
+    - DB_USERNAME
+    - DB_PASSWORD
+    - REDIS_HOST
+    - REDIS_PASSWORD
+    - SESSION_SECRET_KEY
+    - SMTP_SERVER
+    - SMTP_USERNAME
+    - SMTP_PASSWORD
+  
+  optional:
+    - BACKUP_BUCKET
+    - BACKUP_REGION
+    - SENTRY_DSN
+    - NEW_RELIC_LICENSE_KEY

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni-APP Interactive Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        #control-panel {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-group label {
+            font-weight: bold;
+            font-size: 14px;
+            min-width: 60px;
+        }
+
+        select, input, button {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        select, input {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            background: white;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        button {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 10px 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background: linear-gradient(45deg, #218838, #1ea085);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .dashboard-container {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 80px);
+            overflow: hidden;
+        }
+
+        .node {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            width: 180px;
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .node:hover {
+            transform: scale(1.05) translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        .node h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .status {
+            font-size: 12px;
+            margin-top: 8px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: rgba(0,0,0,0.2);
+        }
+
+        #links {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .link {
+            stroke: rgba(255, 255, 255, 0.4);
+            stroke-width: 2px;
+            opacity: 0.7;
+        }
+
+        .global-node {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24) !important;
+            border-color: #ff6b6b !important;
+            font-size: 18px;
+            width: 200px;
+        }
+
+        .flow-info {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 300px;
+            z-index: 1000;
+        }
+
+        .priority-indicator {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 1000;
+        }
+
+        .priority-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+
+        .priority-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        @media (max-width: 768px) {
+            #control-panel {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            
+            .control-group {
+                justify-content: space-between;
+            }
+            
+            .node {
+                width: 140px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Kontrolni panel -->
+    <div id="control-panel">
+        <div class="control-group">
+            <label>Od:</label>
+            <select id="fromNode"></select>
+        </div>
+        
+        <div class="control-group">
+            <label>Do:</label>
+            <select id="toNode"></select>
+        </div>
+        
+        <div class="control-group">
+            <label>Prioriteta:</label>
+            <select id="priority">
+                <option value="1">1 - Nizka</option>
+                <option value="2" selected>2 - Srednja</option>
+                <option value="3">3 - Visoka</option>
+            </select>
+        </div>
+        
+        <div class="control-group">
+            <label>Hitrost:</label>
+            <input type="number" id="speed" value="3" min="1" max="5">
+        </div>
+        
+        <button onclick="triggerFlow()">🚀 Sproži Tok</button>
+        <button onclick="clearFlows()">🧹 Počisti</button>
+        <button onclick="randomFlow()">🎲 Naključni Tok</button>
+    </div>
+
+    <div class="dashboard-container">
+        <svg id="links" width="100%" height="100%"></svg>
+
+        <div id="dashboard">
+            <div class="node global-node" id="global" style="top: 50px; left: 600px;">
+                <h3>🌐 Global Optimizer</h3>
+                <div class="status" id="status-global">✅ Online</div>
+            </div>
+
+            <div class="node" id="finance" style="top: 200px; left: 100px;">
+                <h3>💰 Finance</h3>
+                <div class="status" id="status-finance">✅ Online</div>
+            </div>
+            <div class="node" id="logistics" style="top: 200px; left: 350px;">
+                <h3>🚚 Logistics</h3>
+                <div class="status" id="status-logistics">✅ Online</div>
+            </div>
+            <div class="node" id="healthcare" style="top: 200px; left: 600px;">
+                <h3>🏥 Healthcare</h3>
+                <div class="status" id="status-healthcare">✅ Online</div>
+            </div>
+            <div class="node" id="tourism" style="top: 200px; left: 850px;">
+                <h3>🌴 Tourism</h3>
+                <div class="status" id="status-tourism">✅ Online</div>
+            </div>
+            <div class="node" id="agriculture" style="top: 200px; left: 1100px;">
+                <h3>🚜 Agriculture</h3>
+                <div class="status" id="status-agriculture">✅ Online</div>
+            </div>
+
+            <div class="node" id="industry" style="top: 400px; left: 100px;">
+                <h3>🏭 Industry</h3>
+                <div class="status" id="status-industry">✅ Online</div>
+            </div>
+            <div class="node" id="energy" style="top: 400px; left: 350px;">
+                <h3>⚡ Energy</h3>
+                <div class="status" id="status-energy">✅ Online</div>
+            </div>
+            <div class="node" id="smart_home" style="top: 400px; left: 600px;">
+                <h3>🏠 Smart Home</h3>
+                <div class="status" id="status-smart_home">✅ Online</div>
+            </div>
+            <div class="node" id="vehicles" style="top: 400px; left: 850px;">
+                <h3>🚗 Vehicles</h3>
+                <div class="status" id="status-vehicles">✅ Online</div>
+            </div>
+            <div class="node" id="robotics" style="top: 400px; left: 1100px;">
+                <h3>🤖 Robotics</h3>
+                <div class="status" id="status-robotics">✅ Online</div>
+            </div>
+
+            <div class="node" id="science" style="top: 600px; left: 300px;">
+                <h3>🔬 Science</h3>
+                <div class="status" id="status-science">✅ Online</div>
+            </div>
+            <div class="node" id="communications" style="top: 600px; left: 900px;">
+                <h3>📡 Communications</h3>
+                <div class="status" id="status-communications">✅ Online</div>
+            </div>
+        </div>
+
+        <div class="flow-info">
+            <h4>📊 Tok Informacije</h4>
+            <div id="flow-details">Izberite module in sprožite tok</div>
+        </div>
+
+        <div class="priority-indicator">
+            <h4>🎨 Prioriteta</h4>
+            <div class="priority-item">
+                <div class="priority-color" style="background: red;"></div>
+                <span>Visoka (3)</span>
+            </div>
+            <div class="priority-item">
+                <div class="priority-color" style="background: orange;"></div>
+                <span>Srednja (2)</span>
+            </div>
+            <div class="priority-item">
+                <div class="priority-color" style="background: green;"></div>
+                <span>Nizka (1)</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const linksSVG = document.getElementById("links");
+        let flowCounter = 0;
+
+        const nodes = [
+            "global", "finance", "logistics", "healthcare", "tourism", "agriculture",
+            "industry", "energy", "smart_home", "vehicles", "robotics",
+            "science", "communications"
+        ];
+
+        const nodeNames = {
+            "global": "🌐 Global Optimizer",
+            "finance": "💰 Finance",
+            "logistics": "🚚 Logistics", 
+            "healthcare": "🏥 Healthcare",
+            "tourism": "🌴 Tourism",
+            "agriculture": "🚜 Agriculture",
+            "industry": "🏭 Industry",
+            "energy": "⚡ Energy",
+            "smart_home": "🏠 Smart Home",
+            "vehicles": "🚗 Vehicles",
+            "robotics": "🤖 Robotics",
+            "science": "🔬 Science",
+            "communications": "📡 Communications"
+        };
+
+        // Inicializacija dropdown menijev
+        function initializeDropdowns() {
+            const fromSelect = document.getElementById('fromNode');
+            const toSelect = document.getElementById('toNode');
+            
+            nodes.forEach(node => {
+                const option1 = document.createElement('option');
+                option1.value = node;
+                option1.textContent = nodeNames[node];
+                fromSelect.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = node;
+                option2.textContent = nodeNames[node];
+                toSelect.appendChild(option2);
+            });
+            
+            // Nastavi privzete vrednosti
+            fromSelect.value = 'global';
+            toSelect.value = 'finance';
+        }
+
+        // Povezovanje modulov
+        function connectNodes(sourceId, targetId) {
+            const source = document.getElementById(sourceId);
+            const target = document.getElementById(targetId);
+            
+            if (!source || !target) return;
+
+            const sourceRect = source.getBoundingClientRect();
+            const targetRect = target.getBoundingClientRect();
+            const containerRect = document.querySelector('.dashboard-container').getBoundingClientRect();
+            
+            const x1 = sourceRect.left + sourceRect.width / 2 - containerRect.left;
+            const y1 = sourceRect.top + sourceRect.height / 2 - containerRect.top;
+            const x2 = targetRect.left + targetRect.width / 2 - containerRect.left;
+            const y2 = targetRect.top + targetRect.height / 2 - containerRect.top;
+
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", x1);
+            line.setAttribute("y1", y1);
+            line.setAttribute("x2", x2);
+            line.setAttribute("y2", y2);
+            line.setAttribute("class", "link");
+
+            linksSVG.appendChild(line);
+        }
+
+        // Inicializacija povezav
+        function initializeConnections() {
+            linksSVG.innerHTML = '';
+            // Povežemo Global Optimizer z vsemi moduli
+            nodes.filter(node => node !== 'global').forEach(node => {
+                connectNodes("global", node);
+            });
+        }
+
+        // Animacija toka
+        function animateFlow(flow) {
+            const sourceEl = document.getElementById(flow.from);
+            const targetEl = document.getElementById(flow.to);
+            if (!sourceEl || !targetEl) return;
+
+            const sourceRect = sourceEl.getBoundingClientRect();
+            const targetRect = targetEl.getBoundingClientRect();
+            const containerRect = document.querySelector('.dashboard-container').getBoundingClientRect();
+
+            const x1 = sourceRect.left + sourceRect.width / 2 - containerRect.left;
+            const y1 = sourceRect.top + sourceRect.height / 2 - containerRect.top;
+            const x2 = targetRect.left + targetRect.width / 2 - containerRect.left;
+            const y2 = targetRect.top + targetRect.height / 2 - containerRect.top;
+
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("r", 6 + flow.priority);
+
+            let color = "green";
+            if (flow.priority === 3) color = "red";
+            else if (flow.priority === 2) color = "orange";
+            
+            circle.setAttribute("fill", color);
+            circle.setAttribute("opacity", "0.9");
+            circle.style.filter = `drop-shadow(0 0 ${flow.priority * 3}px ${color})`;
+            linksSVG.appendChild(circle);
+
+            let t = 0;
+            const stepIncrement = 0.015 * flow.speed;
+            
+            function step() {
+                t += stepIncrement;
+                if (t > 1) {
+                    circle.remove();
+                    return;
+                }
+                
+                circle.setAttribute("cx", x1 + (x2 - x1) * t);
+                circle.setAttribute("cy", y1 + (y2 - y1) * t);
+                requestAnimationFrame(step);
+            }
+            step();
+        }
+
+        // Sproži tok iz kontrolnega panela
+        function triggerFlow() {
+            const fromNode = document.getElementById('fromNode').value;
+            const toNode = document.getElementById('toNode').value;
+            const priority = parseInt(document.getElementById('priority').value);
+            const speed = parseInt(document.getElementById('speed').value);
+
+            if (fromNode === toNode) {
+                alert('Izvorni in ciljni modul ne smeta biti enaka!');
+                return;
+            }
+
+            const flow = {
+                from: fromNode,
+                to: toNode,
+                priority: priority,
+                speed: speed
+            };
+
+            animateFlow(flow);
+            flowCounter++;
+
+            // Posodobi info
+            const priorityText = priority === 3 ? 'Visoka' : priority === 2 ? 'Srednja' : 'Nizka';
+            const fromName = nodeNames[fromNode].split(' ').slice(1).join(' ');
+            const toName = nodeNames[toNode].split(' ').slice(1).join(' ');
+            
+            document.getElementById('flow-details').innerHTML = `
+                <strong>Tok #${flowCounter}</strong><br>
+                Od: ${fromName}<br>
+                Do: ${toName}<br>
+                Prioriteta: ${priorityText}<br>
+                Hitrost: ${speed}x
+            `;
+        }
+
+        // Naključni tok
+        function randomFlow() {
+            const fromNode = nodes[Math.floor(Math.random() * nodes.length)];
+            let toNode = nodes[Math.floor(Math.random() * nodes.length)];
+            
+            // Zagotovi, da nista enaka
+            while (toNode === fromNode) {
+                toNode = nodes[Math.floor(Math.random() * nodes.length)];
+            }
+            
+            const priority = Math.floor(Math.random() * 3) + 1;
+            const speed = Math.floor(Math.random() * 5) + 1;
+
+            document.getElementById('fromNode').value = fromNode;
+            document.getElementById('toNode').value = toNode;
+            document.getElementById('priority').value = priority;
+            document.getElementById('speed').value = speed;
+
+            triggerFlow();
+        }
+
+        // Počisti tokove
+        function clearFlows() {
+            const circles = linksSVG.querySelectorAll('circle');
+            circles.forEach(circle => circle.remove());
+            document.getElementById('flow-details').textContent = 'Tokovi počiščeni';
+        }
+
+        // Klik na module
+        nodes.forEach(node => {
+            const element = document.getElementById(node);
+            if (element) {
+                element.onclick = () => {
+                    const moduleName = nodeNames[node];
+                    document.getElementById('flow-details').innerHTML = `
+                        <strong>Modul: ${moduleName}</strong><br>
+                        Status: Online<br>
+                        Kliknite za več informacij
+                    `;
+                };
+            }
+        });
+
+        // Simulacija statusov
+        function simulateStatuses() {
+            setInterval(() => {
+                const statuses = ["✅ Online", "⚠ Warning", "❌ Offline"];
+                const weights = [0.8, 0.15, 0.05]; // 80% online, 15% warning, 5% offline
+                
+                nodes.forEach(id => {
+                    const el = document.getElementById(`status-${id}`);
+                    if (el) {
+                        const rand = Math.random();
+                        let status;
+                        if (rand < weights[0]) status = statuses[0];
+                        else if (rand < weights[0] + weights[1]) status = statuses[1];
+                        else status = statuses[2];
+                        
+                        el.textContent = status;
+                        el.style.color = status === "✅ Online" ? "#4CAF50" : 
+                                        status === "⚠ Warning" ? "#FF9800" : "#F44336";
+                    }
+                });
+            }, 8000);
+        }
+
+        // Tipkovne bližnjice
+        document.addEventListener('keydown', (e) => {
+            switch(e.key.toLowerCase()) {
+                case 'enter':
+                    e.preventDefault();
+                    triggerFlow();
+                    break;
+                case 'r':
+                    randomFlow();
+                    break;
+                case 'c':
+                    clearFlows();
+                    break;
+            }
+        });
+
+        // Inicializacija
+        window.addEventListener('load', () => {
+            initializeDropdowns();
+            initializeConnections();
+            simulateStatuses();
+            
+            document.getElementById('flow-details').innerHTML = `
+                <strong>🚀 Dashboard pripravljen!</strong><br>
+                Tipkovne bližnjice:<br>
+                Enter - Sproži tok<br>
+                R - Naključni tok<br>
+                C - Počisti tokove
+            `;
+        });
+
+        // Responsive povezave
+        window.addEventListener('resize', () => {
+            setTimeout(initializeConnections, 100);
+        });
+    </script>
+</body>
+</html>

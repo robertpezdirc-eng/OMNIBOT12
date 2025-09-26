@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Modal AI - Omnia App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .hero-section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9));
+        }
+
+        .hero-content {
+            z-index: 2;
+            color: white;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        .cta-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cta-primary {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+        }
+
+        .cta-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 107, 107, 0.4);
+        }
+
+        .cta-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .cta-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .floating-icon {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.1;
+            animation: float 6s infinite ease-in-out;
+        }
+
+        .modal-section {
+            padding: 100px 20px;
+            background: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 60px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .modal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .modal-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.15);
+        }
+
+        .modal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+        }
+
+        .modal-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .modal-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .modal-demo {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-content {
+            text-align: center;
+            z-index: 2;
+        }
+
+        .demo-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .voice-controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+
+        .voice-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .voice-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(255, 107, 107, 0.4);
+        }
+
+        .voice-btn.listening {
+            animation: pulse 1.5s infinite;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .video-demo {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ar-demo {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            position: relative;
+        }
+
+        .vr-demo {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            position: relative;
+        }
+
+        .demo-active {
+            animation: demoGlow 2s infinite;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-20px) rotate(90deg); }
+            50% { transform: translateY(-10px) rotate(180deg); }
+            75% { transform: translateY(-30px) rotate(270deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes demoGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(102, 126, 234, 0.6); }
+        }
+
+        .speech-bubble {
+            position: fixed;
+            bottom: 120px;
+            right: 30px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 300px;
+            display: none;
+            z-index: 999;
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 30px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid white;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .modal-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">🌟 Omnia AI</a>
+            <div class="nav-links">
+                <a href="/">Domov</a>
+                <a href="/multimodal">Multi-Modal</a>
+                <a href="/personalization">Personalizacija</a>
+                <a href="/global">Globalno</a>
+                <a href="/versatility">Vsestranskost</a>
+                <a href="/simplicity">Enostavnost</a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="floating-elements">
+            <div class="floating-icon" style="top: 10%; left: 10%; animation-delay: 0s;">🎥</div>
+            <div class="floating-icon" style="top: 20%; right: 15%; animation-delay: 1s;">🌐</div>
+            <div class="floating-icon" style="bottom: 30%; left: 20%; animation-delay: 2s;">🥽</div>
+            <div class="floating-icon" style="bottom: 20%; right: 10%; animation-delay: 3s;">🎤</div>
+            <div class="floating-icon" style="top: 50%; left: 5%; animation-delay: 4s;">🎨</div>
+            <div class="floating-icon" style="top: 60%; right: 5%; animation-delay: 5s;">🚀</div>
+        </div>
+        
+        <div class="hero-content">
+            <h1 class="hero-title">🌟 Multi-Modal AI</h1>
+            <p class="hero-subtitle">Video, 3D, AR/VR in glasovno vodenje - vse v enem</p>
+            <div class="cta-buttons">
+                <button class="cta-btn cta-primary" onclick="scrollToDemo()">
+                    🚀 Preizkusi zdaj
+                </button>
+                <button class="cta-btn cta-secondary" onclick="startVoiceDemo()">
+                    🎤 Glasovno vodenje
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Multi-Modal Demo Section -->
+    <section class="modal-section">
+        <div class="container">
+            <h2 class="section-title">🎯 WOW Faktorji</h2>
+            <p class="section-subtitle">
+                Izkusite prihodnost AI interakcije z našimi naprednimi multi-modalnimi zmožnostmi
+            </p>
+
+            <div class="modal-grid">
+                <!-- Video AI -->
+                <div class="modal-card">
+                    <div class="modal-icon">🎥</div>
+                    <h3 class="modal-title">Video AI Analiza</h3>
+                    <p class="modal-description">
+                        Napredno procesiranje video vsebin z real-time analizo, prepoznavanjem objektov in avtomatskim povzemanjem.
+                    </p>
+                    <div class="modal-demo">
+                        <div class="video-demo" id="video-demo">
+                            <div class="demo-content">
+                                <div style="font-size: 2rem; margin-bottom: 10px;">📹</div>
+                                <div>Kliknite za video demo</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="demo-btn" onclick="startVideoDemo()">▶️ Zaženi video demo</button>
+                </div>
+
+                <!-- 3D Visualization -->
+                <div class="modal-card">
+                    <div class="modal-icon">🌐</div>
+                    <h3 class="modal-title">3D Vizualizacija</h3>
+                    <p class="modal-description">
+                        Interaktivne 3D predstave podatkov, modelov in simulacij za boljše razumevanje kompleksnih informacij.
+                    </p>
+                    <div class="modal-demo">
+                        <div class="demo-content">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">🎲</div>
+                            <div>3D prostor pripravljen</div>
+                        </div>
+                    </div>
+                    <button class="demo-btn" onclick="start3DDemo()">🌐 Odpri 3D prostor</button>
+                </div>
+
+                <!-- AR Experience -->
+                <div class="modal-card">
+                    <div class="modal-icon">📱</div>
+                    <h3 class="modal-title">AR Izkušnja</h3>
+                    <p class="modal-description">
+                        Razširjena realnost, ki združuje digitalne informacije z realnim svetom za neprimerljivo uporabniško izkušnjo.
+                    </p>
+                    <div class="modal-demo">
+                        <div class="ar-demo" id="ar-demo">
+                            <div class="demo-content">
+                                <div style="font-size: 2rem; margin-bottom: 10px;">📱</div>
+                                <div>AR kamera pripravljena</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="demo-btn" onclick="startARDemo()">📱 Aktiviraj AR</button>
+                </div>
+
+                <!-- VR Environment -->
+                <div class="modal-card">
+                    <div class="modal-icon">🥽</div>
+                    <h3 class="modal-title">VR Okolje</h3>
+                    <p class="modal-description">
+                        Popolna potopitev v virtualno realnost za izobraževanje, trening in raziskovanje novih možnosti.
+                    </p>
+                    <div class="modal-demo">
+                        <div class="vr-demo" id="vr-demo">
+                            <div class="demo-content">
+                                <div style="font-size: 2rem; margin-bottom: 10px;">🥽</div>
+                                <div>VR svet pripravljen</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="demo-btn" onclick="startVRDemo()">🥽 Vstopi v VR</button>
+                </div>
+
+                <!-- Voice Control -->
+                <div class="modal-card">
+                    <div class="modal-icon">🎤</div>
+                    <h3 class="modal-title">Glasovno Vodenje</h3>
+                    <p class="modal-description">
+                        Naravno glasovno upravljanje z naprednim prepoznavanjem govora in inteligentnimi odzivi v slovenščini.
+                    </p>
+                    <div class="modal-demo">
+                        <div class="demo-content">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">🎤</div>
+                            <div id="voice-status">Pripravljeno za glasovne ukaze</div>
+                        </div>
+                    </div>
+                    <button class="demo-btn" onclick="toggleVoiceControl()">🎤 Aktiviraj glas</button>
+                </div>
+
+                <!-- AI Assistant -->
+                <div class="modal-card">
+                    <div class="modal-icon">🤖</div>
+                    <h3 class="modal-title">Pametni Asistent</h3>
+                    <p class="modal-description">
+                        Vaš osebni AI asistent, ki kombinira vse modalne zmožnosti za optimalno podporo pri vašem delu.
+                    </p>
+                    <div class="modal-demo">
+                        <div class="demo-content">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">🤖</div>
+                            <div id="assistant-status">Asistent pripravljen</div>
+                        </div>
+                    </div>
+                    <button class="demo-btn" onclick="startAssistantDemo()">🤖 Pogovor z AI</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Voice Controls -->
+    <div class="voice-controls">
+        <button class="voice-btn" id="voice-btn" onclick="toggleVoiceControl()" title="Glasovno vodenje">
+            🎤
+        </button>
+    </div>
+
+    <!-- Speech Bubble -->
+    <div class="speech-bubble" id="speech-bubble">
+        <div id="speech-text">Povejte mi, kaj lahko naredim za vas?</div>
+    </div>
+
+    <script>
+        let isVoiceActive = false;
+        let recognition = null;
+        let synthesis = window.speechSynthesis;
+
+        // Initialize speech recognition if available
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'sl-SI';
+
+            recognition.onresult = function(event) {
+                let finalTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    }
+                }
+                
+                if (finalTranscript) {
+                    handleVoiceCommand(finalTranscript.toLowerCase());
+                }
+            };
+
+            recognition.onerror = function(event) {
+                console.log('Speech recognition error:', event.error);
+                showSpeechBubble('Napaka pri prepoznavanju govora. Poskusite znova.');
+            };
+        }
+
+        function scrollToDemo() {
+            document.querySelector('.modal-section').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        function toggleVoiceControl() {
+            const voiceBtn = document.getElementById('voice-btn');
+            const speechBubble = document.getElementById('speech-bubble');
+            
+            if (!recognition) {
+                showSpeechBubble('Glasovno vodenje ni podprto v vašem brskalniku.');
+                return;
+            }
+
+            if (!isVoiceActive) {
+                isVoiceActive = true;
+                voiceBtn.classList.add('listening');
+                voiceBtn.innerHTML = '🔴';
+                speechBubble.style.display = 'block';
+                recognition.start();
+                showSpeechBubble('Poslušam... Povejte mi ukaz!');
+                speak('Glasovno vodenje aktivirano. Kako vam lahko pomagam?');
+            } else {
+                isVoiceActive = false;
+                voiceBtn.classList.remove('listening');
+                voiceBtn.innerHTML = '🎤';
+                speechBubble.style.display = 'none';
+                recognition.stop();
+            }
+        }
+
+        function handleVoiceCommand(command) {
+            console.log('Voice command:', command);
+            
+            if (command.includes('video') || command.includes('posnetek')) {
+                startVideoDemo();
+                speak('Zaganjam video demo');
+            } else if (command.includes('3d') || command.includes('tri d')) {
+                start3DDemo();
+                speak('Odpiramo 3D prostor');
+            } else if (command.includes('ar') || command.includes('razširjena realnost')) {
+                startARDemo();
+                speak('Aktiviramo AR izkušnjo');
+            } else if (command.includes('vr') || command.includes('virtualna realnost')) {
+                startVRDemo();
+                speak('Vstopamo v VR okolje');
+            } else if (command.includes('asistent') || command.includes('pomoč')) {
+                startAssistantDemo();
+                speak('Vaš AI asistent je pripravljen');
+            } else if (command.includes('nazaj') || command.includes('domov')) {
+                window.location.href = '/';
+                speak('Vračamo se na glavno stran');
+            } else {
+                speak('Ukaz ni prepoznan. Poskusite: video, 3D, AR, VR ali asistent');
+            }
+        }
+
+        function speak(text) {
+            if (synthesis) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'sl-SI';
+                utterance.rate = 0.9;
+                synthesis.speak(utterance);
+            }
+        }
+
+        function showSpeechBubble(text) {
+            const bubble = document.getElementById('speech-bubble');
+            const textElement = document.getElementById('speech-text');
+            textElement.textContent = text;
+            bubble.style.display = 'block';
+            
+            setTimeout(() => {
+                bubble.style.display = 'none';
+            }, 3000);
+        }
+
+        function startVideoDemo() {
+            const videoDemo = document.getElementById('video-demo');
+            videoDemo.classList.add('demo-active');
+            videoDemo.innerHTML = `
+                <div class="demo-content">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">🎬</div>
+                    <div>Video AI analiza v teku...</div>
+                    <div style="font-size: 0.9rem; margin-top: 10px; opacity: 0.8;">
+                        Prepoznavam objekte, analiziram vsebino
+                    </div>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                videoDemo.classList.remove('demo-active');
+                videoDemo.innerHTML = `
+                    <div class="demo-content">
+                        <div style="font-size: 2rem; margin-bottom: 10px;">✅</div>
+                        <div>Video analiza končana!</div>
+                        <div style="font-size: 0.9rem; margin-top: 10px;">
+                            Najdenih 15 objektov, 3 osebe, 95% natančnost
+                        </div>
+                    </div>
+                `;
+            }, 3000);
+        }
+
+        function start3DDemo() {
+            window.open('/simulation', '_blank');
+            speak('Odpiramo 3D simulacije v novem oknu');
+        }
+
+        function startARDemo() {
+            const arDemo = document.getElementById('ar-demo');
+            arDemo.classList.add('demo-active');
+            arDemo.innerHTML = `
+                <div class="demo-content">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">📱</div>
+                    <div>AR kamera aktivna</div>
+                    <div style="font-size: 0.9rem; margin-top: 10px; opacity: 0.8;">
+                        Skeniram okolico za AR objekte...
+                    </div>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                arDemo.classList.remove('demo-active');
+                arDemo.innerHTML = `
+                    <div class="demo-content">
+                        <div style="font-size: 2rem; margin-bottom: 10px;">🌟</div>
+                        <div>AR objekti prikazani!</div>
+                        <div style="font-size: 0.9rem; margin-top: 10px;">
+                            5 virtualnih elementov dodanih v prostor
+                        </div>
+                    </div>
+                `;
+            }, 4000);
+        }
+
+        function startVRDemo() {
+            const vrDemo = document.getElementById('vr-demo');
+            vrDemo.classList.add('demo-active');
+            vrDemo.innerHTML = `
+                <div class="demo-content">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">🥽</div>
+                    <div>Vstopamo v VR...</div>
+                    <div style="font-size: 0.9rem; margin-top: 10px; opacity: 0.8;">
+                        Nalagam virtualno okolje...
+                    </div>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                vrDemo.classList.remove('demo-active');
+                vrDemo.innerHTML = `
+                    <div class="demo-content">
+                        <div style="font-size: 2rem; margin-bottom: 10px;">🌐</div>
+                        <div>VR svet pripravljen!</div>
+                        <div style="font-size: 0.9rem; margin-top: 10px;">
+                            Interaktivno 3D okolje za raziskovanje
+                        </div>
+                    </div>
+                `;
+            }, 3500);
+        }
+
+        function startVoiceDemo() {
+            toggleVoiceControl();
+        }
+
+        function startAssistantDemo() {
+            const assistantStatus = document.getElementById('assistant-status');
+            assistantStatus.textContent = 'AI asistent aktiviran - kako vam lahko pomagam?';
+            
+            // Simulate AI conversation
+            setTimeout(() => {
+                showSpeechBubble('Sem vaš pametni asistent. Lahko kombiniram video, 3D, AR/VR in glas za optimalno pomoč!');
+                speak('Sem vaš pametni asistent. Kako vam lahko pomagam danes?');
+            }, 1000);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🌟 Multi-Modal AI naložen - Omnia App');
+            
+            // Add some interactive elements
+            setTimeout(() => {
+                showSpeechBubble('Dobrodošli! Preizkusite glasovno vodenje s klikom na mikrofon.');
+            }, 2000);
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'v' && e.ctrlKey) {
+                toggleVoiceControl();
+            } else if (e.key === '1' && e.ctrlKey) {
+                startVideoDemo();
+            } else if (e.key === '2' && e.ctrlKey) {
+                start3DDemo();
+            } else if (e.key === '3' && e.ctrlKey) {
+                startARDemo();
+            } else if (e.key === '4' && e.ctrlKey) {
+                startVRDemo();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+version: "3.9"
+
+services:
+  # MongoDB Database
+  mongo:
+    image: mongo:7
+    container_name: omni-mongo-simple
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: omni
+      MONGO_INITDB_ROOT_PASSWORD: omni123
+      MONGO_INITDB_DATABASE: omni
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - omni-network
+
+  # Omni License Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: omni-server-simple
+    restart: always
+    environment:
+      NODE_ENV: development
+      MONGO_URI: mongodb://omni:omni123@mongo:27017/omni?authSource=admin
+      JWT_SECRET: super_secret
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./certs:/app/certs:ro
+    depends_on:
+      - mongo
+    networks:
+      - omni-network
+
+  # Omni Admin GUI
+  admin:
+    build:
+      context: ./admin
+      dockerfile: Dockerfile
+    container_name: omni-admin-simple
+    restart: always
+    environment:
+      NODE_ENV: development
+      SERVER_URL: http://server:3000
+      PORT: 4000
+    ports:
+      - "4000:4000"
+    depends_on:
+      - server
+    networks:
+      - omni-network
+
+# Networks
+networks:
+  omni-network:
+    driver: bridge
+
+# Volumes
+volumes:
+  mongo-data:
+    driver: local

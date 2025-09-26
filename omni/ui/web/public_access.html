@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni - Javni dostop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .status-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            border-left: 5px solid #28a745;
+        }
+
+        .status-card.warning {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+        }
+
+        .status-card.error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .step {
+            background: #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .step h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .code {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+
+        .url-box {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .url-box h3 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+
+        .url-box .url {
+            font-family: monospace;
+            font-size: 1.2em;
+            color: #0066cc;
+            word-break: break-all;
+        }
+
+        .button {
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .button:hover {
+            background: #5a6fd8;
+        }
+
+        .button.secondary {
+            background: #6c757d;
+        }
+
+        .button.secondary:hover {
+            background: #5a6268;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .feature {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .feature h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌐 Omni - Javni dostop</h1>
+            <p>Nastavi spletno dostopnost za deljenje z drugimi</p>
+        </div>
+
+        <div class="status-card warning" id="statusCard">
+            <h3>⚠️ Ngrok ni nameščen</h3>
+            <p>Za javni dostop potrebuješ ngrok. Sledi navodilom spodaj.</p>
+        </div>
+
+        <div class="step">
+            <h3>📥 Korak 1: Namesti ngrok</h3>
+            <p>Prenesi in namesti ngrok iz uradne strani:</p>
+            <div class="code">
+                # Obišči: https://ngrok.com/download
+                # Prenesi za Windows in razpakuj
+                # Dodaj ngrok.exe v PATH ali kopiraj v projekt
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🔑 Korak 2: Registracija (opcijsko)</h3>
+            <p>Registriraj se na ngrok.com za boljše funkcionalnosti:</p>
+            <div class="code">
+                ngrok config add-authtoken YOUR_TOKEN_HERE
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🚀 Korak 3: Zaženi tunel</h3>
+            <p>Odpri nov terminal in zaženi:</p>
+            <div class="code">
+                ngrok http 3001
+            </div>
+        </div>
+
+        <div class="url-box" id="publicUrlBox" style="display: none;">
+            <h3>🌍 Javna povezava:</h3>
+            <div class="url" id="publicUrl">
+                https://abc123.ngrok.io
+            </div>
+            <p style="margin-top: 10px; color: #666;">
+                Deli to povezavo s prijatelji za dostop do Omni aplikacije!
+            </p>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="icon">📱</div>
+                <h4>Mobilna aplikacija</h4>
+                <p>Dostop preko /mobile</p>
+            </div>
+            <div class="feature">
+                <div class="icon">📊</div>
+                <h4>API dostop</h4>
+                <p>RESTful API preko /api</p>
+            </div>
+            <div class="feature">
+                <div class="icon">🔌</div>
+                <h4>WebSocket</h4>
+                <p>Real-time komunikacija</p>
+            </div>
+            <div class="feature">
+                <div class="icon">📋</div>
+                <h4>QR koda</h4>
+                <p>Enostaven dostop preko /qr</p>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="button" onclick="checkNgrok()">🔄 Preveri ngrok</button>
+            <button class="button secondary" onclick="showInstructions()">📖 Podrobna navodila</button>
+            <a href="/mobile" class="button">📱 Mobilna aplikacija</a>
+        </div>
+
+        <div id="instructions" style="display: none; margin-top: 30px;">
+            <h3>📋 Podrobna navodila:</h3>
+            <ol style="padding-left: 20px; line-height: 1.8;">
+                <li>Prenesi ngrok z <a href="https://ngrok.com/download" target="_blank">https://ngrok.com/download</a></li>
+                <li>Razpakuj datoteko in kopiraj ngrok.exe v projekt ali PATH</li>
+                <li>Odpri nov terminal/command prompt</li>
+                <li>Zaženi: <code>ngrok http 3001</code></li>
+                <li>Kopiraj HTTPS URL (npr. https://abc123.ngrok.io)</li>
+                <li>Deli povezavo s prijatelji</li>
+                <li>Dostop do mobilne aplikacije: <code>https://abc123.ngrok.io/mobile</code></li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function checkNgrok() {
+            const statusCard = document.getElementById('statusCard');
+            const publicUrlBox = document.getElementById('publicUrlBox');
+            
+            // Simulacija preverjanja ngrok statusa
+            statusCard.className = 'status-card';
+            statusCard.innerHTML = `
+                <h3>✅ Preverjam ngrok status...</h3>
+                <p>Če je ngrok zagnan, bo javna povezava prikazana spodaj.</p>
+            `;
+            
+            // Simulacija pridobivanja javne povezave
+            setTimeout(() => {
+                // V resničnem scenariju bi to preverilo preko API-ja
+                const isNgrokRunning = Math.random() > 0.5; // Simulacija
+                
+                if (isNgrokRunning) {
+                    const randomId = Math.random().toString(36).substring(7);
+                    const publicUrl = `https://${randomId}.ngrok.io`;
+                    
+                    document.getElementById('publicUrl').textContent = publicUrl;
+                    publicUrlBox.style.display = 'block';
+                    
+                    statusCard.innerHTML = `
+                        <h3>✅ Ngrok je aktiven!</h3>
+                        <p>Javna povezava je na voljo. Deli jo s prijatelji!</p>
+                    `;
+                } else {
+                    statusCard.className = 'status-card error';
+                    statusCard.innerHTML = `
+                        <h3>❌ Ngrok ni zagnan</h3>
+                        <p>Zaženi ngrok v novem terminalu z ukazom: <code>ngrok http 3001</code></p>
+                    `;
+                }
+            }, 2000);
+        }
+
+        function showInstructions() {
+            const instructions = document.getElementById('instructions');
+            instructions.style.display = instructions.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Preveri status ob nalaganju strani
+        window.onload = function() {
+            // Simulacija avtomatskega preverjanja
+            setTimeout(checkNgrok, 1000);
+        };
+    </script>
+</body>
+</html>

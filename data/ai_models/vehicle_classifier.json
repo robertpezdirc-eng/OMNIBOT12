@@ -1,0 +1,26 @@
+{
+  "name": "vehicle_classifier",
+  "version": "1.0.0",
+  "type": "classification",
+  "classes": [
+    "car",
+    "truck",
+    "bus",
+    "motorcycle",
+    "bicycle",
+    "unknown"
+  ],
+  "accuracy": 0.85,
+  "trainingData": 1000,
+  "lastTrained": "2025-09-24T23:14:51.839Z",
+  "parameters": {
+    "layers": 3,
+    "neurons": [
+      128,
+      64,
+      32
+    ],
+    "activation": "relu",
+    "optimizer": "adam"
+  }
+}

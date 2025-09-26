@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Angel Sistemi - Omni AI Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .angels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .angel-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .angel-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            border-color: #667eea;
+        }
+
+        .angel-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .angel-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        .angel-title {
+            flex: 1;
+        }
+
+        .angel-title h3 {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .angel-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .angel-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .angel-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .angel-capabilities {
+            margin-top: 15px;
+        }
+
+        .capabilities-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .capabilities-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .capability-tag {
+            background: #e9ecef;
+            color: #495057;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            margin: 50px 0;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Angel Sistemi</h1>
+            <p>Pregled vseh aktivnih Angel sistemov v Omni AI platformi</p>
+        </div>
+
+        <button class="refresh-btn" onclick="loadAngels()">🔄 Osveži podatke</button>
+
+        <div id="loading" class="loading">
+            Nalagam podatke o Angel sistemih...
+        </div>
+
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div id="angels-container" class="angels-grid" style="display: none;"></div>
+    </div>
+
+    <script>
+        const angelIcons = {
+            'LearningAngel': '🧠',
+            'CommercialAngel': '💼',
+            'OptimizationAngel': '⚡',
+            'InnovationAngel': '💡',
+            'AnalyticsAngel': '📊',
+            'EngagementAngel': '🤝',
+            'GrowthAngel': '📈',
+            'VisionaryAngel': '🔮'
+        };
+
+        async function loadAngels() {
+            const loadingEl = document.getElementById('loading');
+            const errorEl = document.getElementById('error');
+            const containerEl = document.getElementById('angels-container');
+
+            loadingEl.style.display = 'block';
+            errorEl.style.display = 'none';
+            containerEl.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/angels');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const angels = await response.json();
+                displayAngels(angels);
+
+                loadingEl.style.display = 'none';
+                containerEl.style.display = 'grid';
+            } catch (error) {
+                console.error('Napaka pri nalaganju Angel sistemov:', error);
+                loadingEl.style.display = 'none';
+                errorEl.style.display = 'block';
+                errorEl.textContent = `Napaka pri nalaganju podatkov: ${error.message}`;
+            }
+        }
+
+        function displayAngels(angels) {
+            const container = document.getElementById('angels-container');
+            container.innerHTML = '';
+
+            angels.forEach(angel => {
+                const angelCard = createAngelCard(angel);
+                container.appendChild(angelCard);
+            });
+        }
+
+        function createAngelCard(angel) {
+            const card = document.createElement('div');
+            card.className = 'angel-card';
+
+            const icon = angelIcons[angel.name] || '🤖';
+            const statusClass = angel.status === 'active' ? 'status-active' : 'status-inactive';
+            const statusText = angel.status === 'active' ? 'Aktiven' : 'Neaktiven';
+
+            card.innerHTML = `
+                <div class="angel-header">
+                    <div class="angel-icon">${icon}</div>
+                    <div class="angel-title">
+                        <h3>${angel.name}</h3>
+                        <span class="angel-status ${statusClass}">${statusText}</span>
+                    </div>
+                </div>
+                
+                <div class="angel-description">
+                    ${angel.description || 'Opis ni na voljo'}
+                </div>
+                
+                <div class="angel-metrics">
+                    <div class="metric">
+                        <div class="metric-value">${angel.metrics?.response_time || 'N/A'}</div>
+                        <div class="metric-label">Odzivni čas</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">${angel.metrics?.success_rate || 'N/A'}</div>
+                        <div class="metric-label">Uspešnost</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">${angel.metrics?.uptime || 'N/A'}</div>
+                        <div class="metric-label">Delovanje</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">${angel.last_activity || 'N/A'}</div>
+                        <div class="metric-label">Zadnja aktivnost</div>
+                    </div>
+                </div>
+                
+                ${angel.capabilities && angel.capabilities.length > 0 ? `
+                <div class="angel-capabilities">
+                    <div class="capabilities-title">Zmožnosti:</div>
+                    <div class="capabilities-list">
+                        ${angel.capabilities.map(cap => `<span class="capability-tag">${cap}</span>`).join('')}
+                    </div>
+                </div>
+                ` : ''}
+            `;
+
+            return card;
+        }
+
+        // Naloži podatke ob zagonu
+        document.addEventListener('DOMContentLoaded', loadAngels);
+
+        // Osveži podatke vsakih 30 sekund
+        setInterval(loadAngels, 30000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni Mobile - Upravljanje Sistema</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .mobile-container {
+            max-width: 414px;
+            margin: 0 auto;
+            background: #fff;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.3);
+        }
+
+        .status-bar {
+            background: #000;
+            color: #fff;
+            padding: 8px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header .subtitle {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .connection-status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px 10px;
+            text-align: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            color: #64748b;
+            transition: all 0.3s;
+        }
+
+        .nav-tab.active {
+            color: #4f46e5;
+            background: #fff;
+            border-bottom: 2px solid #4f46e5;
+        }
+
+        .nav-tab i {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .content {
+            padding: 20px;
+            min-height: calc(100vh - 200px);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-online {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-offline {
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #4f46e5;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .device-list {
+            list-style: none;
+        }
+
+        .device-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .device-item:last-child {
+            border-bottom: none;
+        }
+
+        .device-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .device-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: #4f46e5;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 18px;
+        }
+
+        .device-details h4 {
+            font-size: 16px;
+            margin-bottom: 3px;
+        }
+
+        .device-details p {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 28px;
+            background: #cbd5e1;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #10b981;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(22px);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .chart-container {
+            height: 200px;
+            margin: 20px 0;
+            background: #f8fafc;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 414px;
+            background: #fff;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            padding: 10px 0;
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 12px;
+            transition: color 0.3s;
+        }
+
+        .nav-item.active {
+            color: #4f46e5;
+        }
+
+        .nav-item i {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4f46e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .notification-dot {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 12px;
+            height: 12px;
+            background: #ef4444;
+            border-radius: 50%;
+            font-size: 8px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 414px) {
+            .mobile-container {
+                max-width: 100%;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <span>Omni Mobile</span>
+            <span>100% <i class="fas fa-battery-full"></i></span>
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="connection-status" id="connectionStatus"></div>
+            <h1>Omni Control</h1>
+            <div class="subtitle">Upravljanje Sistema</div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('dashboard')">
+                <i class="fas fa-tachometer-alt"></i>
+                Nadzorna
+            </button>
+            <button class="nav-tab" onclick="switchTab('devices')">
+                <i class="fas fa-microchip"></i>
+                Naprave
+            </button>
+            <button class="nav-tab" onclick="switchTab('analytics')">
+                <i class="fas fa-chart-line"></i>
+                Analitika
+            </button>
+            <button class="nav-tab" onclick="switchTab('settings')">
+                <i class="fas fa-cog"></i>
+                Nastavitve
+            </button>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Sistemski Pregled</h3>
+                        <span class="status-badge status-online">Online</span>
+                    </div>
+                    <div class="metric-grid">
+                        <div class="metric-item">
+                            <div class="metric-value" id="activeDevices">12</div>
+                            <div class="metric-label">Aktivne Naprave</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="cpuUsage">45%</div>
+                            <div class="metric-label">CPU Uporaba</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="memoryUsage">2.1GB</div>
+                            <div class="metric-label">Pomnilnik</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="networkSpeed">125MB/s</div>
+                            <div class="metric-label">Omrežje</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Nedavna Opozorila</h3>
+                    </div>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle" style="margin-right: 10px;"></i>
+                        Visoka temperatura senzorja #3
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle" style="margin-right: 10px;"></i>
+                        Sistem posodobljen na verzijo 2.1.0
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Hitre Akcije</h3>
+                    </div>
+                    <button class="btn btn-primary" onclick="performQuickAction('backup')">
+                        <i class="fas fa-save"></i> Ustvari Varnostno Kopijo
+                    </button>
+                    <button class="btn btn-secondary" onclick="performQuickAction('scan')">
+                        <i class="fas fa-search"></i> Skeniraj Naprave
+                    </button>
+                    <button class="btn btn-danger" onclick="performQuickAction('emergency')">
+                        <i class="fas fa-power-off"></i> Nujni Izklop
+                    </button>
+                </div>
+            </div>
+
+            <!-- Devices Tab -->
+            <div id="devices" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">IoT Naprave</h3>
+                        <button class="btn btn-primary" style="width: auto; padding: 8px 16px; margin: 0;" onclick="scanDevices()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <ul class="device-list" id="deviceList">
+                        <!-- Devices will be populated by JavaScript -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div id="analytics" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Performanse Sistema</h3>
+                    </div>
+                    <div class="chart-container" id="performanceChart">
+                        <canvas id="performanceCanvas" width="300" height="150"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Energijska Poraba</h3>
+                    </div>
+                    <div class="metric-grid">
+                        <div class="metric-item">
+                            <div class="metric-value" id="dailyConsumption">24.5kWh</div>
+                            <div class="metric-label">Dnevna Poraba</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="monthlyConsumption">735kWh</div>
+                            <div class="metric-label">Mesečna Poraba</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">AI Napovedi</h3>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-brain" style="margin-right: 10px;"></i>
+                        Napovedana 15% povečana poraba v naslednjih 24h
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Sistemske Nastavitve</h3>
+                    </div>
+                    <div class="device-item">
+                        <div class="device-info">
+                            <div class="device-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="device-details">
+                                <h4>Push Obvestila</h4>
+                                <p>Prejemaj obvestila o dogodkih</p>
+                            </div>
+                        </div>
+                        <div class="toggle-switch active" onclick="toggleSetting(this)"></div>
+                    </div>
+                    <div class="device-item">
+                        <div class="device-info">
+                            <div class="device-icon">
+                                <i class="fas fa-moon"></i>
+                            </div>
+                            <div class="device-details">
+                                <h4>Temni Način</h4>
+                                <p>Spremeni temo aplikacije</p>
+                            </div>
+                        </div>
+                        <div class="toggle-switch" onclick="toggleSetting(this)"></div>
+                    </div>
+                    <div class="device-item">
+                        <div class="device-info">
+                            <div class="device-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="device-details">
+                                <h4>Varnostni Način</h4>
+                                <p>Dodatna varnostna preverjanja</p>
+                            </div>
+                        </div>
+                        <div class="toggle-switch active" onclick="toggleSetting(this)"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Informacije o Aplikaciji</h3>
+                    </div>
+                    <div class="device-item">
+                        <div class="device-details">
+                            <h4>Verzija</h4>
+                            <p>2.1.0 (Build 2024.01)</p>
+                        </div>
+                    </div>
+                    <div class="device-item">
+                        <div class="device-details">
+                            <h4>Zadnja Posodobitev</h4>
+                            <p id="lastUpdate">Danes, 14:30</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <button class="btn btn-secondary" onclick="exportData()">
+                        <i class="fas fa-download"></i> Izvozi Podatke
+                    </button>
+                    <button class="btn btn-danger" onclick="resetApp()">
+                        <i class="fas fa-trash"></i> Ponastavi Aplikacijo
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="#" class="nav-item active">
+                <i class="fas fa-home"></i>
+                Domov
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-chart-bar"></i>
+                Statistike
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-bell"></i>
+                Obvestila
+                <span class="notification-dot">3</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-user"></i>
+                Profil
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let devices = [];
+        let systemMetrics = {};
+        let wsConnection = null;
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            connectWebSocket();
+            loadDevices();
+            startMetricsUpdate();
+            initializeChart();
+        });
+
+        function initializeApp() {
+            console.log('🚀 Omni Mobile App inicializirana');
+            updateConnectionStatus(true);
+            updateLastUpdate();
+        }
+
+        function connectWebSocket() {
+            try {
+                wsConnection = new WebSocket('ws://localhost:3000');
+                
+                wsConnection.onopen = function() {
+                    console.log('✅ WebSocket povezava vzpostavljena');
+                    updateConnectionStatus(true);
+                };
+
+                wsConnection.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    handleWebSocketMessage(data);
+                };
+
+                wsConnection.onclose = function() {
+                    console.log('❌ WebSocket povezava prekinjena');
+                    updateConnectionStatus(false);
+                    // Poskusi ponovno povezavo čez 5 sekund
+                    setTimeout(connectWebSocket, 5000);
+                };
+
+                wsConnection.onerror = function(error) {
+                    console.error('WebSocket napaka:', error);
+                    updateConnectionStatus(false);
+                };
+            } catch (error) {
+                console.error('Napaka pri vzpostavljanju WebSocket povezave:', error);
+                updateConnectionStatus(false);
+            }
+        }
+
+        function handleWebSocketMessage(data) {
+            switch(data.type) {
+                case 'metrics':
+                    updateSystemMetrics(data.payload);
+                    break;
+                case 'device_update':
+                    updateDevice(data.payload);
+                    break;
+                case 'alert':
+                    showAlert(data.payload);
+                    break;
+                default:
+                    console.log('Neznano sporočilo:', data);
+            }
+        }
+
+        function updateConnectionStatus(connected) {
+            const statusElement = document.getElementById('connectionStatus');
+            if (connected) {
+                statusElement.style.background = '#10b981';
+                statusElement.title = 'Povezano';
+            } else {
+                statusElement.style.background = '#ef4444';
+                statusElement.title = 'Ni povezave';
+            }
+        }
+
+        function switchTab(tabName) {
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Add active class to selected tab and content
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        function loadDevices() {
+            // Simulacija nalaganja naprav
+            devices = [
+                {
+                    id: 'sensor_01',
+                    name: 'Temperaturni Senzor #1',
+                    type: 'temperature',
+                    status: 'online',
+                    value: '22.5°C',
+                    icon: 'fas fa-thermometer-half'
+                },
+                {
+                    id: 'sensor_02',
+                    name: 'Vlažnostni Senzor #2',
+                    type: 'humidity',
+                    status: 'online',
+                    value: '65%',
+                    icon: 'fas fa-tint'
+                },
+                {
+                    id: 'camera_01',
+                    name: 'Varnostna Kamera #1',
+                    type: 'camera',
+                    status: 'online',
+                    value: 'Aktivna',
+                    icon: 'fas fa-video'
+                },
+                {
+                    id: 'light_01',
+                    name: 'Pametna Luč #1',
+                    type: 'light',
+                    status: 'offline',
+                    value: 'Izklopljena',
+                    icon: 'fas fa-lightbulb'
+                },
+                {
+                    id: 'lock_01',
+                    name: 'Pametna Ključavnica',
+                    type: 'lock',
+                    status: 'online',
+                    value: 'Zaklenjena',
+                    icon: 'fas fa-lock'
+                }
+            ];
+
+            renderDevices();
+        }
+
+        function renderDevices() {
+            const deviceList = document.getElementById('deviceList');
+            deviceList.innerHTML = '';
+
+            devices.forEach(device => {
+                const deviceItem = document.createElement('li');
+                deviceItem.className = 'device-item';
+                deviceItem.innerHTML = `
+                    <div class="device-info">
+                        <div class="device-icon">
+                            <i class="${device.icon}"></i>
+                        </div>
+                        <div class="device-details">
+                            <h4>${device.name}</h4>
+                            <p>${device.value} • ${device.status === 'online' ? 'Povezano' : 'Ni povezave'}</p>
+                        </div>
+                    </div>
+                    <div class="toggle-switch ${device.status === 'online' ? 'active' : ''}" 
+                         onclick="toggleDevice('${device.id}', this)"></div>
+                `;
+                deviceList.appendChild(deviceItem);
+            });
+        }
+
+        function toggleDevice(deviceId, toggleElement) {
+            const device = devices.find(d => d.id === deviceId);
+            if (!device) return;
+
+            // Simulacija preklapljanja naprave
+            const isActive = toggleElement.classList.contains('active');
+            
+            if (isActive) {
+                toggleElement.classList.remove('active');
+                device.status = 'offline';
+                showNotification(`${device.name} izklopljena`, 'info');
+            } else {
+                toggleElement.classList.add('active');
+                device.status = 'online';
+                showNotification(`${device.name} vklopljena`, 'success');
+            }
+
+            // Pošlji ukaz preko WebSocket
+            if (wsConnection && wsConnection.readyState === WebSocket.OPEN) {
+                wsConnection.send(JSON.stringify({
+                    type: 'device_control',
+                    deviceId: deviceId,
+                    action: isActive ? 'off' : 'on'
+                }));
+            }
+
+            renderDevices();
+        }
+
+        function scanDevices() {
+            const button = event.target;
+            const originalHTML = button.innerHTML;
+            
+            button.innerHTML = '<div class="loading"></div>';
+            button.disabled = true;
+
+            // Simulacija skeniranja
+            setTimeout(() => {
+                loadDevices();
+                button.innerHTML = originalHTML;
+                button.disabled = false;
+                showNotification('Skeniranje naprav dokončano', 'success');
+            }, 2000);
+        }
+
+        function startMetricsUpdate() {
+            updateSystemMetrics();
+            setInterval(updateSystemMetrics, 5000); // Posodobi vsakih 5 sekund
+        }
+
+        function updateSystemMetrics(metrics = null) {
+            if (!metrics) {
+                // Simulacija metrik
+                metrics = {
+                    activeDevices: Math.floor(Math.random() * 5) + 10,
+                    cpuUsage: Math.floor(Math.random() * 30) + 30,
+                    memoryUsage: (Math.random() * 2 + 1.5).toFixed(1),
+                    networkSpeed: Math.floor(Math.random() * 50) + 100,
+                    dailyConsumption: (Math.random() * 10 + 20).toFixed(1),
+                    monthlyConsumption: Math.floor(Math.random() * 200) + 650
+                };
+            }
+
+            // Posodobi UI
+            document.getElementById('activeDevices').textContent = metrics.activeDevices;
+            document.getElementById('cpuUsage').textContent = metrics.cpuUsage + '%';
+            document.getElementById('memoryUsage').textContent = metrics.memoryUsage + 'GB';
+            document.getElementById('networkSpeed').textContent = metrics.networkSpeed + 'MB/s';
+            document.getElementById('dailyConsumption').textContent = metrics.dailyConsumption + 'kWh';
+            document.getElementById('monthlyConsumption').textContent = metrics.monthlyConsumption + 'kWh';
+        }
+
+        function initializeChart() {
+            const canvas = document.getElementById('performanceCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Simulacija grafa performans
+            const data = [];
+            for (let i = 0; i < 24; i++) {
+                data.push(Math.random() * 100);
+            }
+
+            drawChart(ctx, data);
+        }
+
+        function drawChart(ctx, data) {
+            const width = ctx.canvas.width;
+            const height = ctx.canvas.height;
+            const padding = 20;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            // Nastavi gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, height);
+            gradient.addColorStop(0, 'rgba(79, 70, 229, 0.8)');
+            gradient.addColorStop(1, 'rgba(79, 70, 229, 0.1)');
+            
+            ctx.fillStyle = gradient;
+            ctx.strokeStyle = '#4f46e5';
+            ctx.lineWidth = 2;
+            
+            // Nariši graf
+            ctx.beginPath();
+            ctx.moveTo(padding, height - padding);
+            
+            for (let i = 0; i < data.length; i++) {
+                const x = padding + (i * (width - 2 * padding)) / (data.length - 1);
+                const y = height - padding - (data[i] * (height - 2 * padding)) / 100;
+                ctx.lineTo(x, y);
+            }
+            
+            ctx.lineTo(width - padding, height - padding);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Nariši črto
+            ctx.beginPath();
+            ctx.moveTo(padding, height - padding - (data[0] * (height - 2 * padding)) / 100);
+            
+            for (let i = 1; i < data.length; i++) {
+                const x = padding + (i * (width - 2 * padding)) / (data.length - 1);
+                const y = height - padding - (data[i] * (height - 2 * padding)) / 100;
+                ctx.lineTo(x, y);
+            }
+            
+            ctx.stroke();
+        }
+
+        function performQuickAction(action) {
+            const button = event.target;
+            const originalHTML = button.innerHTML;
+            
+            button.innerHTML = '<div class="loading"></div> Izvajam...';
+            button.disabled = true;
+
+            setTimeout(() => {
+                switch(action) {
+                    case 'backup':
+                        showNotification('Varnostna kopija ustvarjena', 'success');
+                        break;
+                    case 'scan':
+                        showNotification('Skeniranje naprav dokončano', 'info');
+                        break;
+                    case 'emergency':
+                        showNotification('Nujni izklop izvršen', 'warning');
+                        break;
+                }
+                
+                button.innerHTML = originalHTML;
+                button.disabled = false;
+            }, 2000);
+        }
+
+        function toggleSetting(toggleElement) {
+            toggleElement.classList.toggle('active');
+            
+            // Simulacija shranjevanja nastavitev
+            const settingName = toggleElement.previousElementSibling.querySelector('h4').textContent;
+            const isActive = toggleElement.classList.contains('active');
+            
+            showNotification(`${settingName} ${isActive ? 'vklopljena' : 'izklopljena'}`, 'info');
+        }
+
+        function exportData() {
+            showNotification('Podatki izvoženi v Downloads mapo', 'success');
+        }
+
+        function resetApp() {
+            if (confirm('Ali ste prepričani, da želite ponastaviti aplikacijo?')) {
+                showNotification('Aplikacija ponastavljena', 'warning');
+            }
+        }
+
+        function updateLastUpdate() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('sl-SI', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            document.getElementById('lastUpdate').textContent = `Danes, ${timeString}`;
+        }
+
+        function showNotification(message, type = 'info') {
+            // Ustvari obvestilo
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type}`;
+            notification.style.position = 'fixed';
+            notification.style.top = '80px';
+            notification.style.left = '50%';
+            notification.style.transform = 'translateX(-50%)';
+            notification.style.zIndex = '1000';
+            notification.style.maxWidth = '350px';
+            notification.style.animation = 'slideDown 0.3s ease-out';
+            
+            const icon = type === 'success' ? 'check-circle' : 
+                        type === 'warning' ? 'exclamation-triangle' : 
+                        type === 'error' ? 'times-circle' : 'info-circle';
+            
+            notification.innerHTML = `
+                <i class="fas fa-${icon}" style="margin-right: 10px;"></i>
+                ${message}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Odstrani obvestilo po 3 sekundah
+            setTimeout(() => {
+                notification.style.animation = 'slideUp 0.3s ease-out';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Dodaj CSS animacije za obvestila
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideDown {
+                from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+                to { transform: translateX(-50%) translateY(0); opacity: 1; }
+            }
+            @keyframes slideUp {
+                from { transform: translateX(-50%) translateY(0); opacity: 1; }
+                to { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Posodobi čas vsakih 30 sekund
+        setInterval(updateLastUpdate, 30000);
+    </script>
+</body>
+</html>

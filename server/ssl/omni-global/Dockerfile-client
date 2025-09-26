@@ -1,0 +1,15 @@
+# Dockerfile-client
+FROM node:20
+
+WORKDIR /app
+
+# Copy package files
+COPY client/package*.json ./
+RUN npm install
+
+# Copy client application
+COPY client/ ./
+
+EXPOSE 5000
+
+CMD ["node", "main.js"]

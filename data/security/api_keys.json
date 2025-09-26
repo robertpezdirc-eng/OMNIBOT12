@@ -1,0 +1,26 @@
+{
+  "demo_key_admin": {
+    "key_hash": "218020a90be1269bd0efdc8383d92d09:3850b0c01695121b22de61c36712d6c36b77d4a931bd2b9401da40385bef0edd",
+    "permissions": [
+      "read",
+      "write",
+      "control",
+      "admin"
+    ],
+    "created_at": "2025-09-22T11:13:22.015290",
+    "last_used": null,
+    "active": true,
+    "description": "Admin API key"
+  },
+  "demo_key_device": {
+    "key_hash": "0d8cc88de3c173415646282dd6cc439b:eb81f7d9d89562b27f63ef3a16a44b06e1fa4f181c3cab3e17eaa846bf6ec2a6",
+    "permissions": [
+      "read",
+      "write"
+    ],
+    "created_at": "2025-09-22T11:13:22.149579",
+    "last_used": null,
+    "active": true,
+    "description": "Device API key"
+  }
+}

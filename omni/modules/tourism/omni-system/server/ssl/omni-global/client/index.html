@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni License Validator - Client Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            min-height: 100vh;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 600px;
+            width: 90%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #2d3436;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #636e72;
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+        }
+        
+        .validation-form {
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .license-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            min-width: 250px;
+        }
+        
+        .license-input:focus {
+            outline: none;
+            border-color: #74b9ff;
+            box-shadow: 0 0 0 3px rgba(116, 185, 255, 0.2);
+        }
+        
+        .validate-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+        
+        .validate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(116, 185, 255, 0.4);
+        }
+        
+        .validate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 15px;
+            display: none;
+        }
+        
+        .result.success {
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            color: white;
+        }
+        
+        .result.error {
+            background: linear-gradient(135deg, #e17055 0%, #d63031 100%);
+            color: white;
+        }
+        
+        .result-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .result-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .license-details {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            opacity: 0.9;
+        }
+        
+        .detail-value {
+            font-family: 'Courier New', monospace;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00b894;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .loading {
+            display: none;
+            margin: 20px 0;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #74b9ff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .features-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+        
+        .features-list li {
+            background: rgba(255, 255, 255, 0.2);
+            margin: 5px 0;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .license-input {
+                min-width: auto;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .logo {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="connection-status">
+        <span class="status-indicator"></span>
+        Povezan z Omni strežnikom
+    </div>
+    
+    <div class="container">
+        <div class="logo">🔐</div>
+        <h1>Omni License Validator</h1>
+        <p class="subtitle">Preverite veljavnost vaše Omni licence v realnem času</p>
+        
+        <form class="validation-form" id="validationForm">
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    class="license-input" 
+                    id="licenseKey" 
+                    placeholder="Vnesite licenčni ključ (npr. A1B2C3D4E5F6G7H8)"
+                    maxlength="32"
+                    required
+                >
+                <button type="submit" class="validate-btn" id="validateBtn">
+                    🔍 Preveri licenco
+                </button>
+            </div>
+        </form>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Preverjam licenco...</p>
+        </div>
+        
+        <div class="result" id="result">
+            <div class="result-icon" id="resultIcon"></div>
+            <div class="result-title" id="resultTitle"></div>
+            <div class="result-message" id="resultMessage"></div>
+            <div class="license-details" id="licenseDetails"></div>
+        </div>
+    </div>
+    
+    <script>
+        let eventSource;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeEventSource();
+            
+            // Format license key input
+            document.getElementById('licenseKey').addEventListener('input', function(e) {
+                let value = e.target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+                e.target.value = value;
+            });
+        });
+        
+        // Server-Sent Events for real-time updates
+        function initializeEventSource() {
+            eventSource = new EventSource('/events');
+            
+            // Global WebSocket connection (for production deployment)
+            let globalSocket = null;
+            
+            // Try to connect to global WebSocket server
+            function connectGlobalWebSocket() {
+                try {
+                    // Replace with your domain in production
+                    const globalServerUrl = window.location.protocol === 'https:' 
+                        ? 'wss://yourdomain.com:3000' 
+                        : 'ws://localhost:3100';
+                    
+                    globalSocket = new WebSocket(globalServerUrl);
+                    
+                    globalSocket.onopen = function() {
+                        console.log('🌐 Connected to Global Omni Server');
+                        updateConnectionStatus(true);
+                    };
+                    
+                    globalSocket.onmessage = function(event) {
+                        const data = JSON.parse(event.data);
+                        console.log('🌐 Global license update:', data);
+                        handleLicenseUpdate(data);
+                    };
+                    
+                    globalSocket.onclose = function() {
+                        console.log('🌐 Disconnected from Global Server');
+                        updateConnectionStatus(false);
+                        // Reconnect after 5 seconds
+                        setTimeout(connectGlobalWebSocket, 5000);
+                    };
+                    
+                    globalSocket.onerror = function(error) {
+                        console.log('🌐 Global WebSocket error, using local connection');
+                        updateConnectionStatus(true);
+                    };
+                    
+                } catch (error) {
+                    console.log('🌐 Global WebSocket not available, using local connection');
+                    updateConnectionStatus(true);
+                }
+            }
+            
+            // Connect to global WebSocket
+            connectGlobalWebSocket();
+            
+            eventSource.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                console.log('📡 Local update received:', data);
+                handleLicenseUpdate(data);
+            };
+            
+            eventSource.onerror = function(event) {
+                console.error('EventSource error:', event);
+                updateConnectionStatus(false);
+            };
+            
+            eventSource.onopen = function(event) {
+                updateConnectionStatus(true);
+            };
+        }
+        
+        // Handle license updates
+        function handleLicenseUpdate(data) {
+            const currentLicenseKey = document.getElementById('licenseKey').value;
+            
+            if (data.license && data.license.licenseKey === currentLicenseKey) {
+                // Re-validate current license if it was updated
+                if (data.action === 'updated' || data.action === 'revoked') {
+                    setTimeout(() => {
+                        validateLicense(currentLicenseKey);
+                    }, 1000);
+                }
+            }
+        }
+        
+        // Update connection status
+        function updateConnectionStatus(connected) {
+            const indicator = document.querySelector('.status-indicator');
+            const status = document.querySelector('.connection-status');
+            
+            if (connected) {
+                indicator.style.background = '#00b894';
+                status.innerHTML = '<span class="status-indicator"></span>Povezan z Omni strežnikom';
+            } else {
+                indicator.style.background = '#e17055';
+                status.innerHTML = '<span class="status-indicator"></span>Povezava prekinjena';
+            }
+        }
+        
+        // Form submission
+        document.getElementById('validationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const licenseKey = document.getElementById('licenseKey').value.trim();
+            
+            if (!licenseKey) {
+                showResult(false, 'Napaka', 'Prosimo, vnesite licenčni ključ');
+                return;
+            }
+            
+            if (licenseKey.length < 16) {
+                showResult(false, 'Napaka', 'Licenčni ključ mora imeti vsaj 16 znakov');
+                return;
+            }
+            
+            await validateLicense(licenseKey);
+        });
+        
+        // Validate license
+        async function validateLicense(licenseKey) {
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            const validateBtn = document.getElementById('validateBtn');
+            
+            // Show loading
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            validateBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/validate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ licenseKey })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.valid) {
+                    showResult(true, 'Licenca veljavna! ✅', 'Vaša licenca je aktivna in veljavna', data.license);
+                } else {
+                    showResult(false, 'Licenca neveljavna ❌', data.error || 'Licenca ni veljavna ali je potekla');
+                }
+            } catch (error) {
+                console.error('Validation error:', error);
+                showResult(false, 'Napaka pri preverjanju', 'Prišlo je do napake pri povezavi s strežnikom');
+            } finally {
+                loading.style.display = 'none';
+                validateBtn.disabled = false;
+            }
+        }
+        
+        // Show validation result
+        function showResult(success, title, message, licenseData = null) {
+            const result = document.getElementById('result');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultMessage = document.getElementById('resultMessage');
+            const licenseDetails = document.getElementById('licenseDetails');
+            
+            result.className = `result ${success ? 'success' : 'error'}`;
+            resultIcon.textContent = success ? '✅' : '❌';
+            resultTitle.textContent = title;
+            resultMessage.textContent = message;
+            
+            if (success && licenseData) {
+                const expiresAt = new Date(licenseData.expiresAt);
+                const daysUntilExpiry = Math.ceil((expiresAt - new Date()) / (1000 * 60 * 60 * 24));
+                
+                licenseDetails.innerHTML = `
+                    <div class="detail-row">
+                        <span class="detail-label">Stranka:</span>
+                        <span class="detail-value">${licenseData.clientName}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Produkt:</span>
+                        <span class="detail-value">${licenseData.product}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Paket:</span>
+                        <span class="detail-value">${licenseData.plan}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Poteče:</span>
+                        <span class="detail-value">${expiresAt.toLocaleDateString('sl-SI')} (${daysUntilExpiry} dni)</span>
+                    </div>
+                    ${licenseData.features && licenseData.features.length > 0 ? `
+                        <div style="margin-top: 15px;">
+                            <div class="detail-label">Funkcionalnosti:</div>
+                            <ul class="features-list">
+                                ${licenseData.features.map(feature => `<li>• ${feature}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                `;
+                licenseDetails.style.display = 'block';
+            } else {
+                licenseDetails.style.display = 'none';
+            }
+            
+            result.style.display = 'block';
+            
+            // Scroll to result
+            result.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (eventSource) {
+                eventSource.close();
+            }
+        });
+    </script>
+</body>
+</html>

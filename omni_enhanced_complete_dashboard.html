@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni-APP Enhanced Complete Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .dashboard-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .node {
+            border: 3px solid #2c3e50;
+            border-radius: 12px;
+            padding: 15px;
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            text-align: center;
+            width: 180px;
+            min-height: 80px;
+            position: absolute;
+            cursor: grab;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            user-select: none;
+            z-index: 10;
+            font-weight: bold;
+        }
+
+        .node:active {
+            cursor: grabbing;
+            transform: scale(1.05) rotate(2deg);
+        }
+
+        .node:hover {
+            background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        .status {
+            font-weight: bold;
+            margin-top: 8px;
+            display: block;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            background: #ff9800;
+            color: white;
+        }
+
+        #links {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .link {
+            stroke: #34495e;
+            stroke-width: 3px;
+            stroke-dasharray: 8,4;
+            animation: dash 2s linear infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: 24; }
+        }
+
+        .flow-dot {
+            r: 6;
+            opacity: 0.9;
+            animation: flow-move 3s ease-in-out;
+        }
+
+        .flow-dot.high-priority {
+            fill: #e74c3c;
+            r: 8;
+            filter: drop-shadow(0 0 8px #e74c3c);
+        }
+
+        .flow-dot.medium-priority {
+            fill: #f39c12;
+            r: 6;
+        }
+
+        .flow-dot.low-priority {
+            fill: #27ae60;
+            r: 4;
+        }
+
+        @keyframes flow-move {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        #info-box {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #34495e;
+            border-radius: 12px;
+            padding: 20px;
+            width: 300px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        #controls {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #34495e;
+            border-radius: 12px;
+            padding: 20px;
+            width: 320px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .control-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .control-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .control-section h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        #controls input, #controls button {
+            margin: 5px 0;
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        #controls input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        #controls button {
+            background: linear-gradient(145deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        #controls button:hover {
+            background: linear-gradient(145deg, #2980b9, #1f4e79);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .header-controls {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #34495e;
+            border-radius: 12px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            background: linear-gradient(145deg, #34495e, #2c3e50);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: linear-gradient(145deg, #2c3e50, #1a252f);
+            transform: translateY(-2px);
+        }
+
+        .stats-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #34495e;
+            border-radius: 12px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            min-width: 200px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .priority-stats {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #34495e;
+            border-radius: 12px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            min-width: 200px;
+        }
+
+        .priority-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            padding: 8px;
+            border-radius: 8px;
+        }
+
+        .priority-high { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
+        .priority-medium { background: rgba(243, 156, 18, 0.1); color: #f39c12; }
+        .priority-low { background: rgba(39, 174, 96, 0.1); color: #27ae60; }
+
+        .shortcuts {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.8em;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        @media (max-width: 768px) {
+            #controls, #info-box {
+                position: relative;
+                width: 90%;
+                margin: 10px auto;
+                max-height: none;
+            }
+            
+            .header-controls {
+                position: relative;
+                transform: none;
+                left: auto;
+                top: auto;
+                margin: 10px auto;
+                width: 90%;
+            }
+            
+            .node {
+                width: 140px;
+                min-height: 60px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <svg id="links" width="100%" height="100vh"></svg>
+        
+        <div id="dashboard">
+            <div class="node" id="global" style="top:50px; left:600px;">
+                🌐 Global Optimizer
+                <span class="status" id="status-global">⏳ Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-controls">
+        <button class="btn" onclick="autoLayoutEnhanced()">📐 Auto Layout</button>
+        <button class="btn" onclick="toggleAnimation()">🎬 Animacije</button>
+        <button class="btn" onclick="resetDashboard()">🔄 Reset</button>
+        <button class="btn" onclick="connectWebSocket()">🔌 WebSocket</button>
+        <button class="btn" onclick="testPriorityFlows()">🎯 Test Prioritete</button>
+    </div>
+
+    <div id="info-box">
+        <strong>🎯 OMNI-APP ENHANCED DASHBOARD</strong><br><br>
+        Kliknite na modul za podrobnosti.<br><br>
+        <strong>Funkcionalnosti:</strong><br>
+        • Smart Auto-Layout<br>
+        • Drag & Drop<br>
+        • Real-time WebSocket<br>
+        • Prioritetni tokovi<br>
+        • Hierarhični moduli
+    </div>
+
+    <div id="controls">
+        <div class="control-section">
+            <h3>➕ Dodaj modul</h3>
+            <input type="text" id="new-node-name" placeholder="Ime modula (npr. Tourism)"/>
+            <input type="text" id="new-node-icon" placeholder="Emoji (npr. 🏖️)"/>
+            <button id="add-node">Dodaj modul</button>
+        </div>
+
+        <div class="control-section">
+            <h3>🔗 Dodaj podmodul</h3>
+            <input type="text" id="parent-node-name" placeholder="Glavni modul"/>
+            <input type="text" id="sub-node-name" placeholder="Ime podmodula"/>
+            <input type="text" id="sub-node-icon" placeholder="Emoji"/>
+            <button id="add-subnode">Dodaj podmodul</button>
+        </div>
+
+        <div class="control-section">
+            <h3>🗑️ Odstrani</h3>
+            <input type="text" id="remove-node-name" placeholder="Ime modula/podmodula"/>
+            <button id="remove-node">Odstrani</button>
+        </div>
+    </div>
+
+    <div class="stats-panel">
+        <h3>📊 Statistike</h3>
+        <div class="stat-item">
+            <span>Moduli:</span>
+            <span id="module-count">1</span>
+        </div>
+        <div class="stat-item">
+            <span>Podmoduli:</span>
+            <span id="submodule-count">0</span>
+        </div>
+        <div class="stat-item">
+            <span>Aktivni tokovi:</span>
+            <span id="active-flows">0</span>
+        </div>
+        <div class="stat-item">
+            <span>WebSocket:</span>
+            <span id="websocket-status">🔴 Offline</span>
+        </div>
+    </div>
+
+    <div class="priority-stats">
+        <h3>🎯 Prioritetne statistike</h3>
+        <div class="priority-item priority-high">
+            <span>🔴 Visoka prioriteta:</span>
+            <span id="high-priority-count">0</span>
+        </div>
+        <div class="priority-item priority-medium">
+            <span>🟠 Srednja prioriteta:</span>
+            <span id="medium-priority-count">0</span>
+        </div>
+        <div class="priority-item priority-low">
+            <span>🟢 Nizka prioriteta:</span>
+            <span id="low-priority-count">0</span>
+        </div>
+    </div>
+
+    <div class="shortcuts">
+        <strong>Tipkovne bližnjice:</strong><br>
+        A - Dodaj modul | S - Dodaj submodul | L - Auto layout | R - Reset | T - Test prioritete
+    </div>
+
+    <script>
+        // Vaša originalna koda z izboljšavami
+        const linksSVG = document.getElementById("links");
+        const dashboard = document.getElementById("dashboard");
+        const infoBox = document.getElementById("info-box");
+
+        let nodes = [{id: "global", icon: "🌐", top: 50, left: 600, parent: null}];
+        let lines = [];
+        let nodeStatuses = {global: "⏳ Loading..."};
+        let animationEnabled = true;
+        let websocket = null;
+        let flowCounter = 0;
+
+        // Vaša originalna funkcija createNode z izboljšavami
+        function createNode(id, icon, top = null, left = null, parent = null) {
+            const div = document.createElement("div");
+            div.className = "node";
+            div.id = id;
+            div.style.top = (top || 200) + "px";
+            div.style.left = (left || 100) + "px";
+            div.innerHTML = `${icon} ${id}<span class="status" id="status-${id}">⏳ Loading...</span>`;
+            dashboard.appendChild(div);
+            nodes.push({id, icon, top, left, parent});
+            nodeStatuses[id] = "⏳ Loading...";
+            attachNodeClick(div);
+            makeDraggable(div);
+            
+            // Simuliraj aktivacijo po kratkem času
+            setTimeout(() => {
+                updateNodeStatus(id, 'active');
+            }, Math.random() * 2000 + 1000);
+            
+            updateStats();
+            autoLayout();
+        }
+
+        // Vaša originalna funkcija removeNode z izboljšavami
+        function removeNode(id) {
+            if (id === "global") return alert("Global Optimizer ne more biti odstranjen!");
+            const div = document.getElementById(id);
+            if (div) dashboard.removeChild(div);
+            nodes.filter(n => n.id === id || n.parent === id).forEach(n => {
+                const d = document.getElementById(n.id);
+                if (d) dashboard.removeChild(d);
+                nodeStatuses[n.id] = undefined;
+            });
+            nodes = nodes.filter(n => n.id !== id && n.parent !== id);
+            updateStats();
+            autoLayout();
+        }
+
+        // Vaša originalna funkcija updateConnections z SVG namespace popravkom
+        function updateConnections() {
+            lines.forEach(l => linksSVG.removeChild(l.line));
+            lines = [];
+            nodes.filter(n => n.id !== "global").forEach(n => {
+                const parentId = n.parent || "global";
+                const source = document.getElementById(parentId);
+                const target = document.getElementById(n.id);
+                if (!source || !target) return;
+                
+                const x1 = source.offsetLeft + source.offsetWidth / 2;
+                const y1 = source.offsetTop + source.offsetHeight / 2;
+                const x2 = target.offsetLeft + target.offsetWidth / 2;
+                const y2 = target.offsetTop + target.offsetHeight / 2;
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", x1);
+                line.setAttribute("y1", y1);
+                line.setAttribute("x2", x2);
+                line.setAttribute("y2", y2);
+                line.setAttribute("class", "link");
+                linksSVG.appendChild(line);
+                lines.push({line: line, target: n.id});
+            });
+        }
+
+        // Vaša originalna funkcija attachNodeClick z izboljšavami
+        function attachNodeClick(div) {
+            div.onclick = () => {
+                const id = div.id;
+                const status = nodeStatuses[id] || "⏳ Loading...";
+                const node = nodes.find(n => n.id === id);
+                const connections_from = nodes.filter(n => n.parent === id).length;
+                const connections_to = id === 'global' ? 0 : 1;
+                
+                infoBox.innerHTML = `
+                    <strong>${node.icon} ${id.toUpperCase()}</strong><br><br>
+                    <strong>Status:</strong> ${status}<br>
+                    <strong>Tip:</strong> ${node.parent ? 'Podmodul' : 'Glavni modul'}<br>
+                    ${node.parent ? `<strong>Nadrejeni:</strong> ${node.parent}<br>` : ''}
+                    <strong>Pozicija:</strong> ${Math.round(node.left || 0)}, ${Math.round(node.top || 0)}<br>
+                    <strong>Podmoduli:</strong> ${connections_from}<br>
+                    <strong>Vhodni tokovi:</strong> ${connections_to}<br>
+                    <strong>Opis:</strong> Funkcije modula ${id}
+                `;
+            }
+        }
+
+        // Vaša originalna funkcija makeDraggable
+        function makeDraggable(el) {
+            let offsetX, offsetY;
+            el.onmousedown = (e) => {
+                offsetX = e.clientX - el.offsetLeft;
+                offsetY = e.clientY - el.offsetTop;
+                el.style.zIndex = '1000';
+                
+                function moveHandler(e) {
+                    const newLeft = e.clientX - offsetX;
+                    const newTop = e.clientY - offsetY;
+                    el.style.left = newLeft + "px";
+                    el.style.top = newTop + "px";
+                    
+                    // Posodobi podatke v nodes array
+                    const node = nodes.find(n => n.id === el.id);
+                    if (node) {
+                        node.left = newLeft;
+                        node.top = newTop;
+                    }
+                    
+                    updateConnections();
+                }
+                
+                function upHandler() {
+                    el.style.zIndex = '10';
+                    document.removeEventListener("mousemove", moveHandler);
+                    document.removeEventListener("mouseup", upHandler);
+                }
+                
+                document.addEventListener("mousemove", moveHandler);
+                document.addEventListener("mouseup", upHandler);
+            }
+        }
+
+        // Vaša originalna funkcija autoLayout z izboljšavami
+        function autoLayout() {
+            const global = document.getElementById("global");
+            const marginX = 50, marginY = 150;
+            const topGlobal = 50, leftGlobal = 600;
+            global.style.top = topGlobal + "px";
+            global.style.left = leftGlobal + "px";
+
+            const mainModules = nodes.filter(n => n.parent === null && n.id !== "global");
+            const spacingX = 200;
+            const startX = leftGlobal - ((mainModules.length - 1) / 2) * spacingX;
+
+            mainModules.forEach((mod, i) => {
+                mod.top = topGlobal + marginY;
+                mod.left = startX + i * spacingX;
+                const el = document.getElementById(mod.id);
+                if (el) {
+                    el.style.top = mod.top + "px";
+                    el.style.left = mod.left + "px";
+                }
+
+                const subs = nodes.filter(n => n.parent === mod.id);
+                const subSpacingX = 120;
+                const startSubX = mod.left - ((subs.length - 1) / 2) * subSpacingX;
+                subs.forEach((sub, j) => {
+                    sub.top = mod.top + marginY;
+                    sub.left = startSubX + j * subSpacingX;
+                    const subEl = document.getElementById(sub.id);
+                    if (subEl) {
+                        subEl.style.top = sub.top + "px";
+                        subEl.style.left = sub.left + "px";
+                    }
+                });
+            });
+            updateConnections();
+        }
+
+        // Dodatne funkcije za izboljšave
+
+        // Posodobi status modula
+        function updateNodeStatus(nodeId, status) {
+            const statusElement = document.getElementById(`status-${nodeId}`);
+            if (!statusElement) return;
+            
+            nodeStatuses[nodeId] = getStatusText(status);
+            statusElement.className = `status ${status}`;
+            statusElement.textContent = nodeStatuses[nodeId];
+        }
+
+        function getStatusText(status) {
+            switch(status) {
+                case 'active': return '✅ Aktiven';
+                case 'loading': return '⏳ Nalaganje...';
+                case 'error': return '❌ Napaka';
+                case 'idle': return '💤 Neaktiven';
+                default: return '⏳ Loading...';
+            }
+        }
+
+        // WebSocket funkcionalnost
+        function connectWebSocket() {
+            try {
+                websocket = new WebSocket('ws://localhost:8080');
+                
+                websocket.onopen = function() {
+                    console.log('✅ WebSocket povezan');
+                    document.getElementById('websocket-status').innerHTML = '🟢 Online';
+                    updateNodeStatus('global', 'active');
+                };
+                
+                websocket.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    handleWebSocketMessage(data);
+                };
+                
+                websocket.onclose = function() {
+                    console.log('❌ WebSocket prekinjen');
+                    document.getElementById('websocket-status').innerHTML = '🔴 Offline';
+                    setTimeout(connectWebSocket, 5000);
+                };
+                
+                websocket.onerror = function(error) {
+                    console.error('WebSocket napaka:', error);
+                    document.getElementById('websocket-status').innerHTML = '🟡 Napaka';
+                };
+            } catch (error) {
+                console.log('WebSocket ni na voljo, uporabljam simulacijo');
+                simulateWebSocketData();
+            }
+        }
+
+        // Simulacija WebSocket podatkov
+        function simulateWebSocketData() {
+            setInterval(() => {
+                if (nodes.length > 1 && animationEnabled) {
+                    const randomPriority = Math.floor(Math.random() * 3) + 1;
+                    const randomSpeed = Math.floor(Math.random() * 5) + 1;
+                    
+                    const flowData = {
+                        from: "global",
+                        to: nodes[Math.floor(Math.random() * (nodes.length - 1)) + 1].id,
+                        priority: randomPriority,
+                        speed: randomSpeed,
+                        active: true
+                    };
+                    
+                    animateFlowPriority(flowData);
+                }
+            }, 1500);
+        }
+
+        // Obravnava WebSocket sporočil
+        function handleWebSocketMessage(data) {
+            if (data.type === 'flow') {
+                animateFlowPriority(data);
+            } else if (data.type === 'status') {
+                updateNodeStatus(data.nodeId, data.status);
+            }
+        }
+
+        // Animacija prioritetnih tokov
+        function animateFlowPriority(flowData) {
+            if (!animationEnabled) return;
+            
+            const fromNode = nodes.find(n => n.id === flowData.from);
+            const toNode = nodes.find(n => n.id === flowData.to);
+            
+            if (!fromNode || !toNode) return;
+            
+            // Določi barvo in velikost glede na prioriteto
+            let color, size, glowEffect;
+            switch(flowData.priority) {
+                case 3: // Visoka prioriteta
+                    color = '#e74c3c';
+                    size = 8;
+                    glowEffect = 'drop-shadow(0 0 8px #e74c3c)';
+                    updatePriorityStats('high');
+                    break;
+                case 2: // Srednja prioriteta
+                    color = '#f39c12';
+                    size = 6;
+                    glowEffect = 'none';
+                    updatePriorityStats('medium');
+                    break;
+                case 1: // Nizka prioriteta
+                default:
+                    color = '#27ae60';
+                    size = 4;
+                    glowEffect = 'none';
+                    updatePriorityStats('low');
+                    break;
+            }
+            
+            // Določi hitrost animacije (1-5, kjer 5 je najhitrejše)
+            const animationDuration = Math.max(1, 6 - flowData.speed) * 1000;
+            
+            const svg = document.getElementById('links');
+            const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            
+            dot.setAttribute('r', size);
+            dot.setAttribute('fill', color);
+            dot.style.filter = glowEffect;
+            
+            const fromElement = document.getElementById(fromNode.id);
+            const toElement = document.getElementById(toNode.id);
+            
+            if (!fromElement || !toElement) return;
+            
+            const startX = fromElement.offsetLeft + fromElement.offsetWidth / 2;
+            const startY = fromElement.offsetTop + fromElement.offsetHeight / 2;
+            const endX = toElement.offsetLeft + toElement.offsetWidth / 2;
+            const endY = toElement.offsetTop + toElement.offsetHeight / 2;
+            
+            dot.setAttribute('cx', startX);
+            dot.setAttribute('cy', startY);
+            
+            svg.appendChild(dot);
+            
+            // Animacija premikanja
+            const startTime = Date.now();
+            const animate = () => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / animationDuration, 1);
+                
+                // Easing funkcija za gladko animacijo
+                const easeProgress = 1 - Math.pow(1 - progress, 3);
+                
+                const x = startX + (endX - startX) * easeProgress;
+                const y = startY + (endY - startY) * easeProgress;
+                
+                dot.setAttribute('cx', x);
+                dot.setAttribute('cy', y);
+                
+                // Fade out efekt na koncu
+                if (progress > 0.8) {
+                    dot.style.opacity = (1 - progress) * 5;
+                }
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    svg.removeChild(dot);
+                    updateFlowStats();
+                }
+            };
+            
+            requestAnimationFrame(animate);
+        }
+
+        // Posodobi statistike prioritet
+        function updatePriorityStats(priority) {
+            const countElement = document.getElementById(`${priority}-priority-count`);
+            const currentCount = parseInt(countElement.textContent) || 0;
+            countElement.textContent = currentCount + 1;
+        }
+
+        // Posodobi statistike tokov
+        function updateFlowStats() {
+            flowCounter++;
+            document.getElementById('active-flows').textContent = flowCounter;
+        }
+
+        // Posodobi statistike
+        function updateStats() {
+            const mainModules = nodes.filter(n => n.parent === null).length;
+            const subModules = nodes.filter(n => n.parent !== null).length;
+            
+            document.getElementById('module-count').textContent = mainModules;
+            document.getElementById('submodule-count').textContent = subModules;
+        }
+
+        // Test funkcija za demonstracijo prioritetnih tokov
+        function testPriorityFlows() {
+            if (nodes.length < 2) {
+                alert("Dodajte več modulov za testiranje prioritetnih tokov!");
+                return;
+            }
+            
+            console.log("🎯 Testiram prioritetne tokove...");
+            
+            // Resetiraj statistike
+            document.getElementById("high-priority-count").textContent = "0";
+            document.getElementById("medium-priority-count").textContent = "0";
+            document.getElementById("low-priority-count").textContent = "0";
+            
+            // Generiraj test tokove z različnimi prioritetami in hitrostmi
+            const testFlows = [
+                // Visoka prioriteta - hitri rdeči tokovi
+                {from: "global", to: nodes.find(n => n.id !== "global")?.id, priority: 3, speed: 5, active: true},
+                {from: "global", to: nodes.find(n => n.id !== "global")?.id, priority: 3, speed: 4, active: true},
+                
+                // Srednja prioriteta - srednji oranžni tokovi
+                {from: "global", to: nodes.find(n => n.id !== "global")?.id, priority: 2, speed: 3, active: true},
+                {from: "global", to: nodes.find(n => n.id !== "global")?.id, priority: 2, speed: 2, active: true},
+                
+                // Nizka prioriteta - počasni zeleni tokovi
+                {from: "global", to: nodes.find(n => n.id !== "global")?.id, priority: 1, speed: 1, active: true},
+                {from: "global", to: nodes.find(n => n.id !== "global")?.id, priority: 1, speed: 2, active: true}
+            ];
+            
+            // Zaženi test tokove z zamikom
+            testFlows.forEach((flow, index) => {
+                if (flow.to) {
+                    setTimeout(() => {
+                        animateFlowPriority(flow);
+                    }, index * 500);
+                }
+            });
+            
+            // Prikaži obvestilo
+            infoBox.innerHTML = `
+                <strong>🎯 PRIORITETNI TOKOVI TEST</strong><br><br>
+                <span style="color: red;">🔴 Rdeči dot-i</span> = Visoka prioriteta (hitro)<br>
+                <span style="color: orange;">🟠 Oranžni dot-i</span> = Srednja prioriteta<br>
+                <span style="color: green;">🟢 Zeleni dot-i</span> = Nizka prioriteta (počasi)<br><br>
+                Opazujte različne hitrosti in velikosti dot-ov!<br>
+                Statistike se posodabljajo v realnem času.
+            `;
+        }
+
+        // Preklopi animacije
+        function toggleAnimation() {
+            animationEnabled = !animationEnabled;
+            console.log(`🎬 Animacije: ${animationEnabled ? 'vključene' : 'izključene'}`);
+        }
+
+        // Resetiraj dashboard
+        function resetDashboard() {
+            // Ohrani samo global modul
+            nodes = [{id: "global", icon: "🌐", top: 50, left: 600, parent: null}];
+            lines = [];
+            nodeStatuses = {global: "⏳ Loading..."};
+            flowCounter = 0;
+            
+            // Odstrani vse module razen global
+            const allNodes = dashboard.querySelectorAll('.node');
+            allNodes.forEach(node => {
+                if (node.id !== 'global') {
+                    node.remove();
+                }
+            });
+            
+            // Počisti povezave
+            updateConnections();
+            updateStats();
+            
+            // Resetiraj statistike prioritet
+            document.getElementById("high-priority-count").textContent = "0";
+            document.getElementById("medium-priority-count").textContent = "0";
+            document.getElementById("low-priority-count").textContent = "0";
+            document.getElementById("active-flows").textContent = "0";
+            
+            console.log('🔄 Dashboard resetiran');
+        }
+
+        // Enhanced auto layout
+        function autoLayoutEnhanced() {
+            autoLayout();
+            console.log('✅ Enhanced auto layout izvršen');
+        }
+
+        // Vaši originalni event listener-ji z izboljšavami
+        document.getElementById("add-node").onclick = () => {
+            const name = document.getElementById("new-node-name").value.trim();
+            const icon = document.getElementById("new-node-icon").value.trim() || "📦";
+            if (name && !nodes.find(n => n.id === name)) {
+                createNode(name, icon);
+                // Počisti input polja
+                document.getElementById("new-node-name").value = '';
+                document.getElementById("new-node-icon").value = '';
+            } else if (!name) {
+                alert('Vnesite ime modula!');
+            } else {
+                alert('Modul s tem imenom že obstaja!');
+            }
+        };
+
+        document.getElementById("add-subnode").onclick = () => {
+            const parent = document.getElementById("parent-node-name").value.trim();
+            const name = document.getElementById("sub-node-name").value.trim();
+            const icon = document.getElementById("sub-node-icon").value.trim() || "📦";
+            if (name && parent && nodes.find(n => n.id === parent) && !nodes.find(n => n.id === name)) {
+                createNode(name, icon, null, null, parent);
+                // Počisti input polja
+                document.getElementById("parent-node-name").value = '';
+                document.getElementById("sub-node-name").value = '';
+                document.getElementById("sub-node-icon").value = '';
+            } else if (!name || !parent) {
+                alert('Vnesite ime glavnega modula in podmodula!');
+            } else if (!nodes.find(n => n.id === parent)) {
+                alert('Glavni modul ne obstaja!');
+            } else {
+                alert('Podmodul s tem imenom že obstaja!');
+            }
+        };
+
+        document.getElementById("remove-node").onclick = () => {
+            const name = document.getElementById("remove-node-name").value.trim();
+            if (name) {
+                removeNode(name);
+                document.getElementById("remove-node-name").value = '';
+            } else {
+                alert('Vnesite ime modula za odstranitev!');
+            }
+        };
+
+        // Tipkovne bližnjice
+        document.addEventListener("keydown", (e) => {
+            if (e.target.tagName === "INPUT") return;
+            
+            switch(e.key.toLowerCase()) {
+                case 'a': 
+                    document.getElementById("new-node-name").focus();
+                    break;
+                case 's': 
+                    document.getElementById("parent-node-name").focus();
+                    break;
+                case 'l': 
+                    autoLayoutEnhanced(); 
+                    break;
+                case 'r': 
+                    resetDashboard(); 
+                    break;
+                case 't':
+                    testPriorityFlows();
+                    break;
+            }
+        });
+
+        // Inicializacija ob nalaganju strani
+        window.addEventListener('load', () => {
+            console.log('🚀 Omni-APP Enhanced Dashboard inicializiran');
+            
+            // Inicializiraj global modul
+            attachNodeClick(document.getElementById("global"));
+            makeDraggable(document.getElementById("global"));
+            updateStats();
+            
+            // Poskusi povezavo z WebSocket
+            connectWebSocket();
+            
+            // Avtomatski layout po kratkem času
+            setTimeout(() => {
+                updateNodeStatus('global', 'active');
+                autoLayout();
+            }, 1000);
+        });
+
+        // Responzivnost
+        window.addEventListener('resize', () => {
+            setTimeout(autoLayout, 500);
+        });
+    </script>
+</body>
+</html>

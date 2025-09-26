@@ -1,0 +1,10 @@
+# Dockerfile-admin
+FROM node:20
+
+WORKDIR /app
+COPY admin/package*.json ./
+RUN npm install
+COPY admin/ ./
+
+EXPOSE 4000
+CMD ["node", "main.js"]

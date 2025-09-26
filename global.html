@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Globalna Dostopnost - Omnia App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-top: 100px; /* Account for fixed nav */
+        }
+
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            color: white;
+            padding: 60px 0;
+        }
+
+        .header h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .header p {
+            font-size: 1.4rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .global-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .global-card {
+            background: white;
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.1);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .global-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 35px 90px rgba(0,0,0,0.15);
+        }
+
+        .global-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+        }
+
+        .card-icon {
+            font-size: 4rem;
+            margin-bottom: 25px;
+            display: block;
+            text-align: center;
+        }
+
+        .card-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+
+        .card-description {
+            color: #666;
+            line-height: 1.7;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .features-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .features-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1rem;
+        }
+
+        .features-list li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-icon {
+            font-size: 1.5rem;
+            width: 30px;
+            text-align: center;
+        }
+
+        .languages-showcase {
+            background: white;
+            border-radius: 25px;
+            padding: 50px;
+            margin: 40px 0;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.1);
+        }
+
+        .languages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .language-item {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .language-item:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .language-flag {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .language-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .language-native {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .devices-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .device-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .device-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.15);
+        }
+
+        .device-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            display: block;
+            color: #667eea;
+        }
+
+        .device-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .device-features {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+        }
+
+        .device-features li {
+            padding: 8px 0;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .accessibility-section {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-radius: 25px;
+            padding: 50px;
+            margin: 40px 0;
+        }
+
+        .accessibility-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .accessibility-item {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .accessibility-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        }
+
+        .demo-section {
+            background: white;
+            border-radius: 25px;
+            padding: 50px;
+            margin: 40px 0;
+            text-align: center;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.1);
+        }
+
+        .demo-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #e9ecef;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 25px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.15);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .global-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .languages-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .demo-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">🌟 Omnia AI</a>
+            <div class="nav-links">
+                <a href="/">Domov</a>
+                <a href="/multimodal">Multi-Modal</a>
+                <a href="/personalization">Personalizacija</a>
+                <a href="/global">Globalno</a>
+                <a href="/versatility">Vsestranskost</a>
+                <a href="/simplicity">Enostavnost</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🌍 Globalna Dostopnost</h1>
+            <p>Omnia App je zasnovan za uporabnike po vsem svetu - vsi jeziki, vse kulture, vse naprave</p>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-number">50+</div>
+                <div class="stat-label">Podprtih jezikov</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">195</div>
+                <div class="stat-label">Držav</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Dostopnost</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Podpora</div>
+            </div>
+        </div>
+
+        <!-- Main Features -->
+        <div class="global-grid">
+            <!-- Languages Support -->
+            <div class="global-card">
+                <div class="card-icon">🗣️</div>
+                <h2 class="card-title">Večjezična Podpora</h2>
+                <p class="card-description">
+                    Komunicirajte z AI v svojem maternem jeziku z naravnim razumevanjem kulturnih kontekstov
+                </p>
+                <ul class="features-list">
+                    <li><span class="feature-icon">🌐</span> 50+ jezikov z nativno podporo</li>
+                    <li><span class="feature-icon">🔄</span> Avtomatsko prevajanje v realnem času</li>
+                    <li><span class="feature-icon">🎯</span> Kulturno občutljiva komunikacija</li>
+                    <li><span class="feature-icon">📝</span> Lokalizirani formati in konvencije</li>
+                    <li><span class="feature-icon">🗣️</span> Glasovna podpora v vseh jezikih</li>
+                </ul>
+            </div>
+
+            <!-- Cultural Adaptation -->
+            <div class="global-card">
+                <div class="card-icon">🏛️</div>
+                <h2 class="card-title">Kulturna Prilagoditev</h2>
+                <p class="card-description">
+                    AI razume kulturne razlike in se prilagaja lokalnim običajem ter poslovnim praksam
+                </p>
+                <ul class="features-list">
+                    <li><span class="feature-icon">📅</span> Lokalni formati datumov in časa</li>
+                    <li><span class="feature-icon">💰</span> Regionalne valute in številski formati</li>
+                    <li><span class="feature-icon">🎭</span> Kulturno primerna komunikacija</li>
+                    <li><span class="feature-icon">📊</span> Lokalne poslovne prakse</li>
+                    <li><span class="feature-icon">🎨</span> Regionalne preference oblikovanja</li>
+                </ul>
+            </div>
+
+            <!-- Device Compatibility -->
+            <div class="global-card">
+                <div class="card-icon">📱</div>
+                <h2 class="card-title">Univerzalna Kompatibilnost</h2>
+                <p class="card-description">
+                    Deluje na vseh napravah in platformah za popolno fleksibilnost uporabe
+                </p>
+                <ul class="features-list">
+                    <li><span class="feature-icon">💻</span> Desktop (Windows, macOS, Linux)</li>
+                    <li><span class="feature-icon">📱</span> Mobilne naprave (iOS, Android)</li>
+                    <li><span class="feature-icon">📟</span> Tablice in hibridne naprave</li>
+                    <li><span class="feature-icon">⌚</span> Pametne ure in IoT naprave</li>
+                    <li><span class="feature-icon">🌐</span> Web brskalnike in PWA</li>
+                </ul>
+            </div>
+
+            <!-- Accessibility -->
+            <div class="global-card">
+                <div class="card-icon">♿</div>
+                <h2 class="card-title">Dostopnost za Vse</h2>
+                <p class="card-description">
+                    Popolna podpora za uporabnike s posebnimi potrebami in različnimi sposobnostmi
+                </p>
+                <ul class="features-list">
+                    <li><span class="feature-icon">👁️</span> Podpora za slepe in slabovidne</li>
+                    <li><span class="feature-icon">🔊</span> Glasovno vodenje in navigacija</li>
+                    <li><span class="feature-icon">⌨️</span> Tipkovnične bližnjice</li>
+                    <li><span class="feature-icon">🎨</span> Visokokontrastni načini</li>
+                    <li><span class="feature-icon">🔍</span> Prilagodljive velikosti pisav</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Languages Showcase -->
+        <div class="languages-showcase">
+            <h2 style="text-align: center; margin-bottom: 30px; font-size: 2.5rem; color: #333;">Podprti Jeziki</h2>
+            <div class="languages-grid">
+                <div class="language-item" onclick="switchLanguage('sl')">
+                    <div class="language-flag">🇸🇮</div>
+                    <div class="language-name">Slovenščina</div>
+                    <div class="language-native">Slovenščina</div>
+                </div>
+                <div class="language-item" onclick="switchLanguage('en')">
+                    <div class="language-flag">🇺🇸</div>
+                    <div class="language-name">Angleščina</div>
+                    <div class="language-native">English</div>
+                </div>
+                <div class="language-item" onclick="switchLanguage('de')">
+                    <div class="language-flag">🇩🇪</div>
+                    <div class="language-name">Nemščina</div>
+                    <div class="language-native">Deutsch</div>
+                </div>
+                <div class="language-item" onclick="switchLanguage('it')">
+                    <div class="language-flag">🇮🇹</div>
+                    <div class="language-name">Italijanščina</div>
+                    <div class="language-native">Italiano</div>
+                </div>
+                <div class="language-item" onclick="switchLanguage('fr')">
+                    <div class="language-flag">🇫🇷</div>
+                    <div class="language-name">Francoščina</div>
+                    <div class="language-native">Français</div>
+                </div>
+                <div class="language-item" onclick="switchLanguage('es')">
+                    <div class="language-flag">🇪🇸</div>
+                    <div class="language-name">Španščina</div>
+                    <div class="language-native">Español</div>
+                </div>
+                <div class="language-item" onclick="switchLanguage('zh')">
+                    <div class="language-flag">🇨🇳</div>
+                    <div class="language-name">Kitajščina</div>
+                    <div class="language-native">中文</div>
+                </div>
+                <div class="language-item" onclick="switchLanguage('ja')">
+                    <div class="language-flag">🇯🇵</div>
+                    <div class="language-name">Japonščina</div>
+                    <div class="language-native">日本語</div>
+                </div>
+                <div class="language-item" onclick="switchLanguage('ko')">
+                    <div class="language-flag">🇰🇷</div>
+                    <div class="language-name">Korejščina</div>
+                    <div class="language-native">한국어</div>
+                </div>
+                <div class="language-item" onclick="switchLanguage('ar')">
+                    <div class="language-flag">🇸🇦</div>
+                    <div class="language-name">Arabščina</div>
+                    <div class="language-native">العربية</div>
+                </div>
+                <div class="language-item" onclick="switchLanguage('ru')">
+                    <div class="language-flag">🇷🇺</div>
+                    <div class="language-name">Ruščina</div>
+                    <div class="language-native">Русский</div>
+                </div>
+                <div class="language-item" onclick="switchLanguage('hi')">
+                    <div class="language-flag">🇮🇳</div>
+                    <div class="language-name">Hindijščina</div>
+                    <div class="language-native">हिन्दी</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Devices Showcase -->
+        <div class="devices-showcase">
+            <div class="device-card">
+                <div class="device-icon">💻</div>
+                <h3 class="device-title">Desktop</h3>
+                <ul class="device-features">
+                    <li>✅ Windows 10/11</li>
+                    <li>✅ macOS Monterey+</li>
+                    <li>✅ Ubuntu/Linux</li>
+                    <li>✅ Polne funkcionalnosti</li>
+                </ul>
+            </div>
+            <div class="device-card">
+                <div class="device-icon">📱</div>
+                <h3 class="device-title">Mobilne naprave</h3>
+                <ul class="device-features">
+                    <li>✅ iOS 14+</li>
+                    <li>✅ Android 8+</li>
+                    <li>✅ Odzivni dizajn</li>
+                    <li>✅ Offline podpora</li>
+                </ul>
+            </div>
+            <div class="device-card">
+                <div class="device-icon">📟</div>
+                <h3 class="device-title">Tablice</h3>
+                <ul class="device-features">
+                    <li>✅ iPad Pro/Air</li>
+                    <li>✅ Android tablice</li>
+                    <li>✅ Surface Pro</li>
+                    <li>✅ Hibridni način</li>
+                </ul>
+            </div>
+            <div class="device-card">
+                <div class="device-icon">⌚</div>
+                <h3 class="device-title">Pametne naprave</h3>
+                <ul class="device-features">
+                    <li>✅ Apple Watch</li>
+                    <li>✅ Wear OS</li>
+                    <li>✅ IoT naprave</li>
+                    <li>✅ Glasovni asistenti</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Accessibility Section -->
+        <div class="accessibility-section">
+            <h2 style="text-align: center; margin-bottom: 30px; font-size: 2.5rem; color: #333;">Dostopnost za Vse</h2>
+            <div class="accessibility-grid">
+                <div class="accessibility-item">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">👁️ Vizualna dostopnost</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>• Podpora za bralce zaslona</li>
+                        <li>• Visokokontrastni načini</li>
+                        <li>• Prilagodljive velikosti pisav</li>
+                        <li>• Barvno slepi uporabniki</li>
+                    </ul>
+                </div>
+                <div class="accessibility-item">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">🔊 Slušna dostopnost</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>• Vizualni indikatorji zvoka</li>
+                        <li>• Podnapisi za video</li>
+                        <li>• Glasovno vodenje</li>
+                        <li>• Vibracije za opozorila</li>
+                    </ul>
+                </div>
+                <div class="accessibility-item">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">⌨️ Motorična dostopnost</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>• Tipkovnične bližnjice</li>
+                        <li>• Glasovno upravljanje</li>
+                        <li>• Prilagodljivi gesti</li>
+                        <li>• Alternativni vnos</li>
+                    </ul>
+                </div>
+                <div class="accessibility-item">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">🧠 Kognitivna dostopnost</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>• Enostaven vmesnik</li>
+                        <li>• Jasne navodila</li>
+                        <li>• Prilagodljiva hitrost</li>
+                        <li>• Kontekstualna pomoč</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Demo Section -->
+        <div class="demo-section">
+            <h2 style="margin-bottom: 20px; font-size: 2.5rem; color: #333;">Preizkusite Globalne Funkcionalnosti</h2>
+            <p style="color: #666; font-size: 1.2rem; margin-bottom: 30px;">
+                Odkrijte kako Omnia App deluje v različnih jezikih in na različnih napravah
+            </p>
+            <div class="demo-buttons">
+                <button class="btn btn-primary" onclick="testLanguageSwitch()">
+                    🌐 Preizkusi jezike
+                </button>
+                <button class="btn btn-primary" onclick="testAccessibility()">
+                    ♿ Preizkusi dostopnost
+                </button>
+                <button class="btn btn-primary" onclick="testDevices()">
+                    📱 Preizkusi naprave
+                </button>
+                <button class="btn btn-secondary" onclick="viewDocumentation()">
+                    📚 Dokumentacija
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchLanguage(lang) {
+            const messages = {
+                'sl': 'Jezik spremenjen na slovenščino! 🇸🇮',
+                'en': 'Language changed to English! 🇺🇸',
+                'de': 'Sprache auf Deutsch geändert! 🇩🇪',
+                'it': 'Lingua cambiata in italiano! 🇮🇹',
+                'fr': 'Langue changée en français! 🇫🇷',
+                'es': '¡Idioma cambiado a español! 🇪🇸',
+                'zh': '语言已更改为中文！🇨🇳',
+                'ja': '言語が日本語に変更されました！🇯🇵',
+                'ko': '언어가 한국어로 변경되었습니다! 🇰🇷',
+                'ar': 'تم تغيير اللغة إلى العربية! 🇸🇦',
+                'ru': 'Язык изменен на русский! 🇷🇺',
+                'hi': 'भाषा हिन्दी में बदल दी गई! 🇮🇳'
+            };
+            
+            showNotification(messages[lang] || 'Language switched!');
+            
+            // Simulate language change effect
+            document.body.style.transition = 'all 0.5s ease';
+            document.body.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                document.body.style.transform = 'scale(1)';
+            }, 200);
+        }
+
+        function testLanguageSwitch() {
+            showNotification('🌐 Testiranje večjezične podpore...');
+            
+            const languages = ['sl', 'en', 'de', 'fr', 'es'];
+            let index = 0;
+            
+            const interval = setInterval(() => {
+                switchLanguage(languages[index]);
+                index++;
+                
+                if (index >= languages.length) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        showNotification('✅ Test večjezične podpore končan!');
+                    }, 1000);
+                }
+            }, 1500);
+        }
+
+        function testAccessibility() {
+            showNotification('♿ Testiranje dostopnosti...');
+            
+            // Simulate accessibility features
+            const features = [
+                'Visokokontrastni način aktiviran',
+                'Povečana pisava nastavljena',
+                'Glasovno vodenje omogočeno',
+                'Tipkovnične bližnjice aktivne'
+            ];
+            
+            features.forEach((feature, index) => {
+                setTimeout(() => {
+                    showNotification(`✅ ${feature}`);
+                }, (index + 1) * 1000);
+            });
+        }
+
+        function testDevices() {
+            showNotification('📱 Testiranje kompatibilnosti naprav...');
+            
+            const devices = [
+                '💻 Desktop optimizacija',
+                '📱 Mobilna prilagoditev',
+                '📟 Tablična podpora',
+                '⌚ Pametne naprave'
+            ];
+            
+            devices.forEach((device, index) => {
+                setTimeout(() => {
+                    showNotification(`✅ ${device} preverjena`);
+                }, (index + 1) * 800);
+            });
+        }
+
+        function viewDocumentation() {
+            alert(`📚 Dokumentacija Globalne Dostopnosti
+
+🌐 JEZIKI:
+• 50+ podprtih jezikov
+• Avtomatsko zaznavanje jezika
+• Kulturno občutljivo prevajanje
+• Lokalizirani formati
+
+♿ DOSTOPNOST:
+• WCAG 2.1 AA standard
+• Podpora za bralce zaslona
+• Tipkovnične bližnjice
+• Glasovno upravljanje
+
+📱 NAPRAVE:
+• Odzivni dizajn
+• Progressive Web App
+• Offline funkcionalnosti
+• Cross-platform podpora
+
+🔧 IMPLEMENTACIJA:
+• API za jezike
+• Accessibility hooks
+• Device detection
+• Cultural adaptation
+
+Za več informacij obiščite našo spletno dokumentacijo.`);
+        }
+
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 15px;
+                box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                max-width: 350px;
+                font-weight: 600;
+            `;
+            notification.textContent = message;
+            
+            // Add animation keyframes
+            if (!document.getElementById('notification-styles')) {
+                const style = document.createElement('style');
+                style.id = 'notification-styles';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideIn 0.3s ease-out reverse';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🌍 Globalna dostopnost naložena - Omnia App');
+            
+            // Simulate initial detection
+            setTimeout(() => {
+                showNotification('🌍 Zaznana lokacija: Slovenija 🇸🇮');
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

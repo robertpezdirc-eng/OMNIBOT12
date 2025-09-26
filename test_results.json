@@ -1,0 +1,242 @@
+{
+  "timestamp": "2025-09-22T20:23:51.499188",
+  "total_tests": 22,
+  "passed": 11,
+  "failed": 11,
+  "success_rate": 50.0,
+  "results": [
+    {
+      "name": "cloud_infrastructure_health",
+      "status": "failed",
+      "duration": 2.7150490283966064,
+      "message": "Service cloud_infrastructure is not accessible: Cannot connect to host localhost:8200 ssl:default [The remote computer refused the network connection]",
+      "details": null
+    },
+    {
+      "name": "message_broker_health",
+      "status": "failed",
+      "duration": 0.2831909656524658,
+      "message": "Service message_broker returned status 404",
+      "details": null
+    },
+    {
+      "name": "enterprise_security_health",
+      "status": "failed",
+      "duration": 0.29152798652648926,
+      "message": "Service enterprise_security returned status 404",
+      "details": null
+    },
+    {
+      "name": "multi_tenant_database_health",
+      "status": "passed",
+      "duration": 0.27091240882873535,
+      "message": "Service multi_tenant_database is healthy",
+      "details": {
+        "status": "healthy",
+        "timestamp": "2025-09-22T18:23:39.959397",
+        "database": "connected",
+        "tenants": 3,
+        "active_connections": 3
+      }
+    },
+    {
+      "name": "production_dashboard_health",
+      "status": "passed",
+      "duration": 0.263671875,
+      "message": "Service production_dashboard is healthy",
+      "details": {
+        "status": "healthy",
+        "timestamp": "2025-09-22T18:23:40.224308",
+        "version": "1.0.0",
+        "services_monitored": 6,
+        "connected_clients": 1
+      }
+    },
+    {
+      "name": "cloud_infrastructure_regions",
+      "status": "failed",
+      "duration": 2.750542163848877,
+      "message": "Endpoint /regions error: Cannot connect to host localhost:8200 ssl:default [The remote computer refused the network connection]",
+      "details": null
+    },
+    {
+      "name": "cloud_infrastructure_services",
+      "status": "failed",
+      "duration": 2.5951731204986572,
+      "message": "Endpoint /services error: Cannot connect to host localhost:8200 ssl:default [The remote computer refused the network connection]",
+      "details": null
+    },
+    {
+      "name": "cloud_infrastructure_metrics",
+      "status": "failed",
+      "duration": 2.6111645698547363,
+      "message": "Endpoint /metrics error: Cannot connect to host localhost:8200 ssl:default [The remote computer refused the network connection]",
+      "details": null
+    },
+    {
+      "name": "message_broker_topics",
+      "status": "passed",
+      "duration": 0.011957883834838867,
+      "message": "Endpoint /topics accessible",
+      "details": null
+    },
+    {
+      "name": "message_broker_metrics",
+      "status": "passed",
+      "duration": 0.007271766662597656,
+      "message": "Endpoint /metrics accessible",
+      "details": null
+    },
+    {
+      "name": "enterprise_security_audit",
+      "status": "passed",
+      "duration": 0.010979413986206055,
+      "message": "Endpoint /audit accessible",
+      "details": null
+    },
+    {
+      "name": "enterprise_security_compliance",
+      "status": "passed",
+      "duration": 0.005106449127197266,
+      "message": "Endpoint /compliance accessible",
+      "details": null
+    },
+    {
+      "name": "multi_tenant_database_tenants",
+      "status": "passed",
+      "duration": 0.0023009777069091797,
+      "message": "Endpoint /tenants accessible",
+      "details": null
+    },
+    {
+      "name": "multi_tenant_database_audit",
+      "status": "passed",
+      "duration": 0.26128697395324707,
+      "message": "Endpoint /audit accessible",
+      "details": null
+    },
+    {
+      "name": "production_dashboard_api_services",
+      "status": "passed",
+      "duration": 0.0028302669525146484,
+      "message": "Endpoint /api/services accessible",
+      "details": null
+    },
+    {
+      "name": "production_dashboard_api_metrics",
+      "status": "passed",
+      "duration": 0.2753908634185791,
+      "message": "Endpoint /api/metrics accessible",
+      "details": null
+    },
+    {
+      "name": "dashboard_service_discovery",
+      "status": "passed",
+      "duration": 0.009930610656738281,
+      "message": "Dashboard can discover all services",
+      "details": {
+        "services": {
+          "cloud_infrastructure": {
+            "service_name": "cloud_infrastructure",
+            "status": "offline",
+            "url": "http://localhost:8200",
+            "response_time_ms": 0.0,
+            "last_check": "2025-09-22T18:23:44.078658",
+            "uptime_percentage": 0.0,
+            "error_count": 100,
+            "version": "unknown"
+          },
+          "message_broker": {
+            "service_name": "message_broker",
+            "status": "warning",
+            "url": "http://localhost:8201",
+            "response_time_ms": 267.52,
+            "last_check": "2025-09-22T18:23:44.353351",
+            "uptime_percentage": 99.0,
+            "error_count": 1,
+            "version": "unknown"
+          },
+          "enterprise_security": {
+            "service_name": "enterprise_security",
+            "status": "warning",
+            "url": "http://localhost:8202",
+            "response_time_ms": 269.06,
+            "last_check": "2025-09-22T18:23:44.623334",
+            "uptime_percentage": 99.0,
+            "error_count": 3,
+            "version": "unknown"
+          },
+          "multi_tenant_database": {
+            "service_name": "multi_tenant_database",
+            "status": "healthy",
+            "url": "http://localhost:8203",
+            "response_time_ms": 261.03,
+            "last_check": "2025-09-22T18:23:44.887762",
+            "uptime_percentage": 99.7,
+            "error_count": 2,
+            "version": "1.0.0"
+          },
+          "core_api": {
+            "service_name": "core_api",
+            "status": "offline",
+            "url": "http://localhost:8100",
+            "response_time_ms": 0.0,
+            "last_check": "2025-09-22T18:23:47.603098",
+            "uptime_percentage": 0.0,
+            "error_count": 100,
+            "version": "unknown"
+          },
+          "dashboard": {
+            "service_name": "dashboard",
+            "status": "offline",
+            "url": "http://localhost:8099",
+            "response_time_ms": 0.0,
+            "last_check": "2025-09-22T18:23:11.479133",
+            "uptime_percentage": 0.0,
+            "error_count": 100,
+            "version": "unknown"
+          }
+        },
+        "summary": {
+          "healthy": 1,
+          "total": 6
+        }
+      }
+    },
+    {
+      "name": "cloud_infrastructure_metrics",
+      "status": "failed",
+      "duration": 2.6497795581817627,
+      "message": "Service cloud_infrastructure metrics error: Cannot connect to host localhost:8200 ssl:default [The remote computer refused the network connection]",
+      "details": null
+    },
+    {
+      "name": "message_broker_metrics",
+      "status": "failed",
+      "duration": 0.005643367767333984,
+      "message": "Service message_broker metrics endpoint failed: 404",
+      "details": null
+    },
+    {
+      "name": "enterprise_security_metrics",
+      "status": "failed",
+      "duration": 0.003477334976196289,
+      "message": "Service enterprise_security metrics endpoint failed: 404",
+      "details": null
+    },
+    {
+      "name": "multi_tenant_database_metrics",
+      "status": "failed",
+      "duration": 0.002681732177734375,
+      "message": "Service multi_tenant_database metrics endpoint failed: 404",
+      "details": null
+    },
+    {
+      "name": "production_dashboard_metrics",
+      "status": "failed",
+      "duration": 0.0016930103302001953,
+      "message": "Service production_dashboard metrics endpoint failed: 404",
+      "details": null
+    }
+  ]
+}

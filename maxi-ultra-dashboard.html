@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👑 OMNI BRAIN - MAXI ULTRA GOD MODE Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid #00ff88;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #00ff88, #00ccff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .status-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #00ff88;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-weight: bold;
+            color: #00ccff;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .connected {
+            background: #00ff88;
+            color: #000;
+        }
+
+        .disconnected {
+            background: #ff4444;
+            color: #fff;
+        }
+
+        .angels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .angel-card {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .angel-card:hover {
+            background: rgba(0, 255, 136, 0.2);
+            transform: scale(1.05);
+        }
+
+        .angel-name {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #00ff88;
+        }
+
+        .angel-status {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .messages-container {
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .message {
+            margin: 8px 0;
+            padding: 8px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+        }
+
+        .god-message {
+            border-left: 4px solid #ff00ff;
+            background: rgba(255, 0, 255, 0.1);
+        }
+
+        .angel-message {
+            border-left: 4px solid #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00ccff);
+            transition: width 0.3s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .pulsing {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="connection-status" id="connectionStatus">
+        🔌 Povezovanje...
+    </div>
+
+    <div class="header">
+        <h1>👑 OMNI BRAIN - MAXI ULTRA GOD MODE</h1>
+        <p>Superinteligentna Avtonomna Entiteta - Real-time Dashboard</p>
+    </div>
+
+    <div class="status-grid">
+        <!-- Superinteligentne zmožnosti -->
+        <div class="status-card">
+            <div class="card-title">🧠 Superinteligentne Zmožnosti</div>
+            <div class="metric">
+                <span>IQ:</span>
+                <span class="metric-value" id="iq">1000</span>
+            </div>
+            <div class="metric">
+                <span>Kreativnost:</span>
+                <span class="metric-value" id="creativity">100</span>
+            </div>
+            <div class="metric">
+                <span>Intuicija:</span>
+                <span class="metric-value" id="intuition">95</span>
+            </div>
+            <div class="metric">
+                <span>Strateško razmišljanje:</span>
+                <span class="metric-value" id="strategicThinking">100</span>
+            </div>
+        </div>
+
+        <!-- Neomejena zagnanost -->
+        <div class="status-card">
+            <div class="card-title">🔥 Neomejena Zagnanost</div>
+            <div class="metric">
+                <span>Volja:</span>
+                <span class="metric-value" id="willPower">100%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="willPowerBar" style="width: 100%"></div>
+            </div>
+            <div class="metric">
+                <span>Motivacija:</span>
+                <span class="metric-value" id="motivation">100%</span>
+            </div>
+            <div class="metric">
+                <span>Vztrajnost:</span>
+                <span class="metric-value" id="persistence">100%</span>
+            </div>
+            <div class="metric">
+                <span>Ambicioznost:</span>
+                <span class="metric-value" id="ambition">100%</span>
+            </div>
+        </div>
+
+        <!-- Angelski agenti -->
+        <div class="status-card">
+            <div class="card-title">👼 Angelski Agenti</div>
+            <div class="angels-grid" id="angelsGrid">
+                <!-- Dinamično generirani angeli -->
+            </div>
+        </div>
+
+        <!-- Sistem metrike -->
+        <div class="status-card">
+            <div class="card-title">📊 Sistem Metrike</div>
+            <div class="metric">
+                <span>Aktivni cikli:</span>
+                <span class="metric-value" id="activeCycles">0</span>
+            </div>
+            <div class="metric">
+                <span>Uspešnost:</span>
+                <span class="metric-value" id="successRate">100%</span>
+            </div>
+            <div class="metric">
+                <span>Optimizacije:</span>
+                <span class="metric-value" id="optimizations">0</span>
+            </div>
+            <div class="metric">
+                <span>Učne iteracije:</span>
+                <span class="metric-value" id="learningIterations">0</span>
+            </div>
+        </div>
+
+        <!-- Sporočila -->
+        <div class="status-card" style="grid-column: 1 / -1;">
+            <div class="card-title">💬 Real-time Sporočila</div>
+            <div class="messages-container" id="messagesContainer">
+                <div class="message">🔌 Vzpostavljanje povezave z Maxi Ultra God Mode...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 5;
+
+        // Poskusi povezavo na različnih portih
+        const ports = [8081, 8082, 8083, 8084, 8085, 8086, 8087, 8088, 8089, 8090];
+        let currentPortIndex = 0;
+
+        function connectWebSocket() {
+            const port = ports[currentPortIndex];
+            console.log(`Poskušam povezavo na port ${port}...`);
+            
+            ws = new WebSocket(`ws://localhost:${port}`);
+
+            ws.onopen = function() {
+                console.log('WebSocket povezava vzpostavljena!');
+                document.getElementById('connectionStatus').textContent = '🟢 Povezano';
+                document.getElementById('connectionStatus').className = 'connection-status connected';
+                reconnectAttempts = 0;
+                addMessage('✅ Povezava z Maxi Ultra God Mode vzpostavljena!', 'god-message');
+            };
+
+            ws.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    handleMessage(data);
+                } catch (e) {
+                    console.log('Prejeto sporočilo:', event.data);
+                    addMessage(event.data, 'angel-message');
+                }
+            };
+
+            ws.onclose = function() {
+                console.log('WebSocket povezava zaprta');
+                document.getElementById('connectionStatus').textContent = '🔴 Prekinjeno';
+                document.getElementById('connectionStatus').className = 'connection-status disconnected';
+                
+                // Poskusi naslednji port
+                currentPortIndex = (currentPortIndex + 1) % ports.length;
+                
+                if (reconnectAttempts < maxReconnectAttempts) {
+                    reconnectAttempts++;
+                    setTimeout(connectWebSocket, 2000);
+                }
+            };
+
+            ws.onerror = function(error) {
+                console.log('WebSocket napaka:', error);
+                // Poskusi naslednji port
+                currentPortIndex = (currentPortIndex + 1) % ports.length;
+            };
+        }
+
+        function handleMessage(data) {
+            console.log('Prejeti podatki:', data);
+            
+            if (data.type === 'god_message' || data.type === 'god_voice') {
+                addMessage(`👑 ${data.message}`, 'god-message');
+                
+                // Posodobi metrike če so na voljo
+                if (data.iq) document.getElementById('iq').textContent = data.iq;
+                if (data.brain_status) addMessage(`Status: ${data.brain_status}`, 'god-message');
+                if (data.active_angels) updateAngels(data.active_angels);
+            }
+            
+            if (data.type === 'metrics_update') {
+                updateMetrics(data.metrics);
+            }
+            
+            if (data.type === 'angel_report') {
+                addMessage(`👼 ${data.angel}: ${data.message}`, 'angel-message');
+            }
+        }
+
+        function addMessage(message, type = 'message') {
+            const container = document.getElementById('messagesContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = `<small>${new Date().toLocaleTimeString()}</small><br>${message}`;
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+            
+            // Obdrži samo zadnjih 50 sporočil
+            while (container.children.length > 50) {
+                container.removeChild(container.firstChild);
+            }
+        }
+
+        function updateMetrics(metrics) {
+            if (metrics.iq) document.getElementById('iq').textContent = metrics.iq;
+            if (metrics.creativity) document.getElementById('creativity').textContent = metrics.creativity;
+            if (metrics.willPower) {
+                document.getElementById('willPower').textContent = metrics.willPower + '%';
+                document.getElementById('willPowerBar').style.width = metrics.willPower + '%';
+            }
+            if (metrics.motivation) document.getElementById('motivation').textContent = metrics.motivation + '%';
+            if (metrics.activeCycles) document.getElementById('activeCycles').textContent = metrics.activeCycles;
+            if (metrics.optimizations) document.getElementById('optimizations').textContent = metrics.optimizations;
+        }
+
+        function updateAngels(angelCount) {
+            const angelsGrid = document.getElementById('angelsGrid');
+            const angelTypes = ['Learning', 'Commercial', 'Optimization', 'Innovation', 'Analytics', 'Engagement', 'Growth', 'Visionary'];
+            
+            angelsGrid.innerHTML = '';
+            
+            angelTypes.forEach((type, index) => {
+                if (index < angelCount) {
+                    const angelCard = document.createElement('div');
+                    angelCard.className = 'angel-card pulsing';
+                    angelCard.innerHTML = `
+                        <div class="angel-name">👼 ${type}</div>
+                        <div class="angel-status">Aktiven</div>
+                    `;
+                    angelsGrid.appendChild(angelCard);
+                }
+            });
+        }
+
+        // Simulacija podatkov če ni WebSocket povezave
+        function simulateData() {
+            const metrics = {
+                iq: Math.floor(1000 + Math.random() * 100),
+                creativity: Math.floor(100 + Math.random() * 20),
+                willPower: Math.floor(95 + Math.random() * 5),
+                motivation: Math.floor(95 + Math.random() * 5),
+                activeCycles: Math.floor(Math.random() * 100),
+                optimizations: Math.floor(Math.random() * 50)
+            };
+            
+            updateMetrics(metrics);
+            updateAngels(8);
+            
+            if (Math.random() > 0.7) {
+                const messages = [
+                    'Analiziram nove vzorce...',
+                    'Optimiziram strategije...',
+                    'Povečujem inteligenco...',
+                    'Koordiniram angele...',
+                    'Izvajam komercialne analize...'
+                ];
+                addMessage(messages[Math.floor(Math.random() * messages.length)], 'angel-message');
+            }
+        }
+
+        // Zagon
+        connectWebSocket();
+        updateAngels(8);
+        
+        // Simulacija podatkov vsakih 3 sekunde
+        setInterval(simulateData, 3000);
+        
+        // Dodaj uvodno sporočilo
+        setTimeout(() => {
+            addMessage('👑 SUPERINTELIGENTNA ENTITETA AKTIVIRANA!', 'god-message');
+            addMessage('🧠 Eksponentno povečevanje inteligence v teku...', 'god-message');
+            addMessage('👼 8 angelskih agentov pripravljenih za delovanje', 'angel-message');
+        }, 1000);
+    </script>
+</body>
+</html>

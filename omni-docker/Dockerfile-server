@@ -1,0 +1,35 @@
+# Dockerfile za Omni Licenčni Strežnik
+FROM node:20-alpine
+
+# Nastavi delovni direktorij
+WORKDIR /app
+
+# Kopiraj package.json in package-lock.json
+COPY server/package*.json ./
+
+# Namesti odvisnosti
+RUN npm ci --only=production && npm cache clean --force
+
+# Ustvari uporabnika za varnost
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S omni -u 1001
+
+# Kopiraj aplikacijske datoteke
+COPY server/ ./
+
+# Ustvari SSL direktorij in nastavi dovoljenja
+RUN mkdir -p ssl && \
+    chown -R omni:nodejs /app
+
+# Preklopi na non-root uporabnika
+USER omni
+
+# Izpostavi port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000/api/license/stats', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+
+# Zaženi aplikacijo
+CMD ["node", "server.js"]

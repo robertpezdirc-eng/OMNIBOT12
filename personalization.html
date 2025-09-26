@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vaš Osebni AI - Omnia App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-top: 100px; /* Account for fixed nav */
+        }
+
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            color: white;
+            padding: 50px 0;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .personalization-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.15);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .feature-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .demo-area {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            min-height: 200px;
+            position: relative;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .user-info h4 {
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .user-info p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .learning-progress {
+            margin: 20px 0;
+        }
+
+        .progress-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .progress-bar {
+            width: 100px;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .preferences-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .preference-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .preference-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .preference-item.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .ai-suggestions {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .suggestion-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #e9ecef;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .chat-interface {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 80%;
+        }
+
+        .message.user {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            margin-left: auto;
+        }
+
+        .message.ai {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            outline: none;
+        }
+
+        .chat-input input:focus {
+            border-color: #667eea;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .personalization-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .preferences-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">🌟 Omnia AI</a>
+            <div class="nav-links">
+                <a href="/">Domov</a>
+                <a href="/multimodal">Multi-Modal</a>
+                <a href="/personalization">Personalizacija</a>
+                <a href="/global">Globalno</a>
+                <a href="/versatility">Vsestranskost</a>
+                <a href="/simplicity">Enostavnost</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Vaš Osebni AI</h1>
+            <p>AI asistent, ki vas razume, se uči vaših navad in se prilagaja vašim potrebam</p>
+        </div>
+
+        <div class="personalization-grid">
+            <!-- User Profile & Learning -->
+            <div class="feature-card">
+                <div class="feature-icon">👤</div>
+                <h3 class="feature-title">Osebni Profil</h3>
+                <p class="feature-description">
+                    AI se uči vaših navad, preferenc in delovnega sloga za optimalno personalizacijo.
+                </p>
+                <div class="demo-area">
+                    <div class="user-profile">
+                        <div class="avatar" id="user-avatar">U</div>
+                        <div class="user-info">
+                            <h4 id="user-name">Uporabnik</h4>
+                            <p id="user-role">AI se uči vaših navad...</p>
+                        </div>
+                    </div>
+                    <div class="learning-progress">
+                        <div class="progress-item">
+                            <span>Delovni slog</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <span>Preference</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 60%"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <span>Komunikacija</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 85%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="updateProfile()">📝 Posodobi profil</button>
+            </div>
+
+            <!-- Smart Preferences -->
+            <div class="feature-card">
+                <div class="feature-icon">⚙️</div>
+                <h3 class="feature-title">Pametne Nastavitve</h3>
+                <p class="feature-description">
+                    AI avtomatsko prilagaja vmesnik, funkcionalnosti in odzive glede na vaše preference.
+                </p>
+                <div class="demo-area">
+                    <h4 style="margin-bottom: 15px;">Vaše preference:</h4>
+                    <div class="preferences-grid">
+                        <div class="preference-item active" onclick="togglePreference(this)">
+                            <div>🌙</div>
+                            <div>Temna tema</div>
+                        </div>
+                        <div class="preference-item" onclick="togglePreference(this)">
+                            <div>🔊</div>
+                            <div>Zvočni odzivi</div>
+                        </div>
+                        <div class="preference-item active" onclick="togglePreference(this)">
+                            <div>📊</div>
+                            <div>Vizualni prikazi</div>
+                        </div>
+                        <div class="preference-item" onclick="togglePreference(this)">
+                            <div>⚡</div>
+                            <div>Hitri odzivi</div>
+                        </div>
+                        <div class="preference-item active" onclick="togglePreference(this)">
+                            <div>🎯</div>
+                            <div>Fokus način</div>
+                        </div>
+                        <div class="preference-item" onclick="togglePreference(this)">
+                            <div>🌍</div>
+                            <div>Globalni dostop</div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="savePreferences()">💾 Shrani nastavitve</button>
+            </div>
+
+            <!-- AI Suggestions -->
+            <div class="feature-card">
+                <div class="feature-icon">💡</div>
+                <h3 class="feature-title">Pametni Predlogi</h3>
+                <p class="feature-description">
+                    Na podlagi vaših navad AI predlaga optimalne rešitve in izboljšave.
+                </p>
+                <div class="demo-area">
+                    <div class="ai-suggestions">
+                        <h4 style="margin-bottom: 15px;">Današnji predlogi:</h4>
+                        <div class="suggestion-item" onclick="applySuggestion(this)">
+                            <div>📈</div>
+                            <div>
+                                <strong>Produktivnost</strong><br>
+                                <small>Predlagam 25-minutne fokus bloke</small>
+                            </div>
+                        </div>
+                        <div class="suggestion-item" onclick="applySuggestion(this)">
+                            <div>🎯</div>
+                            <div>
+                                <strong>Optimizacija</strong><br>
+                                <small>Avtomatiziraj ponavljajoče naloge</small>
+                            </div>
+                        </div>
+                        <div class="suggestion-item" onclick="applySuggestion(this)">
+                            <div>📚</div>
+                            <div>
+                                <strong>Učenje</strong><br>
+                                <small>Nova funkcionalnost za raziskovanje</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="generateSuggestions()">🔄 Generiraj nove predloge</button>
+            </div>
+
+            <!-- Adaptive Interface -->
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <h3 class="feature-title">Prilagodljiv Vmesnik</h3>
+                <p class="feature-description">
+                    Vmesnik se dinamično prilagaja vašemu delovnemu slogu in trenutnim potrebam.
+                </p>
+                <div class="demo-area">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">94%</div>
+                            <div class="stat-label">Prilagoditev</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">127</div>
+                            <div class="stat-label">Interakcij</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">15</div>
+                            <div class="stat-label">Dni učenja</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">8.9</div>
+                            <div class="stat-label">Ocena UX</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-top: 20px; color: #666;">
+                        <p>AI se je naučil vaših navad in optimiziral vmesnik za 40% boljšo produktivnost</p>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="customizeInterface()">🎨 Prilagodi vmesnik</button>
+            </div>
+
+            <!-- Smart Chat -->
+            <div class="feature-card">
+                <div class="feature-icon">💬</div>
+                <h3 class="feature-title">Pameten Pogovor</h3>
+                <p class="feature-description">
+                    AI se spominja konteksta, vaših projektov in preferenc za naravno komunikacijo.
+                </p>
+                <div class="demo-area">
+                    <div class="chat-interface">
+                        <div class="chat-messages" id="chat-messages">
+                            <div class="message ai">
+                                Pozdravljeni! Opazil sem, da običajno delate na projektih dopoldne. Kako vam lahko danes pomagam?
+                            </div>
+                            <div class="message user">
+                                Potrebujem pomoč pri analizi podatkov
+                            </div>
+                            <div class="message ai">
+                                Odlično! Glede na vaše prejšnje projekte predlagam uporabo vizualnih grafov. Želite, da pripravim analizo v vašem priljubljenem formatu?
+                            </div>
+                        </div>
+                        <div class="chat-input">
+                            <input type="text" id="chat-input" placeholder="Vnesite sporočilo..." onkeypress="handleChatInput(event)">
+                            <button class="btn btn-primary" onclick="sendMessage()">Pošlji</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Learning Analytics -->
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Analitika Učenja</h3>
+                <p class="feature-description">
+                    Podrobna analiza kako AI razume vaše potrebe in se prilagaja vašemu slogu dela.
+                </p>
+                <div class="demo-area">
+                    <h4 style="margin-bottom: 15px;">AI učenje v realnem času:</h4>
+                    <div class="learning-progress">
+                        <div class="progress-item">
+                            <span>🎯 Razumevanje ciljev</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 88%"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <span>⏰ Časovni vzorci</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 92%"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <span>📝 Komunikacijski slog</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 76%"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <span>🔧 Orodja in funkcije</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 84%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="background: #e8f4fd; padding: 15px; border-radius: 10px; margin-top: 15px;">
+                        <strong>💡 Insight:</strong> AI je odkril, da ste najbolj produktivni med 9:00-11:00 in predlaga fokusiranje kompleksnih nalog v tem času.
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="viewDetailedAnalytics()">📈 Podrobna analitika</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userProfile = {
+            name: 'Uporabnik',
+            role: 'AI se uči vaših navad...',
+            preferences: ['dark-theme', 'visual-displays', 'focus-mode'],
+            interactions: 127,
+            learningDays: 15
+        };
+
+        function updateProfile() {
+            const name = prompt('Vnesite vaše ime:', userProfile.name);
+            const role = prompt('Vnesite vašo vlogo/področje dela:', userProfile.role);
+            
+            if (name) {
+                userProfile.name = name;
+                document.getElementById('user-name').textContent = name;
+                document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+            }
+            
+            if (role) {
+                userProfile.role = role;
+                document.getElementById('user-role').textContent = role;
+            }
+            
+            // Simulate AI learning
+            setTimeout(() => {
+                showNotification('✅ Profil posodobljen! AI se prilagaja vašim novim informacijam...');
+            }, 1000);
+        }
+
+        function togglePreference(element) {
+            element.classList.toggle('active');
+            
+            // Update user preferences
+            const prefText = element.textContent.trim();
+            showNotification(`Preference "${prefText}" ${element.classList.contains('active') ? 'aktivirana' : 'deaktivirana'}`);
+        }
+
+        function savePreferences() {
+            const activePrefs = document.querySelectorAll('.preference-item.active');
+            showNotification(`💾 Shranjenih ${activePrefs.length} preferenc. AI se prilagaja...`);
+            
+            // Simulate AI adaptation
+            setTimeout(() => {
+                showNotification('🤖 AI se je uspešno prilagodil vašim novim nastavitvam!');
+            }, 2000);
+        }
+
+        function applySuggestion(element) {
+            const suggestion = element.querySelector('strong').textContent;
+            element.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+            element.style.color = 'white';
+            element.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                showNotification(`✅ Predlog "${suggestion}" apliciran!`);
+                element.style.opacity = '0.7';
+            }, 500);
+        }
+
+        function generateSuggestions() {
+            const suggestions = [
+                { icon: '🚀', title: 'Avtomatizacija', desc: 'Avtomatiziraj email odgovore' },
+                { icon: '📱', title: 'Mobilnost', desc: 'Optimiziraj za mobilne naprave' },
+                { icon: '🔍', title: 'Analiza', desc: 'Poglobi analizo uporabnikov' },
+                { icon: '⚡', title: 'Hitrost', desc: 'Pospeši poročila za 50%' },
+                { icon: '🎯', title: 'Fokus', desc: 'Blokiraj motnje med delom' }
+            ];
+            
+            const container = document.querySelector('.ai-suggestions');
+            const randomSuggestion = suggestions[Math.floor(Math.random() * suggestions.length)];
+            
+            const newSuggestion = document.createElement('div');
+            newSuggestion.className = 'suggestion-item';
+            newSuggestion.onclick = () => applySuggestion(newSuggestion);
+            newSuggestion.innerHTML = `
+                <div>${randomSuggestion.icon}</div>
+                <div>
+                    <strong>${randomSuggestion.title}</strong><br>
+                    <small>${randomSuggestion.desc}</small>
+                </div>
+            `;
+            
+            container.appendChild(newSuggestion);
+            showNotification('💡 Nov predlog generiran na podlagi vaših navad!');
+        }
+
+        function customizeInterface() {
+            const themes = ['Svetla tema', 'Temna tema', 'Modra tema', 'Zelena tema'];
+            const selectedTheme = themes[Math.floor(Math.random() * themes.length)];
+            
+            showNotification(`🎨 Vmesnik prilagojen: ${selectedTheme} aktivirana`);
+            
+            // Simulate interface change
+            setTimeout(() => {
+                document.body.style.filter = 'hue-rotate(30deg)';
+                setTimeout(() => {
+                    document.body.style.filter = 'none';
+                }, 1000);
+            }, 500);
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            const messagesContainer = document.getElementById('chat-messages');
+            
+            // Add user message
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user';
+            userMessage.textContent = message;
+            messagesContainer.appendChild(userMessage);
+            
+            // Clear input
+            input.value = '';
+            
+            // Simulate AI response
+            setTimeout(() => {
+                const aiResponses = [
+                    'Razumem vaše potrebe. Na podlagi vaših prejšnjih projektov predlagam...',
+                    'Odličo vprašanje! Glede na vaš delovni slog bi bilo najbolje...',
+                    'To se ujema z vašimi cilji. Lahko pripravim personalizirano rešitev...',
+                    'Opazil sem, da to povezano z vašimi prejšnjimi nalogami. Predlagam...'
+                ];
+                
+                const aiMessage = document.createElement('div');
+                aiMessage.className = 'message ai';
+                aiMessage.textContent = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+                messagesContainer.appendChild(aiMessage);
+                
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 1000);
+        }
+
+        function handleChatInput(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function viewDetailedAnalytics() {
+            showNotification('📊 Odpiramo podrobno analitiko učenja AI...');
+            
+            setTimeout(() => {
+                alert(`📈 Podrobna Analitika AI Učenja:
+
+🎯 Razumevanje ciljev: 88%
+- AI prepozna vaše glavne cilje v 9/10 primerih
+- Najbolje razume produktivnostne naloge
+
+⏰ Časovni vzorci: 92%  
+- Optimalni čas dela: 9:00-11:00
+- Povprečna seja: 45 minut
+- Najboljši dan: Torek
+
+📝 Komunikacijski slog: 76%
+- Preferirate kratke, jasne odgovore
+- Vizualne predstave pred tekstom
+- Tehnični jezik: srednja raven
+
+🔧 Orodja in funkcije: 84%
+- Najpogosteje: dokumenti, analiza
+- Redko: video, 3D simulacije
+- Priložnost: AR/VR funkcionalnosti
+
+💡 Priporočila za izboljšanje:
+- Več interakcije z vizualnimi orodji
+- Testiranje glasovnih ukazov
+- Raziskovanje avtomatizacije`);
+            }, 1500);
+        }
+
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                max-width: 300px;
+            `;
+            notification.textContent = message;
+            
+            // Add animation keyframes
+            if (!document.getElementById('notification-styles')) {
+                const style = document.createElement('style');
+                style.id = 'notification-styles';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideIn 0.3s ease-out reverse';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🤖 Personalizacija naložena - Omnia App');
+            
+            // Simulate initial AI learning
+            setTimeout(() => {
+                showNotification('🤖 AI analizira vaše navade in se prilagaja...');
+            }, 2000);
+            
+            // Update stats periodically
+            setInterval(() => {
+                userProfile.interactions++;
+                const statCards = document.querySelectorAll('.stat-value');
+                if (statCards.length > 1) {
+                    statCards[1].textContent = userProfile.interactions;
+                }
+            }, 10000);
+        });
+    </script>
+</body>
+</html>

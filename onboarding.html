@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omnia App - Hitri Začetek</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Industry Selection */
+        .industry-selection {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: #333;
+        }
+
+        .industry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .industry-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .industry-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .industry-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .industry-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .industry-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* Drag & Drop Interface */
+        .drag-drop-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .drop-zone {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            background: rgba(102, 126, 234, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #764ba2;
+            transform: scale(1.02);
+        }
+
+        .drop-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .drop-text {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Workflow Templates */
+        .workflow-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .workflow-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .workflow-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .workflow-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .workflow-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .workflow-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+        }
+
+        .workflow-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .workflow-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .workflow-features {
+            list-style: none;
+            margin-bottom: 1rem;
+        }
+
+        .workflow-features li {
+            padding: 0.3rem 0;
+            color: #555;
+        }
+
+        .workflow-features li:before {
+            content: "✓ ";
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .select-workflow-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .select-workflow-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Progress Bar */
+        .progress-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            border-radius: 25px;
+            height: 10px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .start-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .start-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Dobrodošli v Omnia App</h1>
+            <p>Nastavimo vašo AI platformo v 3 enostavnih korakih</p>
+        </div>
+
+        <!-- Step 1: Industry Selection -->
+        <div class="industry-selection">
+            <h2 class="section-title">1. Izberite vašo panogo</h2>
+            <div class="industry-grid">
+                <div class="industry-card" data-industry="turizem">
+                    <span class="industry-icon">🏖️</span>
+                    <div class="industry-name">Turizem</div>
+                </div>
+                <div class="industry-card" data-industry="gostinstvo">
+                    <span class="industry-icon">🍽️</span>
+                    <div class="industry-name">Gostinstvo</div>
+                </div>
+                <div class="industry-card" data-industry="kmetijstvo">
+                    <span class="industry-icon">🚜</span>
+                    <div class="industry-name">Kmetijstvo</div>
+                </div>
+                <div class="industry-card" data-industry="zdravstvo">
+                    <span class="industry-icon">🏥</span>
+                    <div class="industry-name">Zdravstvo</div>
+                </div>
+                <div class="industry-card" data-industry="it">
+                    <span class="industry-icon">💻</span>
+                    <div class="industry-name">IT</div>
+                </div>
+                <div class="industry-card" data-industry="marketing">
+                    <span class="industry-icon">📈</span>
+                    <div class="industry-name">Marketing</div>
+                </div>
+                <div class="industry-card" data-industry="izobrazevanje">
+                    <span class="industry-icon">🎓</span>
+                    <div class="industry-name">Izobraževanje</div>
+                </div>
+                <div class="industry-card" data-industry="finance">
+                    <span class="industry-icon">💰</span>
+                    <div class="industry-name">Finance</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Drag & Drop Interface -->
+        <div class="drag-drop-section">
+            <h2 class="section-title">2. Naložite vaše podatke (opcijsko)</h2>
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-icon">📁</div>
+                <div class="drop-text">Povlecite in spustite datoteke sem ali kliknite za izbiro</div>
+                <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                    Izberite datoteke
+                </button>
+                <input type="file" id="fileInput" class="file-input" multiple accept=".pdf,.doc,.docx,.txt,.csv,.xlsx">
+            </div>
+        </div>
+
+        <!-- Step 3: Workflow Templates -->
+        <div class="workflow-section">
+            <h2 class="section-title">3. Izberite predlogo workflow-a</h2>
+            <div class="workflow-grid" id="workflowGrid">
+                <!-- Workflows will be populated based on selected industry -->
+            </div>
+        </div>
+
+        <!-- Progress and Start -->
+        <div class="progress-section">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Izberite panogo za začetek</div>
+            <button class="start-btn" id="startBtn" disabled>Začni z Omnia App</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedIndustry = null;
+        let selectedWorkflow = null;
+        let uploadedFiles = [];
+        let progress = 0;
+
+        // Industry workflows data
+        const industryWorkflows = {
+            turizem: [
+                {
+                    icon: "🗺️",
+                    title: "Pametno Načrtovanje Itinerarjev",
+                    description: "Avtomatsko ustvarjanje personaliziranih potovalnih načrtov",
+                    features: ["Dnevni itinerarji", "Rezervacije", "Vremenske napovedi", "Lokalne znamenitosti"]
+                },
+                {
+                    icon: "🏨",
+                    title: "Rezervacijski Sistem",
+                    description: "AI chatbot za upravljanje rezervacij 24/7",
+                    features: ["Avtomatske rezervacije", "Dinamične cene", "Večjezična podpora", "PMS integracija"]
+                }
+            ],
+            gostinstvo: [
+                {
+                    icon: "📋",
+                    title: "Upravljanje Menijev",
+                    description: "Dinamično prilagajanje menijev in kalkulacija stroškov",
+                    features: ["Kalkulacija stroškov", "Sezonske jedi", "Analiza priljubljenosti", "Alergeni"]
+                },
+                {
+                    icon: "👨‍🍳",
+                    title: "AI Kuhar Asistent",
+                    description: "Pomoč pri pripravi jedi in upravljanju kuhinje",
+                    features: ["Prilagojeni recepti", "Optimizacija sestavin", "Časovno načrtovanje", "Nadomestki"]
+                }
+            ],
+            it: [
+                {
+                    icon: "⚙️",
+                    title: "Avtomatsko Generiranje Kode",
+                    description: "Ustvarjanje kode na podlagi specifikacij",
+                    features: ["Popolna koda", "Testi", "Dokumentacija", "API endpoints"]
+                },
+                {
+                    icon: "🔍",
+                    title: "Sistemska Diagnostika",
+                    description: "Analiza in reševanje sistemskih težav",
+                    features: ["Log analiza", "Identifikacija ozkih grl", "Optimizacije", "Monitoring"]
+                }
+            ]
+        };
+
+        // Industry selection
+        document.querySelectorAll('.industry-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.industry-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedIndustry = this.dataset.industry;
+                updateProgress();
+                loadWorkflows();
+            });
+        });
+
+        // Drag & Drop functionality
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            uploadedFiles = Array.from(files);
+            updateDropZone();
+            updateProgress();
+        }
+
+        function updateDropZone() {
+            if (uploadedFiles.length > 0) {
+                dropZone.innerHTML = `
+                    <div class="drop-icon">✅</div>
+                    <div class="drop-text">Naloženih ${uploadedFiles.length} datotek</div>
+                    <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                        Dodaj več datotek
+                    </button>
+                `;
+            }
+        }
+
+        function loadWorkflows() {
+            const workflowGrid = document.getElementById('workflowGrid');
+            const workflows = industryWorkflows[selectedIndustry] || [];
+            
+            workflowGrid.innerHTML = workflows.map(workflow => `
+                <div class="workflow-card" onclick="selectWorkflow('${workflow.title}')">
+                    <div class="workflow-header">
+                        <span class="workflow-icon">${workflow.icon}</span>
+                        <div class="workflow-title">${workflow.title}</div>
+                    </div>
+                    <div class="workflow-description">${workflow.description}</div>
+                    <ul class="workflow-features">
+                        ${workflow.features.map(feature => `<li>${feature}</li>`).join('')}
+                    </ul>
+                    <button class="select-workflow-btn">Izberi ta workflow</button>
+                </div>
+            `).join('');
+        }
+
+        function selectWorkflow(workflowTitle) {
+            selectedWorkflow = workflowTitle;
+            document.querySelectorAll('.workflow-card').forEach(card => {
+                card.style.border = card.querySelector('.workflow-title').textContent === workflowTitle 
+                    ? '2px solid #667eea' : 'none';
+            });
+            updateProgress();
+        }
+
+        function updateProgress() {
+            let newProgress = 0;
+            let progressText = '';
+
+            if (selectedIndustry) {
+                newProgress += 50;
+                progressText = 'Panoga izbrana';
+            }
+            
+            if (selectedWorkflow) {
+                newProgress += 50;
+                progressText = 'Pripravljen za začetek!';
+            }
+
+            progress = newProgress;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = progressText;
+            document.getElementById('startBtn').disabled = progress < 100;
+        }
+
+        // Start button
+        document.getElementById('startBtn').addEventListener('click', function() {
+            // Redirect to main app with selected configuration
+            const config = {
+                industry: selectedIndustry,
+                workflow: selectedWorkflow,
+                files: uploadedFiles.length
+            };
+            
+            localStorage.setItem('omniaConfig', JSON.stringify(config));
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>

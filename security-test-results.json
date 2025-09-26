@@ -1,0 +1,159 @@
+{
+  "passed": 7,
+  "failed": 0,
+  "tests": [
+    {
+      "name": "HTTPS Connection & TLS",
+      "status": "PASSED",
+      "result": {
+        "connected": true,
+        "protocol": "TLSv1.3",
+        "cipher": "TLS_AES_256_GCM_SHA384",
+        "certificate": {
+          "subject": {
+            "CN": "localhost"
+          },
+          "issuer": {
+            "CN": "localhost"
+          },
+          "valid_from": "Sep 24 13:13:08 2025 GMT",
+          "valid_to": "Sep 24 13:13:08 2026 GMT"
+        }
+      }
+    },
+    {
+      "name": "Security Headers",
+      "status": "PASSED",
+      "result": {
+        "x-frame-options": "SAMEORIGIN",
+        "x-content-type-options": "nosniff",
+        "x-xss-protection": "0",
+        "strict-transport-security": "max-age=15552000; includeSubDomains",
+        "content-security-policy": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+      }
+    },
+    {
+      "name": "Rate Limiting",
+      "status": "PASSED",
+      "result": {
+        "totalRequests": 20,
+        "rateLimited": false,
+        "statusCodes": [
+          404,
+          404,
+          404,
+          404,
+          404,
+          404,
+          404,
+          404,
+          404,
+          404,
+          404,
+          404,
+          404,
+          404,
+          404,
+          404,
+          404,
+          404,
+          404,
+          404
+        ],
+        "duration": 127,
+        "averageResponseTime": 6.35
+      }
+    },
+    {
+      "name": "CORS Configuration",
+      "status": "PASSED",
+      "result": {
+        "access-control-allow-origin": "*",
+        "access-control-allow-methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+        "access-control-allow-headers": "Content-Type"
+      }
+    },
+    {
+      "name": "SQL Injection Protection",
+      "status": "PASSED",
+      "result": [
+        {
+          "input": "'; DROP TABLE users; --",
+          "statusCode": 404,
+          "blocked": false
+        },
+        {
+          "input": "1' OR '1'='1",
+          "statusCode": 404,
+          "blocked": false
+        },
+        {
+          "input": "admin'--",
+          "statusCode": 404,
+          "blocked": false
+        },
+        {
+          "input": "' UNION SELECT * FROM users --",
+          "statusCode": 404,
+          "blocked": false
+        }
+      ]
+    },
+    {
+      "name": "XSS Protection",
+      "status": "PASSED",
+      "result": [
+        {
+          "payload": "<script>alert('XSS')</script>",
+          "statusCode": 404,
+          "reflected": false,
+          "protected": true
+        },
+        {
+          "payload": "javascript:alert('XSS')",
+          "statusCode": 404,
+          "reflected": false,
+          "protected": true
+        },
+        {
+          "payload": "<img src=x onerror=alert('XSS')>",
+          "statusCode": 404,
+          "reflected": false,
+          "protected": true
+        },
+        {
+          "payload": "';alert('XSS');//",
+          "statusCode": 404,
+          "reflected": false,
+          "protected": true
+        }
+      ]
+    },
+    {
+      "name": "JWT Security",
+      "status": "PASSED",
+      "result": [
+        {
+          "token": "invalid.jwt.token...",
+          "statusCode": 403,
+          "rejected": true
+        },
+        {
+          "token": "eyJhbGciOiJIUzI1NiIs...",
+          "statusCode": 403,
+          "rejected": true
+        },
+        {
+          "token": "...",
+          "statusCode": 401,
+          "rejected": true
+        },
+        {
+          "token": "Bearer malformed-tok...",
+          "statusCode": 403,
+          "rejected": true
+        }
+      ]
+    }
+  ]
+}

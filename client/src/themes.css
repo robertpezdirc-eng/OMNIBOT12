@@ -1,0 +1,340 @@
+/* 🎨 OMNI Theme System - Light & Dark Mode */
+
+/* Theme Transition */
+.theme-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-transition.transitioning {
+  opacity: 0.9;
+  transform: scale(0.99);
+}
+
+/* CSS Variables for Light Theme */
+:root,
+[data-theme="light"] {
+  /* Primary Colors */
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-primary-light: #dbeafe;
+  
+  /* Secondary Colors */
+  --color-secondary: #8b5cf6;
+  --color-secondary-hover: #7c3aed;
+  --color-secondary-light: #ede9fe;
+  
+  /* Background Colors */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f8fafc;
+  --color-bg-tertiary: #f1f5f9;
+  --color-bg-card: #ffffff;
+  --color-bg-overlay: rgba(255, 255, 255, 0.9);
+  
+  /* Text Colors */
+  --color-text-primary: #1e293b;
+  --color-text-secondary: #64748b;
+  --color-text-tertiary: #94a3b8;
+  --color-text-inverse: #ffffff;
+  
+  /* Border Colors */
+  --color-border-primary: #e2e8f0;
+  --color-border-secondary: #cbd5e1;
+  --color-border-focus: #3b82f6;
+  
+  /* Shadow Colors */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* Gradient Colors */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  
+  /* Glass Effect */
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-backdrop: blur(10px);
+}
+
+/* CSS Variables for Dark Theme */
+[data-theme="dark"] {
+  /* Primary Colors */
+  --color-primary: #60a5fa;
+  --color-primary-hover: #3b82f6;
+  --color-primary-light: #1e3a8a;
+  
+  /* Secondary Colors */
+  --color-secondary: #a78bfa;
+  --color-secondary-hover: #8b5cf6;
+  --color-secondary-light: #4c1d95;
+  
+  /* Background Colors */
+  --color-bg-primary: #0f172a;
+  --color-bg-secondary: #1e293b;
+  --color-bg-tertiary: #334155;
+  --color-bg-card: #1e293b;
+  --color-bg-overlay: rgba(15, 23, 42, 0.9);
+  
+  /* Text Colors */
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #cbd5e1;
+  --color-text-tertiary: #94a3b8;
+  --color-text-inverse: #0f172a;
+  
+  /* Border Colors */
+  --color-border-primary: #334155;
+  --color-border-secondary: #475569;
+  --color-border-focus: #60a5fa;
+  
+  /* Shadow Colors */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+  
+  /* Gradient Colors */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  
+  /* Glass Effect */
+  --glass-bg: rgba(0, 0, 0, 0.2);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-backdrop: blur(15px);
+}
+
+/* Base Styles */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+/* Theme-aware Components */
+.themed-card {
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.themed-input {
+  background-color: var(--color-bg-card);
+  border: 2px solid var(--color-border-primary);
+  color: var(--color-text-primary);
+}
+
+.themed-input:focus {
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.themed-button-primary {
+  background: var(--gradient-primary);
+  color: var(--color-text-inverse);
+  border: none;
+  box-shadow: var(--shadow-md);
+}
+
+.themed-button-primary:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.themed-button-secondary {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-primary);
+}
+
+.themed-button-secondary:hover {
+  background-color: var(--color-bg-tertiary);
+}
+
+/* Glass Morphism */
+.themed-glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-backdrop);
+  border: 1px solid var(--glass-border);
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+  position: relative;
+  width: 60px;
+  height: 30px;
+  background: var(--gradient-primary);
+  border-radius: 15px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-md);
+}
+
+.theme-toggle:hover {
+  box-shadow: var(--shadow-lg);
+  transform: scale(1.05);
+}
+
+.theme-toggle::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .theme-toggle::before {
+  transform: translateX(30px);
+}
+
+.theme-toggle-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  transition: opacity 0.3s ease;
+}
+
+.theme-toggle-icon.sun {
+  left: 6px;
+  opacity: 1;
+}
+
+.theme-toggle-icon.moon {
+  right: 6px;
+  opacity: 0;
+}
+
+[data-theme="dark"] .theme-toggle-icon.sun {
+  opacity: 0;
+}
+
+[data-theme="dark"] .theme-toggle-icon.moon {
+  opacity: 1;
+}
+
+/* Scrollbar Theming */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gradient-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gradient-secondary);
+}
+
+/* Selection Theming */
+::selection {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+/* Dark Mode Specific Animations */
+[data-theme="dark"] .neon-blue {
+  text-shadow: 
+    0 0 5px #60a5fa,
+    0 0 10px #60a5fa,
+    0 0 15px #60a5fa,
+    0 0 20px #60a5fa;
+}
+
+[data-theme="dark"] .neon-purple {
+  text-shadow: 
+    0 0 5px #a78bfa,
+    0 0 10px #a78bfa,
+    0 0 15px #a78bfa,
+    0 0 20px #a78bfa;
+}
+
+[data-theme="dark"] .neon-pink {
+  text-shadow: 
+    0 0 5px #f472b6,
+    0 0 10px #f472b6,
+    0 0 15px #f472b6,
+    0 0 20px #f472b6;
+}
+
+/* Particle Effects for Dark Mode */
+[data-theme="dark"] .particles::before {
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, rgba(96, 165, 250, 0.3), transparent),
+    radial-gradient(2px 2px at 40px 70px, rgba(167, 139, 250, 0.2), transparent),
+    radial-gradient(1px 1px at 90px 40px, rgba(244, 114, 182, 0.4), transparent),
+    radial-gradient(1px 1px at 130px 80px, rgba(96, 165, 250, 0.3), transparent),
+    radial-gradient(2px 2px at 160px 30px, rgba(167, 139, 250, 0.2), transparent);
+}
+
+/* Theme-aware Hover Effects */
+.themed-hover:hover {
+  background-color: var(--color-bg-secondary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Theme-aware Focus States */
+.themed-focus:focus {
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+[data-theme="dark"] .themed-focus:focus {
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+}
+
+/* Responsive Theme Adjustments */
+@media (max-width: 768px) {
+  .theme-toggle {
+    width: 50px;
+    height: 25px;
+  }
+  
+  .theme-toggle::before {
+    width: 19px;
+    height: 19px;
+  }
+  
+  [data-theme="dark"] .theme-toggle::before {
+    transform: translateX(25px);
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  :root {
+    --color-border-primary: #000000;
+    --color-text-secondary: #000000;
+  }
+  
+  [data-theme="dark"] {
+    --color-border-primary: #ffffff;
+    --color-text-secondary: #ffffff;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .theme-transition,
+  .theme-toggle,
+  .theme-toggle::before {
+    transition: none !important;
+  }
+}

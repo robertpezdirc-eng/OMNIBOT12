@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni-APP Real-Time Backend Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+            user-select: none;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            z-index: -1;
+        }
+
+        #dashboard {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .node {
+            border: 3px solid rgba(255, 255, 255, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            text-align: center;
+            width: 180px;
+            position: absolute;
+            cursor: grab;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+            font-weight: 600;
+            font-size: 14px;
+            transform-origin: center;
+        }
+
+        .node:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-8px) scale(1.08);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+            border-color: #4CAF50;
+            z-index: 100;
+        }
+
+        .node:active, .node.dragging {
+            cursor: grabbing;
+            transform: scale(1.1) rotate(2deg);
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            border-color: #ff6b6b;
+        }
+
+        .node.main-module {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+            width: 200px;
+            border: 3px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .node.main-module:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            color: white;
+        }
+
+        .node.submodule {
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px solid #4CAF50;
+            width: 160px;
+            font-size: 13px;
+            position: relative;
+        }
+
+        .node.submodule::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 15px;
+            height: 3px;
+            background: #4CAF50;
+            border-radius: 2px;
+        }
+
+        .node.submodule:hover {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: #45a049;
+        }
+
+        .node.global {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            font-weight: bold;
+            width: 240px;
+            animation: globalPulse 3s infinite;
+            border: 3px solid rgba(255, 255, 255, 0.6);
+        }
+
+        @keyframes globalPulse {
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 0 10px 40px rgba(255, 107, 107, 0.3);
+            }
+            50% { 
+                transform: scale(1.03); 
+                box-shadow: 0 15px 60px rgba(255, 107, 107, 0.5);
+            }
+        }
+
+        .status {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .status.online { 
+            background: #4CAF50; 
+            color: white; 
+            animation: statusGlow 2s ease-in-out infinite alternate;
+        }
+        
+        .status.warning { 
+            background: #ff9800; 
+            color: white; 
+            animation: statusBlink 1.5s ease-in-out infinite;
+        }
+        
+        .status.offline { 
+            background: #f44336; 
+            color: white; 
+        }
+        
+        .status.loading { 
+            background: #2196F3; 
+            color: white; 
+            animation: statusPulse 1.2s ease-in-out infinite;
+        }
+
+        .status.processing {
+            background: #9C27B0;
+            color: white;
+            animation: statusRotate 2s linear infinite;
+        }
+
+        .status.maintenance {
+            background: #FF5722;
+            color: white;
+            animation: statusFlash 1s ease-in-out infinite;
+        }
+
+        @keyframes statusGlow {
+            from { box-shadow: 0 0 8px rgba(76, 175, 80, 0.6); }
+            to { box-shadow: 0 0 20px rgba(76, 175, 80, 0.9); }
+        }
+
+        @keyframes statusBlink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.6; }
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes statusRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes statusFlash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        #links {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .link {
+            stroke: rgba(255, 255, 255, 0.8);
+            stroke-width: 3px;
+            stroke-dasharray: 12, 6;
+            animation: dash 2.5s linear infinite;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
+            transition: all 0.3s ease;
+        }
+
+        .link.main-connection {
+            stroke: #4CAF50;
+            stroke-width: 4px;
+            stroke-dasharray: 15, 8;
+            filter: drop-shadow(0 0 8px rgba(76, 175, 80, 0.6));
+        }
+
+        .link.sub-connection {
+            stroke: #2196F3;
+            stroke-width: 3px;
+            stroke-dasharray: 10, 5;
+            filter: drop-shadow(0 0 6px rgba(33, 150, 243, 0.5));
+        }
+
+        .link.active {
+            stroke-width: 5px;
+            animation: dash 1s linear infinite, linkPulse 2s ease-in-out infinite;
+        }
+
+        .link.high-traffic {
+            stroke-width: 6px;
+            stroke: #FFD700;
+            animation: dash 0.5s linear infinite, linkPulse 1s ease-in-out infinite;
+            filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.8));
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: -18; }
+        }
+
+        @keyframes linkPulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        .data-dot {
+            r: 6;
+            filter: drop-shadow(0 0 10px currentColor);
+            animation: dotGlow 1.5s ease-in-out infinite alternate;
+            transition: all 0.3s ease;
+        }
+
+        .data-dot.online { fill: #4CAF50; }
+        .data-dot.warning { fill: #ff9800; }
+        .data-dot.offline { fill: #f44336; }
+        .data-dot.loading { fill: #2196F3; }
+        .data-dot.processing { fill: #9C27B0; }
+        .data-dot.maintenance { fill: #FF5722; }
+
+        @keyframes dotGlow {
+            from { opacity: 0.6; r: 5; }
+            to { opacity: 1; r: 8; }
+        }
+
+        #connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            z-index: 300;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            min-width: 280px;
+        }
+
+        .connection-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: connectionPulse 2s ease-in-out infinite;
+        }
+
+        .connection-indicator.connected {
+            background: #4CAF50;
+        }
+
+        .connection-indicator.disconnected {
+            background: #f44336;
+        }
+
+        .connection-indicator.connecting {
+            background: #ff9800;
+        }
+
+        @keyframes connectionPulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.3); opacity: 1; }
+        }
+
+        #backend-controls {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border: 3px solid rgba(255, 255, 255, 0.4);
+            border-radius: 20px;
+            padding: 25px;
+            width: 380px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+            z-index: 200;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        #backend-controls h3 {
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+            font-size: 1.2em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        #backend-controls input, #backend-controls button {
+            margin: 8px 0;
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        #backend-controls button {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #backend-controls button:hover {
+            background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        #backend-controls button.disconnect-btn {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+        }
+
+        #backend-controls button.disconnect-btn:hover {
+            background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+            box-shadow: 0 8px 20px rgba(244, 67, 54, 0.4);
+        }
+
+        .control-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.03);
+            border-radius: 15px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        #real-time-stats {
+            position: fixed;
+            left: 20px;
+            bottom: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            z-index: 200;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            min-width: 300px;
+        }
+
+        .stats-item {
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stats-value {
+            font-weight: bold;
+            color: #4CAF50;
+            font-size: 14px;
+        }
+
+        .stats-value.warning {
+            color: #ff9800;
+        }
+
+        .stats-value.error {
+            color: #f44336;
+        }
+
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            z-index: 2000;
+            animation: fadeInOut 4s ease-in-out;
+            font-weight: bold;
+            font-size: 16px;
+            border: 2px solid #4CAF50;
+            max-width: 80%;
+            text-align: center;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            20%, 80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .backend-log {
+            background: rgba(0, 0, 0, 0.8);
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+        }
+
+        .log-entry {
+            margin: 2px 0;
+            opacity: 0.8;
+        }
+
+        .log-entry.error {
+            color: #ff4444;
+        }
+
+        .log-entry.warning {
+            color: #ffaa00;
+        }
+
+        .log-entry.success {
+            color: #44ff44;
+        }
+
+        @media (max-width: 768px) {
+            .node {
+                width: 140px;
+                padding: 15px;
+                font-size: 12px;
+            }
+            
+            #backend-controls, #connection-status {
+                width: 300px;
+                padding: 20px;
+            }
+            
+            #real-time-stats {
+                font-size: 11px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <svg id="links" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+        <defs>
+            <marker id="arrowhead" markerWidth="12" markerHeight="8" 
+                    refX="11" refY="4" orient="auto">
+                <polygon points="0 0, 12 4, 0 8" fill="rgba(255, 255, 255, 0.8)" />
+            </marker>
+            <marker id="arrowhead-main" markerWidth="12" markerHeight="8" 
+                    refX="11" refY="4" orient="auto">
+                <polygon points="0 0, 12 4, 0 8" fill="#4CAF50" />
+            </marker>
+            <marker id="arrowhead-sub" markerWidth="12" markerHeight="8" 
+                    refX="11" refY="4" orient="auto">
+                <polygon points="0 0, 12 4, 0 8" fill="#2196F3" />
+            </marker>
+            <filter id="glow">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                <feMerge> 
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+        </defs>
+    </svg>
+
+    <div id="dashboard">
+        <div class="node global" id="global" style="top: 50px; left: 600px;">
+            🌐 Global Optimizer
+            <span class="status loading" id="status-global">⏳ Connecting...</span>
+        </div>
+    </div>
+
+    <div id="connection-status">
+        <div style="font-weight: bold; margin-bottom: 15px; color: #4CAF50;">🔗 Backend Connection Status</div>
+        <div style="margin-bottom: 10px;">
+            <span class="connection-indicator connecting" id="connection-indicator"></span>
+            <span id="connection-text">Connecting to Omni-APP Backend...</span>
+        </div>
+        <div style="font-size: 12px; opacity: 0.8;">
+            <div>Endpoint: <span id="backend-endpoint">ws://localhost:8080/status</span></div>
+            <div>Last Update: <span id="last-backend-update">--:--:--</span></div>
+            <div>Messages Received: <span id="messages-count">0</span></div>
+            <div>Connection Uptime: <span id="connection-uptime">00:00:00</span></div>
+        </div>
+    </div>
+
+    <div id="backend-controls">
+        <h3>🔌 Real-Time Backend Integration</h3>
+        
+        <div class="control-section">
+            <strong>🌐 WebSocket Connection:</strong>
+            <input type="text" id="backend-url" placeholder="ws://localhost:8080/status" value="ws://localhost:8080/status"/>
+            <button id="connect-backend">Connect to Backend</button>
+            <button id="disconnect-backend" class="disconnect-btn">Disconnect</button>
+        </div>
+
+        <div class="control-section">
+            <strong>📡 Fallback REST API:</strong>
+            <input type="text" id="rest-api-url" placeholder="http://localhost:8080/api/status" value="http://localhost:8080/api/status"/>
+            <button id="test-rest-api">Test REST Endpoint</button>
+        </div>
+
+        <div class="control-section">
+            <strong>⚙️ Connection Settings:</strong>
+            <label>Auto-reconnect: <input type="checkbox" id="auto-reconnect" checked/></label><br>
+            <label>Update Interval (ms): <input type="number" id="update-interval" value="2000" min="500" max="10000"/></label><br>
+            <label>Enable Animations: <input type="checkbox" id="enable-animations" checked/></label>
+        </div>
+
+        <div class="backend-log" id="backend-log">
+            <div class="log-entry success">[INFO] Backend integration initialized</div>
+            <div class="log-entry">[DEBUG] Waiting for connection...</div>
+        </div>
+    </div>
+
+    <div id="real-time-stats">
+        <div style="font-weight: bold; margin-bottom: 15px; color: #4CAF50;">📊 Real-Time Dashboard Statistics</div>
+        <div class="stats-item">
+            <span>Backend Status:</span>
+            <span class="stats-value" id="backend-status">Disconnected</span>
+        </div>
+        <div class="stats-item">
+            <span>Active Modules:</span>
+            <span class="stats-value" id="active-modules">0</span>
+        </div>
+        <div class="stats-item">
+            <span>Online Modules:</span>
+            <span class="stats-value" id="online-modules">0</span>
+        </div>
+        <div class="stats-item">
+            <span>Warning Modules:</span>
+            <span class="stats-value warning" id="warning-modules">0</span>
+        </div>
+        <div class="stats-item">
+            <span>Offline Modules:</span>
+            <span class="stats-value error" id="offline-modules">0</span>
+        </div>
+        <div class="stats-item">
+            <span>Data Flow Rate:</span>
+            <span class="stats-value" id="data-flow-rate">0.0</span> MB/s
+        </div>
+        <div class="stats-item">
+            <span>Processing Load:</span>
+            <span class="stats-value" id="processing-load">0</span>%
+        </div>
+        <div class="stats-item">
+            <span>Response Time:</span>
+            <span class="stats-value" id="response-time">0</span> ms
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        const linksSVG = document.getElementById("links");
+        const dashboard = document.getElementById("dashboard");
+        
+        let nodes = [{
+            id: "global", 
+            icon: "🌐", 
+            top: 50, 
+            left: 600, 
+            parent: null, 
+            type: "global"
+        }];
+        
+        let lines = [];
+        let nodeStatuses = {global: "⏳ Connecting..."};
+        let animationDots = [];
+        let websocket = null;
+        let connectionStartTime = null;
+        let messagesReceived = 0;
+        let isConnected = false;
+        let autoReconnectEnabled = true;
+        let reconnectAttempts = 0;
+        let maxReconnectAttempts = 5;
+        let updateInterval = 2000;
+        let animationsEnabled = true;
+        let backendData = {};
+        let performanceMetrics = {
+            dataFlowRate: 0,
+            processingLoad: 0,
+            responseTime: 0
+        };
+
+        // WebSocket Connection Management
+        function connectToBackend() {
+            const backendUrl = document.getElementById('backend-url').value.trim();
+            
+            if (!backendUrl) {
+                showNotification('⚠️ Prosim vnesi URL za backend!');
+                return;
+            }
+
+            if (websocket && websocket.readyState === WebSocket.OPEN) {
+                showNotification('ℹ️ Že povezan z backendom!');
+                return;
+            }
+
+            addLogEntry('info', `Connecting to ${backendUrl}...`);
+            updateConnectionStatus('connecting', 'Connecting to Omni-APP Backend...');
+
+            try {
+                websocket = new WebSocket(backendUrl);
+                connectionStartTime = Date.now();
+
+                websocket.onopen = function(event) {
+                    isConnected = true;
+                    reconnectAttempts = 0;
+                    updateConnectionStatus('connected', 'Connected to Omni-APP Backend');
+                    addLogEntry('success', 'WebSocket connection established');
+                    showNotification('✅ Uspešno povezan z Omni-APP backendom!');
+                    
+                    // Request initial status
+                    websocket.send(JSON.stringify({
+                        type: 'request_status',
+                        timestamp: Date.now()
+                    }));
+                };
+
+                websocket.onmessage = function(event) {
+                    messagesReceived++;
+                    document.getElementById('messages-count').textContent = messagesReceived;
+                    document.getElementById('last-backend-update').textContent = new Date().toLocaleTimeString();
+                    
+                    try {
+                        const data = JSON.parse(event.data);
+                        handleBackendMessage(data);
+                        addLogEntry('success', `Received: ${data.type || 'status_update'}`);
+                    } catch (error) {
+                        addLogEntry('error', `Invalid JSON received: ${error.message}`);
+                    }
+                };
+
+                websocket.onerror = function(error) {
+                    addLogEntry('error', `WebSocket error: ${error.message || 'Connection failed'}`);
+                    updateConnectionStatus('disconnected', 'Connection Error');
+                };
+
+                websocket.onclose = function(event) {
+                    isConnected = false;
+                    updateConnectionStatus('disconnected', 'Disconnected from Backend');
+                    addLogEntry('warning', `Connection closed: ${event.reason || 'Unknown reason'}`);
+                    
+                    if (autoReconnectEnabled && reconnectAttempts < maxReconnectAttempts) {
+                        reconnectAttempts++;
+                        addLogEntry('info', `Auto-reconnect attempt ${reconnectAttempts}/${maxReconnectAttempts} in 5s...`);
+                        setTimeout(() => {
+                            if (!isConnected) {
+                                connectToBackend();
+                            }
+                        }, 5000);
+                    }
+                };
+
+            } catch (error) {
+                addLogEntry('error', `Failed to create WebSocket: ${error.message}`);
+                updateConnectionStatus('disconnected', 'Connection Failed');
+            }
+        }
+
+        function disconnectFromBackend() {
+            if (websocket) {
+                autoReconnectEnabled = false;
+                websocket.close();
+                websocket = null;
+                addLogEntry('info', 'Manually disconnected from backend');
+                showNotification('🔌 Disconnected from backend');
+            }
+        }
+
+        function updateConnectionStatus(status, text) {
+            const indicator = document.getElementById('connection-indicator');
+            const statusText = document.getElementById('connection-text');
+            const backendStatus = document.getElementById('backend-status');
+            
+            indicator.className = `connection-indicator ${status}`;
+            statusText.textContent = text;
+            backendStatus.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+            backendStatus.className = `stats-value ${status === 'connected' ? '' : status === 'connecting' ? 'warning' : 'error'}`;
+        }
+
+        // Handle messages from backend
+        function handleBackendMessage(data) {
+            const startTime = Date.now();
+            
+            switch (data.type) {
+                case 'status_update':
+                    handleStatusUpdate(data);
+                    break;
+                case 'module_data':
+                    handleModuleData(data);
+                    break;
+                case 'performance_metrics':
+                    handlePerformanceMetrics(data);
+                    break;
+                case 'system_alert':
+                    handleSystemAlert(data);
+                    break;
+                default:
+                    addLogEntry('warning', `Unknown message type: ${data.type}`);
+            }
+            
+            // Update response time
+            performanceMetrics.responseTime = Date.now() - startTime;
+            document.getElementById('response-time').textContent = performanceMetrics.responseTime;
+        }
+
+        function handleStatusUpdate(data) {
+            if (data.modules && Array.isArray(data.modules)) {
+                data.modules.forEach(module => {
+                    updateModuleStatus(module.id, module.status, module.metadata);
+                });
+                
+                // Create missing modules
+                data.modules.forEach(module => {
+                    if (!nodes.find(n => n.id === module.id) && module.id !== 'global') {
+                        createModuleFromBackend(module);
+                    }
+                });
+                
+                updateRealTimeStats();
+                
+                if (animationsEnabled) {
+                    triggerDataFlowAnimations();
+                }
+            }
+        }
+
+        function handleModuleData(data) {
+            backendData[data.moduleId] = data.data;
+            addLogEntry('info', `Module data updated: ${data.moduleId}`);
+        }
+
+        function handlePerformanceMetrics(data) {
+            performanceMetrics = { ...performanceMetrics, ...data.metrics };
+            document.getElementById('data-flow-rate').textContent = performanceMetrics.dataFlowRate?.toFixed(1) || '0.0';
+            document.getElementById('processing-load').textContent = Math.round(performanceMetrics.processingLoad || 0);
+        }
+
+        function handleSystemAlert(data) {
+            showNotification(`🚨 ${data.message}`, data.severity || 'warning');
+            addLogEntry(data.severity || 'warning', `ALERT: ${data.message}`);
+        }
+
+        function updateModuleStatus(moduleId, status, metadata = {}) {
+            nodeStatuses[moduleId] = status;
+            const statusEl = document.getElementById(`status-${moduleId}`);
+            
+            if (statusEl) {
+                statusEl.textContent = status;
+                statusEl.className = `status ${getStatusClass(status)}`;
+                
+                // Update node border color based on status
+                const nodeEl = document.getElementById(moduleId);
+                if (nodeEl) {
+                    const statusClass = getStatusClass(status);
+                    nodeEl.style.borderColor = getStatusColor(statusClass);
+                }
+            }
+            
+            // Store metadata for detailed view
+            if (metadata && Object.keys(metadata).length > 0) {
+                backendData[moduleId] = metadata;
+            }
+        }
+
+        function createModuleFromBackend(moduleData) {
+            const { id, icon = '📦', type = 'main', parent = null, position } = moduleData;
+            
+            // Calculate position
+            let x, y;
+            if (position) {
+                x = position.x;
+                y = position.y;
+            } else {
+                // Auto-position around global node
+                const globalNode = nodes.find(n => n.id === 'global');
+                const angle = nodes.length * 60 * (Math.PI / 180);
+                const radius = type === 'sub' ? 180 : 300;
+                x = globalNode.left + radius * Math.cos(angle);
+                y = globalNode.top + radius * Math.sin(angle);
+            }
+            
+            createNode(id, icon, y, x, parent, type);
+        }
+
+        function getStatusClass(status) {
+            const statusLower = status.toLowerCase();
+            if (statusLower.includes('online') || statusLower.includes('✅')) return 'online';
+            if (statusLower.includes('warning') || statusLower.includes('⚠')) return 'warning';
+            if (statusLower.includes('offline') || statusLower.includes('❌')) return 'offline';
+            if (statusLower.includes('processing') || statusLower.includes('🔄')) return 'processing';
+            if (statusLower.includes('maintenance') || statusLower.includes('🔧')) return 'maintenance';
+            return 'loading';
+        }
+
+        function getStatusColor(statusClass) {
+            const colors = {
+                'online': '#4CAF50',
+                'warning': '#ff9800',
+                'offline': '#f44336',
+                'processing': '#9C27B0',
+                'maintenance': '#FF5722',
+                'loading': '#2196F3'
+            };
+            return colors[statusClass] || '#2196F3';
+        }
+
+        // REST API Fallback
+        async function testRestAPI() {
+            const apiUrl = document.getElementById('rest-api-url').value.trim();
+            
+            if (!apiUrl) {
+                showNotification('⚠️ Prosim vnesi REST API URL!');
+                return;
+            }
+
+            addLogEntry('info', `Testing REST API: ${apiUrl}`);
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    timeout: 5000
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    addLogEntry('success', `REST API test successful`);
+                    handleBackendMessage(data);
+                    showNotification('✅ REST API test successful!');
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                addLogEntry('error', `REST API test failed: ${error.message}`);
+                showNotification(`❌ REST API test failed: ${error.message}`);
+            }
+        }
+
+        // Animation and Visual Updates
+        function triggerDataFlowAnimations() {
+            if (!animationsEnabled) return;
+            
+            lines.forEach(line => {
+                if (Math.random() > 0.4) { // 60% chance of animation
+                    animateRealTimeFlow(line);
+                }
+            });
+        }
+
+        function animateRealTimeFlow(lineObj) {
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            const targetStatus = nodeStatuses[lineObj.target] || 'loading';
+            const statusClass = getStatusClass(targetStatus);
+            
+            circle.setAttribute("r", "6");
+            circle.setAttribute("class", `data-dot ${statusClass}`);
+            circle.setAttribute("fill", getStatusColor(statusClass));
+            
+            linksSVG.appendChild(circle);
+            animationDots.push(circle);
+            
+            // Enhanced animation with variable speed based on status
+            const baseSpeed = 3000;
+            const speedMultiplier = statusClass === 'online' ? 0.7 : statusClass === 'warning' ? 1.2 : 1.5;
+            const duration = baseSpeed * speedMultiplier + Math.random() * 2000;
+            
+            const startTime = Date.now();
+            
+            function step() {
+                const elapsed = Date.now() - startTime;
+                const progress = elapsed / duration;
+                
+                if (progress >= 1) {
+                    if (circle.parentNode) {
+                        linksSVG.removeChild(circle);
+                    }
+                    animationDots = animationDots.filter(dot => dot !== circle);
+                    return;
+                }
+                
+                const l = lineObj.line;
+                const x1 = parseFloat(l.getAttribute("x1"));
+                const y1 = parseFloat(l.getAttribute("y1"));
+                const x2 = parseFloat(l.getAttribute("x2"));
+                const y2 = parseFloat(l.getAttribute("y2"));
+                
+                // Smooth easing with status-based variation
+                let easeProgress;
+                if (statusClass === 'online') {
+                    easeProgress = 1 - Math.pow(1 - progress, 2); // Faster, smoother
+                } else if (statusClass === 'warning') {
+                    easeProgress = progress + 0.1 * Math.sin(progress * Math.PI * 4); // Slightly jittery
+                } else {
+                    easeProgress = 1 - Math.pow(1 - progress, 3); // Slower
+                }
+                
+                const currentX = x1 + (x2 - x1) * easeProgress;
+                const currentY = y1 + (y2 - y1) * easeProgress;
+                
+                circle.setAttribute("cx", currentX);
+                circle.setAttribute("cy", currentY);
+                
+                // Dynamic size based on progress
+                const size = 6 + 2 * Math.sin(progress * Math.PI);
+                circle.setAttribute("r", size);
+                
+                requestAnimationFrame(step);
+            }
+            
+            step();
+        }
+
+        function updateRealTimeStats() {
+            const activeModules = nodes.length - 1; // Exclude global
+            const onlineCount = Object.values(nodeStatuses).filter(s => getStatusClass(s) === 'online').length;
+            const warningCount = Object.values(nodeStatuses).filter(s => getStatusClass(s) === 'warning').length;
+            const offlineCount = Object.values(nodeStatuses).filter(s => getStatusClass(s) === 'offline').length;
+            
+            document.getElementById('active-modules').textContent = activeModules;
+            document.getElementById('online-modules').textContent = onlineCount;
+            document.getElementById('warning-modules').textContent = warningCount;
+            document.getElementById('offline-modules').textContent = offlineCount;
+        }
+
+        // Utility Functions
+        function addLogEntry(type, message) {
+            const logContainer = document.getElementById('backend-log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            
+            logContainer.appendChild(entry);
+            
+            // Keep only last 50 entries
+            while (logContainer.children.length > 50) {
+                logContainer.removeChild(logContainer.firstChild);
+            }
+            
+            // Auto-scroll to bottom
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            
+            if (type === 'warning') {
+                notification.style.borderColor = '#ff9800';
+            } else if (type === 'error') {
+                notification.style.borderColor = '#f44336';
+            }
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    document.body.removeChild(notification);
+                }
+            }, 4000);
+        }
+
+        function updateConnectionUptime() {
+            if (connectionStartTime && isConnected) {
+                const uptime = Date.now() - connectionStartTime;
+                const hours = Math.floor(uptime / 3600000);
+                const minutes = Math.floor((uptime % 3600000) / 60000);
+                const seconds = Math.floor((uptime % 60000) / 1000);
+                
+                document.getElementById('connection-uptime').textContent = 
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            } else {
+                document.getElementById('connection-uptime').textContent = '00:00:00';
+            }
+        }
+
+        // Node Management (from previous dashboard)
+        function createNode(id, icon, top = 200, left = 100, parent = null, type = "main") {
+            if (nodes.find(n => n.id === id)) {
+                return false;
+            }
+
+            const div = document.createElement("div");
+            let nodeClass = "node";
+            if (type === "sub") nodeClass += " submodule";
+            else if (type === "main") nodeClass += " main-module";
+            else if (type === "global") nodeClass += " global";
+            
+            div.className = nodeClass;
+            div.id = id;
+            div.style.top = top + "px";
+            div.style.left = left + "px";
+            div.innerHTML = `${icon} ${id}<span class="status loading" id="status-${id}">⏳ Loading...</span>`;
+            
+            dashboard.appendChild(div);
+            nodes.push({id, icon, top, left, parent, type});
+            nodeStatuses[id] = "⏳ Loading...";
+            
+            updateConnections();
+            return true;
+        }
+
+        function updateConnections() {
+            // Clear existing lines
+            lines.forEach(l => {
+                if (l.line && l.line.parentNode) {
+                    linksSVG.removeChild(l.line);
+                }
+            });
+            lines = [];
+            
+            // Create new connections
+            nodes.filter(n => n.id !== "global").forEach(n => {
+                const parentId = n.parent || "global";
+                const source = document.getElementById(parentId);
+                const target = document.getElementById(n.id);
+                
+                if (!source || !target) return;
+                
+                const sourceRect = source.getBoundingClientRect();
+                const targetRect = target.getBoundingClientRect();
+                
+                const sourceCenterX = sourceRect.left + sourceRect.width / 2;
+                const sourceCenterY = sourceRect.top + sourceRect.height / 2;
+                const targetCenterX = targetRect.left + targetRect.width / 2;
+                const targetCenterY = targetRect.top + targetRect.height / 2;
+                
+                const dx = targetCenterX - sourceCenterX;
+                const dy = targetCenterY - sourceCenterY;
+                const angle = Math.atan2(dy, dx);
+                
+                const sourceRadius = Math.min(sourceRect.width, sourceRect.height) / 2;
+                const targetRadius = Math.min(targetRect.width, targetRect.height) / 2;
+                
+                const x1 = sourceCenterX + sourceRadius * Math.cos(angle);
+                const y1 = sourceCenterY + sourceRadius * Math.sin(angle);
+                const x2 = targetCenterX - targetRadius * Math.cos(angle);
+                const y2 = targetCenterY - targetRadius * Math.sin(angle);
+                
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", x1);
+                line.setAttribute("y1", y1);
+                line.setAttribute("x2", x2);
+                line.setAttribute("y2", y2);
+                
+                const connectionType = n.parent ? "sub-connection" : "main-connection";
+                line.setAttribute("class", `link ${connectionType}`);
+                line.setAttribute("filter", "url(#glow)");
+                
+                if (connectionType === "main-connection") {
+                    line.setAttribute("marker-end", "url(#arrowhead-main)");
+                } else {
+                    line.setAttribute("marker-end", "url(#arrowhead-sub)");
+                }
+                
+                linksSVG.appendChild(line);
+                lines.push({
+                    line: line,
+                    target: n.id,
+                    source: parentId,
+                    type: connectionType
+                });
+            });
+        }
+
+        // Event Listeners
+        document.getElementById('connect-backend').onclick = connectToBackend;
+        document.getElementById('disconnect-backend').onclick = disconnectFromBackend;
+        document.getElementById('test-rest-api').onclick = testRestAPI;
+
+        document.getElementById('auto-reconnect').onchange = function() {
+            autoReconnectEnabled = this.checked;
+            addLogEntry('info', `Auto-reconnect ${this.checked ? 'enabled' : 'disabled'}`);
+        };
+
+        document.getElementById('update-interval').onchange = function() {
+            updateInterval = parseInt(this.value);
+            addLogEntry('info', `Update interval set to ${updateInterval}ms`);
+        };
+
+        document.getElementById('enable-animations').onchange = function() {
+            animationsEnabled = this.checked;
+            addLogEntry('info', `Animations ${this.checked ? 'enabled' : 'disabled'}`);
+        };
+
+        // Initialize Dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add some example modules for demonstration
+            setTimeout(() => {
+                createNode("Finance", "💰", 300, 200, null, "main");
+                createNode("Plačila", "💳", 450, 350, "Finance", "sub");
+                createNode("Analize", "📊", 450, 450, "Finance", "sub");
+                
+                createNode("Turizem", "🏖️", 300, 600, null, "main");
+                createNode("Rezervacije", "📅", 450, 750, "Turizem", "sub");
+                
+                createNode("Marketing", "📢", 700, 400, null, "main");
+                
+                updateConnections();
+                updateRealTimeStats();
+            }, 1000);
+            
+            // Start connection uptime counter
+            setInterval(updateConnectionUptime, 1000);
+            
+            // Simulate some backend data for demo purposes
+            setTimeout(() => {
+                if (!isConnected) {
+                    simulateBackendData();
+                }
+            }, 3000);
+        });
+
+        // Demo simulation when no real backend is available
+        function simulateBackendData() {
+            addLogEntry('info', 'Starting demo simulation (no real backend connected)');
+            
+            setInterval(() => {
+                if (!isConnected) {
+                    // Simulate status updates
+                    const modules = ['global', 'Finance', 'Plačila', 'Analize', 'Turizem', 'Rezervacije', 'Marketing'];
+                    const statuses = ['✅ Online', '⚠️ Warning', '🔄 Processing', '🔧 Maintenance'];
+                    const weights = [0.7, 0.2, 0.08, 0.02];
+                    
+                    modules.forEach(moduleId => {
+                        if (Math.random() > 0.8) { // 20% chance of status change
+                            let random = Math.random();
+                            let status;
+                            
+                            if (random < weights[0]) status = statuses[0];
+                            else if (random < weights[0] + weights[1]) status = statuses[1];
+                            else if (random < weights[0] + weights[1] + weights[2]) status = statuses[2];
+                            else status = statuses[3];
+                            
+                            updateModuleStatus(moduleId, status);
+                        }
+                    });
+                    
+                    // Simulate performance metrics
+                    performanceMetrics.dataFlowRate = Math.random() * 50 + 10;
+                    performanceMetrics.processingLoad = Math.random() * 100;
+                    performanceMetrics.responseTime = Math.random() * 200 + 50;
+                    
+                    document.getElementById('data-flow-rate').textContent = performanceMetrics.dataFlowRate.toFixed(1);
+                    document.getElementById('processing-load').textContent = Math.round(performanceMetrics.processingLoad);
+                    document.getElementById('response-time').textContent = Math.round(performanceMetrics.responseTime);
+                    
+                    updateRealTimeStats();
+                    
+                    if (animationsEnabled) {
+                        triggerDataFlowAnimations();
+                    }
+                }
+            }, updateInterval);
+        }
+    </script>
+</body>
+</html>

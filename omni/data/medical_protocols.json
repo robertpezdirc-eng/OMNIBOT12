@@ -1,0 +1,76 @@
+{
+  "fever_protocol": {
+    "condition": "fever",
+    "temperature_threshold": 38.0,
+    "actions": [
+      "Izmeri temperaturo vsakih 2 uri",
+      "Zagotovi hidracijo",
+      "Razmisli o antipiretiku",
+      "Če temperatura > 39°C, kontaktiraj zdravnika"
+    ],
+    "medications": [
+      "paracetamol",
+      "ibuprofen"
+    ],
+    "monitoring_interval": 120
+  },
+  "hypertension_protocol": {
+    "condition": "hypertension",
+    "bp_threshold": {
+      "systolic": 140,
+      "diastolic": 90
+    },
+    "actions": [
+      "Preveri krvni tlak ponovno čez 15 minut",
+      "Zagotovi mir in sproščenost",
+      "Preveri trenutne zdravila",
+      "Če tlak ostaja visok, kontaktiraj zdravnika"
+    ],
+    "medications": [
+      "ACE inhibitorji",
+      "beta blokatorji"
+    ],
+    "monitoring_interval": 30
+  },
+  "tachycardia_protocol": {
+    "condition": "tachycardia",
+    "heart_rate_threshold": 100,
+    "actions": [
+      "Preveri srčni utrip ponovno",
+      "Oceni simptome (omotica, bolečina v prsih)",
+      "Zagotovi mir",
+      "Če utrip > 120 bpm, kontaktiraj zdravnika"
+    ],
+    "monitoring_interval": 15
+  },
+  "veterinary_fever": {
+    "condition": "animal_fever",
+    "temperature_threshold": 39.5,
+    "actions": [
+      "Izmeri temperaturo rektalno",
+      "Zagotovi svežo vodo",
+      "Opazuj vedenje živali",
+      "Kontaktiraj veterinarja če temperatura > 40°C"
+    ],
+    "species_specific": {
+      "dog": {
+        "normal_temp_range": [
+          38.0,
+          39.2
+        ]
+      },
+      "cat": {
+        "normal_temp_range": [
+          38.1,
+          39.2
+        ]
+      },
+      "horse": {
+        "normal_temp_range": [
+          37.2,
+          38.3
+        ]
+      }
+    }
+  }
+}

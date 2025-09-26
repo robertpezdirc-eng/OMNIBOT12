@@ -1,0 +1,33 @@
+{
+  "timestamp": "2025-09-24T18:31:22.049327",
+  "mqtt_config": {
+    "broker": "localhost",
+    "port": 1883,
+    "tls_enabled": false,
+    "auth_enabled": false,
+    "protocol": "MQTTv3.1.1",
+    "qos_settings": {
+      "default": 1,
+      "command": 2,
+      "status": 0
+    }
+  },
+  "validation": {
+    "valid": true,
+    "issues": [],
+    "warnings": [
+      "MQTT broker je nastavljen na localhost - preveri za produkcijo",
+      "MQTT avtentikacija ni nastavljena - priporočeno za varnost"
+    ],
+    "config_summary": {
+      "broker": "localhost:1883",
+      "tls_enabled": false,
+      "auth_enabled": false,
+      "protocol": "MQTTv3.1.1"
+    }
+  },
+  "test_results": {
+    "config_valid": true,
+    "connection_test": false
+  }
+}

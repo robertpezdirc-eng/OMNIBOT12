@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistemski Logi - Omni AI Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-group label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .control-group select,
+        .control-group input {
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .control-group select:focus,
+        .control-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #495057);
+        }
+
+        .logs-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            min-height: 500px;
+        }
+
+        .logs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .logs-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .logs-count {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .logs-list {
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+        }
+
+        .log-entry {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f8f9fa;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            transition: background-color 0.2s ease;
+        }
+
+        .log-entry:hover {
+            background-color: #f8f9fa;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-timestamp {
+            color: #6c757d;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .log-level {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-right: 10px;
+            display: inline-block;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .log-level-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .log-level-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .log-level-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .log-level-debug {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .log-message {
+            color: #333;
+        }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            font-size: 1.1rem;
+            margin: 50px 0;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .no-logs {
+            text-align: center;
+            color: #666;
+            font-size: 1.1rem;
+            margin: 50px 0;
+        }
+
+        .auto-refresh {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+        }
+
+        .auto-refresh input[type="checkbox"] {
+            transform: scale(1.2);
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .status-active {
+            background: #28a745;
+        }
+
+        .status-inactive {
+            background: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 Sistemski Logi</h1>
+            <p>Pregled sistemskih dogodkov in logov Omni AI platforme</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="log-level">Nivo:</label>
+                <select id="log-level">
+                    <option value="all">Vsi</option>
+                    <option value="info">Info</option>
+                    <option value="warning">Opozorila</option>
+                    <option value="error">Napake</option>
+                    <option value="debug">Debug</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="log-source">Vir:</label>
+                <select id="log-source">
+                    <option value="all">Vsi</option>
+                    <option value="main_app">Glavna aplikacija</option>
+                    <option value="angel_api">Angel API</option>
+                    <option value="unified_server">Enotni strežnik</option>
+                    <option value="system">Sistem</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="log-limit">Število:</label>
+                <select id="log-limit">
+                    <option value="50">50</option>
+                    <option value="100" selected>100</option>
+                    <option value="200">200</option>
+                    <option value="500">500</option>
+                </select>
+            </div>
+
+            <button class="btn" onclick="loadLogs()">🔄 Osveži</button>
+            <button class="btn btn-secondary" onclick="clearLogs()">🗑️ Počisti</button>
+
+            <div class="auto-refresh">
+                <input type="checkbox" id="auto-refresh" checked>
+                <label for="auto-refresh">Samodejno osvežuj</label>
+                <span class="status-indicator status-active" id="refresh-indicator"></span>
+            </div>
+        </div>
+
+        <div class="logs-container">
+            <div class="logs-header">
+                <div class="logs-title">Sistemski logi</div>
+                <div class="logs-count" id="logs-count">Nalagam...</div>
+            </div>
+
+            <div id="loading" class="loading">
+                Nalagam sistemske loge...
+            </div>
+
+            <div id="error" class="error" style="display: none;"></div>
+
+            <div id="no-logs" class="no-logs" style="display: none;">
+                Ni razpoložljivih logov za prikaz
+            </div>
+
+            <div id="logs-list" class="logs-list" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        let autoRefreshInterval;
+        let currentLogs = [];
+
+        // Simulirani logi za demo
+        const sampleLogs = [
+            {
+                timestamp: new Date().toISOString(),
+                level: 'info',
+                source: 'unified_server',
+                message: 'Enotni strežnik uspešno zagnan na portu 3000'
+            },
+            {
+                timestamp: new Date(Date.now() - 30000).toISOString(),
+                level: 'info',
+                source: 'angel_api',
+                message: 'Angel API Gateway aktiven na portu 3001'
+            },
+            {
+                timestamp: new Date(Date.now() - 60000).toISOString(),
+                level: 'info',
+                source: 'main_app',
+                message: 'Glavna aplikacija uspešno inicializirana'
+            },
+            {
+                timestamp: new Date(Date.now() - 90000).toISOString(),
+                level: 'warning',
+                source: 'system',
+                message: 'Backup sistem ni konfiguriran - lokalni način'
+            },
+            {
+                timestamp: new Date(Date.now() - 120000).toISOString(),
+                level: 'info',
+                source: 'angel_api',
+                message: 'LearningAngel sistem aktiven - odzivni čas: 45ms'
+            },
+            {
+                timestamp: new Date(Date.now() - 150000).toISOString(),
+                level: 'info',
+                source: 'angel_api',
+                message: 'CommercialAngel sistem aktiven - odzivni čas: 32ms'
+            },
+            {
+                timestamp: new Date(Date.now() - 180000).toISOString(),
+                level: 'debug',
+                source: 'unified_server',
+                message: 'API endpoint /api/health poklican - status: 200'
+            },
+            {
+                timestamp: new Date(Date.now() - 210000).toISOString(),
+                level: 'info',
+                source: 'system',
+                message: 'Kvantno procesiranje aktivno'
+            }
+        ];
+
+        async function loadLogs() {
+            const loadingEl = document.getElementById('loading');
+            const errorEl = document.getElementById('error');
+            const noLogsEl = document.getElementById('no-logs');
+            const logsListEl = document.getElementById('logs-list');
+
+            loadingEl.style.display = 'block';
+            errorEl.style.display = 'none';
+            noLogsEl.style.display = 'none';
+            logsListEl.style.display = 'none';
+
+            try {
+                // Za demo uporabljamo simulirane loge
+                // V produkciji bi to bil API klic: const response = await fetch('/api/logs');
+                
+                await new Promise(resolve => setTimeout(resolve, 500)); // Simulacija nalaganja
+                
+                const logs = [...sampleLogs];
+                
+                // Dodamo nekaj novih logov za simulacijo
+                const now = new Date();
+                logs.unshift({
+                    timestamp: now.toISOString(),
+                    level: 'info',
+                    source: 'unified_server',
+                    message: `API zahteva obdelana - ${now.toLocaleTimeString('sl-SI')}`
+                });
+
+                currentLogs = logs;
+                displayLogs(filterLogs(logs));
+
+                loadingEl.style.display = 'none';
+                logsListEl.style.display = 'block';
+            } catch (error) {
+                console.error('Napaka pri nalaganju logov:', error);
+                loadingEl.style.display = 'none';
+                errorEl.style.display = 'block';
+                errorEl.textContent = `Napaka pri nalaganju logov: ${error.message}`;
+            }
+        }
+
+        function filterLogs(logs) {
+            const level = document.getElementById('log-level').value;
+            const source = document.getElementById('log-source').value;
+            const limit = parseInt(document.getElementById('log-limit').value);
+
+            let filtered = logs;
+
+            if (level !== 'all') {
+                filtered = filtered.filter(log => log.level === level);
+            }
+
+            if (source !== 'all') {
+                filtered = filtered.filter(log => log.source === source);
+            }
+
+            return filtered.slice(0, limit);
+        }
+
+        function displayLogs(logs) {
+            const container = document.getElementById('logs-list');
+            const countEl = document.getElementById('logs-count');
+            const noLogsEl = document.getElementById('no-logs');
+
+            if (logs.length === 0) {
+                container.style.display = 'none';
+                noLogsEl.style.display = 'block';
+                countEl.textContent = 'Ni logov';
+                return;
+            }
+
+            countEl.textContent = `Prikazujem ${logs.length} logov`;
+            container.innerHTML = '';
+
+            logs.forEach(log => {
+                const logEntry = createLogEntry(log);
+                container.appendChild(logEntry);
+            });
+        }
+
+        function createLogEntry(log) {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+
+            const timestamp = new Date(log.timestamp).toLocaleString('sl-SI');
+            const levelClass = `log-level-${log.level}`;
+
+            entry.innerHTML = `
+                <span class="log-timestamp">${timestamp}</span>
+                <span class="log-level ${levelClass}">${log.level.toUpperCase()}</span>
+                <span class="log-message">[${log.source}] ${log.message}</span>
+            `;
+
+            return entry;
+        }
+
+        function clearLogs() {
+            if (confirm('Ali ste prepričani, da želite počistiti vse loge?')) {
+                currentLogs = [];
+                displayLogs([]);
+            }
+        }
+
+        function setupAutoRefresh() {
+            const checkbox = document.getElementById('auto-refresh');
+            const indicator = document.getElementById('refresh-indicator');
+
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    autoRefreshInterval = setInterval(loadLogs, 10000); // Vsakih 10 sekund
+                    indicator.className = 'status-indicator status-active';
+                } else {
+                    clearInterval(autoRefreshInterval);
+                    indicator.className = 'status-indicator status-inactive';
+                }
+            });
+
+            // Začni z avtomatskim osvežanjem
+            if (checkbox.checked) {
+                autoRefreshInterval = setInterval(loadLogs, 10000);
+            }
+        }
+
+        function setupFilters() {
+            const levelSelect = document.getElementById('log-level');
+            const sourceSelect = document.getElementById('log-source');
+            const limitSelect = document.getElementById('log-limit');
+
+            [levelSelect, sourceSelect, limitSelect].forEach(select => {
+                select.addEventListener('change', () => {
+                    if (currentLogs.length > 0) {
+                        displayLogs(filterLogs(currentLogs));
+                    }
+                });
+            });
+        }
+
+        // Inicializacija
+        document.addEventListener('DOMContentLoaded', function() {
+            setupAutoRefresh();
+            setupFilters();
+            loadLogs();
+        });
+
+        // Počisti interval ob zapuščanju strani
+        window.addEventListener('beforeunload', function() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌍 Omni Global Optimizer - Globalni Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            color: #7f8c8d;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .system-status {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .status-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-card.healthy {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .status-card.warning {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .status-card.critical {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+
+        .status-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .module-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .module-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+        }
+
+        .module-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .module-status {
+            margin-left: auto;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .module-status.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .module-status.inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .module-status.optimizing {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .module-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-top: 0.2rem;
+        }
+
+        .decisions-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .decision-item {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .decision-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .decision-item.critical {
+            border-left-color: #e74c3c;
+        }
+
+        .decision-item.important {
+            border-left-color: #f39c12;
+        }
+
+        .decision-item.routine {
+            border-left-color: #27ae60;
+        }
+
+        .decision-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .decision-title {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .decision-level {
+            padding: 0.2rem 0.6rem;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .decision-level.critical {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .decision-level.important {
+            background: #fff8e1;
+            color: #ef6c00;
+        }
+
+        .decision-level.routine {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .decision-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .decision-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.4rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-approve {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #219a52;
+        }
+
+        .btn-reject {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background: #c0392b;
+        }
+
+        .refresh-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .chart {
+            height: 300px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .modules-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .status-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌍 Omni Global Optimizer</h1>
+        <div class="subtitle">Centralni nadzorni center za vse panoge in sisteme</div>
+    </div>
+
+    <div class="container">
+        <!-- Sistemski status -->
+        <div class="system-status">
+            <h2>📊 Sistemski Status</h2>
+            <div class="status-grid">
+                <div class="status-card healthy" id="system-health">
+                    <div class="status-value">ZDRAVO</div>
+                    <div class="status-label">Zdravje Sistema</div>
+                </div>
+                <div class="status-card" id="active-modules">
+                    <div class="status-value">8/9</div>
+                    <div class="status-label">Aktivni Moduli</div>
+                </div>
+                <div class="status-card" id="efficiency">
+                    <div class="status-value">94%</div>
+                    <div class="status-label">Učinkovitost</div>
+                </div>
+                <div class="status-card" id="cost-savings">
+                    <div class="status-value">€2,450</div>
+                    <div class="status-label">Mesečni Prihranki</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Moduli -->
+        <div class="modules-grid">
+            <!-- IoT Avtonomno Učenje -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🔌</div>
+                    <div class="module-title">IoT Avtonomno Učenje</div>
+                    <div class="module-status active">AKTIVNO</div>
+                </div>
+                <div class="module-metrics">
+                    <div class="metric">
+                        <div class="metric-value">156</div>
+                        <div class="metric-label">Povezane Naprave</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">98%</div>
+                        <div class="metric-label">Učinkovitost</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">€340</div>
+                        <div class="metric-label">Prihranki</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">24/7</div>
+                        <div class="metric-label">Delovanje</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Finančni Optimizator -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">💶</div>
+                    <div class="module-title">Finančni Optimizator</div>
+                    <div class="module-status active">AKTIVNO</div>
+                </div>
+                <div class="module-metrics">
+                    <div class="metric">
+                        <div class="metric-value">€45,230</div>
+                        <div class="metric-label">Mesečni Promet</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">12%</div>
+                        <div class="metric-label">Stopnja Varčevanja</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">€890</div>
+                        <div class="metric-label">Prihranki</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">95%</div>
+                        <div class="metric-label">Natančnost</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logistični Optimizator -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🚚</div>
+                    <div class="module-title">Logistični Optimizator</div>
+                    <div class="module-status optimizing">OPTIMIZIRA</div>
+                </div>
+                <div class="module-metrics">
+                    <div class="metric">
+                        <div class="metric-value">23</div>
+                        <div class="metric-label">Aktivne Poti</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">87%</div>
+                        <div class="metric-label">Učinkovitost Poti</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">€450</div>
+                        <div class="metric-label">Prihranki Goriva</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">2.3h</div>
+                        <div class="metric-label">Prihranek Časa</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zdravstveni Optimizator -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🩺</div>
+                    <div class="module-title">Zdravstveni Optimizator</div>
+                    <div class="module-status active">AKTIVNO</div>
+                </div>
+                <div class="module-metrics">
+                    <div class="metric">
+                        <div class="metric-value">47</div>
+                        <div class="metric-label">Pacienti</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">12</div>
+                        <div class="metric-label">Termini</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">3</div>
+                        <div class="metric-label">Opozorila</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">96%</div>
+                        <div class="metric-label">Zdravje Pacientov</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Turizem Optimizator -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🌴</div>
+                    <div class="module-title">Turizem Optimizator</div>
+                    <div class="module-status active">AKTIVNO</div>
+                </div>
+                <div class="module-metrics">
+                    <div class="metric">
+                        <div class="metric-value">15</div>
+                        <div class="metric-label">Destinacije</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">89%</div>
+                        <div class="metric-label">Zasedenost</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">€2,340</div>
+                        <div class="metric-label">Dnevni Prihodek</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">4.8★</div>
+                        <div class="metric-label">Povprečna Ocena</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kmetijstvo Optimizator -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🚜</div>
+                    <div class="module-title">Kmetijstvo Optimizator</div>
+                    <div class="module-status optimizing">OPTIMIZIRA</div>
+                </div>
+                <div class="module-metrics">
+                    <div class="metric">
+                        <div class="metric-value">8</div>
+                        <div class="metric-label">Polja</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">245</div>
+                        <div class="metric-label">Živali</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">€1,850</div>
+                        <div class="metric-label">Pričakovani Pridelek</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">94%</div>
+                        <div class="metric-label">Zdravje Živali</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Turistični Načrtovalec -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🌍</div>
+                    <div class="module-title">Turistični Načrtovalec</div>
+                    <div class="module-status active">AKTIVNO</div>
+                </div>
+                <div class="module-metrics">
+                    <div class="metric">
+                        <div class="metric-value">134</div>
+                        <div class="metric-label">Aktivni Izleti</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">4.8/5</div>
+                        <div class="metric-label">Ocena Strank</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">€2,340</div>
+                        <div class="metric-label">Dnevni Promet</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">89%</div>
+                        <div class="metric-label">Zasedenost</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kmetijska Podpora -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🌱</div>
+                    <div class="module-title">Kmetijska Podpora</div>
+                    <div class="module-status active">AKTIVNO</div>
+                </div>
+                <div class="module-metrics">
+                    <div class="metric">
+                        <div class="metric-value">15</div>
+                        <div class="metric-label">Kmetije</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">234</div>
+                        <div class="metric-label">Živali</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">92%</div>
+                        <div class="metric-label">Zdravje Živali</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">€1,200</div>
+                        <div class="metric-label">Prihranki</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Energetski Manager -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">⚡</div>
+                    <div class="module-title">Energetski Manager</div>
+                    <div class="module-status active">AKTIVNO</div>
+                </div>
+                <div class="module-metrics">
+                    <div class="metric">
+                        <div class="metric-value">850kW</div>
+                        <div class="metric-label">Trenutna Poraba</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">67%</div>
+                        <div class="metric-label">Obnovljivi Viri</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">€560</div>
+                        <div class="metric-label">Prihranki</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">15%</div>
+                        <div class="metric-label">Zmanjšanje CO₂</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Varnostni Monitor -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🛡️</div>
+                    <div class="module-title">Varnostni Monitor</div>
+                    <div class="module-status active">AKTIVNO</div>
+                </div>
+                <div class="module-metrics">
+                    <div class="metric">
+                        <div class="metric-value">24</div>
+                        <div class="metric-label">Kamere</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">0</div>
+                        <div class="metric-label">Aktivni Alarmi</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">99.9%</div>
+                        <div class="metric-label">Delovanje</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">3</div>
+                        <div class="metric-label">Dogodki Danes</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Globalni Optimizator -->
+            <div class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🌐</div>
+                    <div class="module-title">Globalni Optimizator</div>
+                    <div class="module-status active">AKTIVNO</div>
+                </div>
+                <div class="module-metrics">
+                    <div class="metric">
+                        <div class="metric-value">8/9</div>
+                        <div class="metric-label">Koordinirani Moduli</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">94%</div>
+                        <div class="metric-label">Globalna Učinkovitost</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">€2,450</div>
+                        <div class="metric-label">Skupni Prihranki</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">5min</div>
+                        <div class="metric-label">Cikel Optimizacije</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Avtonomne Odločitve -->
+        <div class="decisions-panel">
+            <h2>🤖 Avtonomne Odločitve</h2>
+            <div id="decisions-list">
+                <div class="decision-item critical">
+                    <div class="decision-header">
+                        <div class="decision-title">Visoka energetska poraba</div>
+                        <div class="decision-level critical">KRITIČNO</div>
+                    </div>
+                    <div class="decision-description">
+                        Poraba 950W presega 90% limita (1000W). Priporočam zmanjšanje nebistvene porabe.
+                    </div>
+                    <div class="decision-actions">
+                        <button class="btn btn-approve" onclick="approveDecision('energy_001')">✅ Odobri</button>
+                        <button class="btn btn-reject" onclick="rejectDecision('energy_001')">❌ Zavrni</button>
+                    </div>
+                </div>
+
+                <div class="decision-item important">
+                    <div class="decision-header">
+                        <div class="decision-title">Prekoračitev proračuna</div>
+                        <div class="decision-level important">POMEMBNO</div>
+                    </div>
+                    <div class="decision-description">
+                        Mesečni stroški 12.000€ presegajo proračun 10.000€. Predlagam optimizacijo stroškov.
+                    </div>
+                    <div class="decision-actions">
+                        <button class="btn btn-approve" onclick="approveDecision('finance_001')">✅ Odobri</button>
+                        <button class="btn btn-reject" onclick="rejectDecision('finance_001')">❌ Zavrni</button>
+                    </div>
+                </div>
+
+                <div class="decision-item routine">
+                    <div class="decision-header">
+                        <div class="decision-title">Nizke zaloge</div>
+                        <div class="decision-level routine">RUTINSKO</div>
+                    </div>
+                    <div class="decision-description">
+                        Nizke zaloge za 3 izdelke. Priporočam naročilo novih zalog.
+                    </div>
+                    <div class="decision-actions">
+                        <button class="btn btn-approve" onclick="approveDecision('logistics_001')">✅ Odobri</button>
+                        <button class="btn btn-reject" onclick="rejectDecision('logistics_001')">❌ Zavrni</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grafikon učinkovitosti -->
+        <div class="chart-container">
+            <h2>📈 Učinkovitost Skozi Čas</h2>
+            <div class="chart">
+                Grafikon učinkovitosti bo prikazan tukaj
+                <br>
+                <small>(Integracija z Chart.js ali podobno knjižnico)</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading indikator -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div>Posodabljam podatke...</div>
+    </div>
+
+    <!-- Gumb za osvežitev -->
+    <button class="refresh-btn" onclick="refreshData()" title="Osveži podatke">
+        🔄
+    </button>
+
+    <script>
+        // Simulacija podatkov
+        let systemData = {
+            health: "ZDRAVO",
+            activeModules: 11,
+            totalModules: 12,
+            efficiency: 94,
+            costSavings: 2450,
+            modules: {
+                iot: { status: "active", efficiency: 98, savings: 340 },
+                finance: { status: "active", efficiency: 95, savings: 890 },
+                logistics: { status: "optimizing", efficiency: 87, savings: 450 },
+                healthcare_optimizer: { status: "active", efficiency: 96, savings: 0 },
+                tourism_optimizer: { status: "active", efficiency: 89, savings: 2340 },
+                agriculture_optimizer: { status: "optimizing", efficiency: 94, savings: 1850 },
+                energy: { status: "active", efficiency: 91, savings: 560 },
+                security: { status: "active", efficiency: 99.9, savings: 0 },
+                global: { status: "active", efficiency: 94, savings: 2450 }
+            }
+        };
+
+        // Funkcije za upravljanje odločitev
+        function approveDecision(decisionId) {
+            showLoading();
+            
+            // Simulacija API klica
+            setTimeout(() => {
+                console.log(`Odločitev ${decisionId} odobrena`);
+                
+                // Odstrani odločitev iz seznama
+                const decisionElement = document.querySelector(`[onclick*="${decisionId}"]`).closest('.decision-item');
+                decisionElement.style.opacity = '0.5';
+                decisionElement.innerHTML = '<div style="text-align: center; color: #27ae60; font-weight: bold;">✅ ODOBRENO</div>';
+                
+                hideLoading();
+                
+                // Osveži podatke čez 2 sekundi
+                setTimeout(refreshData, 2000);
+            }, 1000);
+        }
+
+        function rejectDecision(decisionId) {
+            showLoading();
+            
+            // Simulacija API klica
+            setTimeout(() => {
+                console.log(`Odločitev ${decisionId} zavrnjena`);
+                
+                // Odstrani odločitev iz seznama
+                const decisionElement = document.querySelector(`[onclick*="${decisionId}"]`).closest('.decision-item');
+                decisionElement.style.opacity = '0.5';
+                decisionElement.innerHTML = '<div style="text-align: center; color: #e74c3c; font-weight: bold;">❌ ZAVRNJENO</div>';
+                
+                hideLoading();
+            }, 1000);
+        }
+
+        // Funkcije za osveževanje podatkov
+        function refreshData() {
+            showLoading();
+            
+            // Simulacija API klica
+            setTimeout(() => {
+                // Posodobi sistemske metrike
+                updateSystemMetrics();
+                
+                // Posodobi module
+                updateModuleMetrics();
+                
+                hideLoading();
+                
+                console.log("Podatki osveženi");
+            }, 2000);
+        }
+
+        function updateSystemMetrics() {
+            // Simuliraj spremembe
+            systemData.efficiency = Math.max(85, Math.min(99, systemData.efficiency + (Math.random() - 0.5) * 4));
+            systemData.costSavings += Math.floor((Math.random() - 0.5) * 200);
+            
+            // Posodobi UI
+            document.getElementById('efficiency').querySelector('.status-value').textContent = Math.round(systemData.efficiency) + '%';
+            document.getElementById('cost-savings').querySelector('.status-value').textContent = '€' + systemData.costSavings.toLocaleString();
+            
+            // Posodobi barvo glede na učinkovitost
+            const efficiencyCard = document.getElementById('efficiency');
+            if (systemData.efficiency >= 90) {
+                efficiencyCard.className = 'status-card healthy';
+            } else if (systemData.efficiency >= 75) {
+                efficiencyCard.className = 'status-card warning';
+            } else {
+                efficiencyCard.className = 'status-card critical';
+            }
+        }
+
+        function updateModuleMetrics() {
+            // Posodobi metrike modulov
+            Object.keys(systemData.modules).forEach(moduleKey => {
+                const module = systemData.modules[moduleKey];
+                module.efficiency = Math.max(70, Math.min(99, module.efficiency + (Math.random() - 0.5) * 3));
+            });
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // Avtomatsko osveževanje vsakih 30 sekund
+        setInterval(refreshData, 30000);
+
+        // Inicializacija
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🌍 Omni Global Optimizer Dashboard naložen');
+            
+            // Simuliraj povezavo z backend
+            setTimeout(() => {
+                console.log('✅ Povezava z OmniCore vzpostavljena');
+            }, 1000);
+        });
+
+        // Dodaj animacije ob nalaganju
+        window.addEventListener('load', function() {
+            const cards = document.querySelectorAll('.module-card, .status-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.5s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

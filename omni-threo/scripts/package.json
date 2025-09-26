@@ -1,0 +1,27 @@
+{
+  "name": "omni-threo-scripts",
+  "version": "1.0.0",
+  "description": "Setup and deployment scripts for Omni Threo project",
+  "main": "setup-env.js",
+  "scripts": {
+    "setup": "node setup-env.js",
+    "setup:dev": "node setup-env.js development",
+    "setup:prod": "node setup-env.js production",
+    "setup:render": "node setup-env.js render",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "omni",
+    "threo",
+    "setup",
+    "environment",
+    "deployment"
+  ],
+  "author": "Omni Threo Team",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

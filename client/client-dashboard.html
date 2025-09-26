@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni Client Panel - Electron</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="utils/encryption.js"></script>
+    
+    <style>
+        .module-card {
+            transition: all 0.3s ease;
+            border: 2px solid #e9ecef;
+        }
+        .module-card.locked {
+            opacity: 0.6;
+            background-color: #f8f9fa;
+            border-color: #dc3545;
+        }
+        .module-card.unlocked {
+            border-color: #28a745;
+            background-color: #f8fff9;
+        }
+        .license-status {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .license-valid {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .license-invalid {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .license-demo {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .premium-badge {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            font-weight: bold;
+        }
+        .demo-badge {
+            background: linear-gradient(45deg, #ff9500, #ffb347);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Connection Status -->
+    <div class="connection-status">
+        <span id="connectionStatus" class="badge bg-secondary">
+            <i class="fas fa-circle"></i> Povezovanje...
+        </span>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 bg-dark text-white p-4">
+                <h3><i class="fas fa-user-circle"></i> Omni Client</h3>
+                <hr>
+                
+                <!-- License Status -->
+                <div id="licenseStatus" class="license-status license-invalid">
+                    <h6><i class="fas fa-key"></i> Status licence</h6>
+                    <div id="licenseInfo">Preverjam licenco...</div>
+                </div>
+
+                <!-- Client Info -->
+                <div class="mb-3">
+                    <h6><i class="fas fa-id-card"></i> Client ID</h6>
+                    <code id="clientId">Nalagam...</code>
+                </div>
+
+                <!-- License Expiry -->
+                <div class="mb-3">
+                    <h6><i class="fas fa-calendar-alt"></i> Veljavnost</h6>
+                    <div id="licenseExpiry">-</div>
+                </div>
+
+                <!-- Actions -->
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" onclick="checkLicense()">
+                        <i class="fas fa-sync"></i> Preveri licenco
+                    </button>
+                    <button class="btn btn-warning" onclick="refreshModules()">
+                        <i class="fas fa-refresh"></i> Osveži module
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 p-4">
+                <h2><i class="fas fa-tachometer-alt"></i> Nadzorna plošča</h2>
+                
+                <!-- Modules Grid -->
+                <div class="row" id="modulesGrid">
+                    <!-- Modules will be dynamically loaded here -->
+                </div>
+
+                <!-- License Details -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-info-circle"></i> Podrobnosti licence</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Plan:</strong> <span id="licensePlan">-</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Zadnja preveritev:</strong> <span id="lastCheck">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="fas fa-bell text-primary me-2"></i>
+                <strong class="me-auto">Obvestilo</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toastMessage">
+                <!-- Toast message will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Configuration
+        const SERVER_URL = 'http://localhost:3000';
+        const ENCRYPTION_KEY = 'omni-client-secret-key-2024';
+        
+        // Debug Configuration
+        const DEBUG_MODE = true;
+        const DEBUG_PREFIX = '[OMNI-CLIENT]';
+        
+        // Global variables
+        let socket = null;
+        let currentLicense = null;
+        let clientId = null;
+        let lastLicenseState = null;
+        let offlineMode = false;
+        let availableModules = [
+            { id: 'tourism', name: 'Turizem', icon: 'fas fa-map-marked-alt', premium: false },
+            { id: 'finance', name: 'Finance', icon: 'fas fa-chart-line', premium: true },
+            { id: 'analytics', name: 'Analitika', icon: 'fas fa-chart-bar', premium: true },
+            { id: 'automation', name: 'Avtomatizacija', icon: 'fas fa-robot', premium: true },
+            { id: 'ai-assistant', name: 'AI Pomočnik', icon: 'fas fa-brain', premium: true },
+            { id: 'reporting', name: 'Poročila', icon: 'fas fa-file-alt', premium: false }
+        ];
+
+        // Debug logging function
+        function debugLog(message, type = 'info', data = null) {
+            if (!DEBUG_MODE) return;
+            
+            const timestamp = new Date().toISOString();
+            const logMessage = `${DEBUG_PREFIX} [${timestamp}] ${message}`;
+            
+            switch(type) {
+                case 'error':
+                    console.error(logMessage, data || '');
+                    break;
+                case 'warn':
+                    console.warn(logMessage, data || '');
+                    break;
+                case 'success':
+                    console.log(`%c${logMessage}`, 'color: green; font-weight: bold;', data || '');
+                    break;
+                case 'license':
+                    console.log(`%c${logMessage}`, 'color: blue; font-weight: bold;', data || '');
+                    break;
+                default:
+                    console.log(logMessage, data || '');
+            }
+        }
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            debugLog('🚀 Inicializacija aplikacije začeta', 'info');
+            initializeApp();
+        });
+
+        async function initializeApp() {
+            debugLog('📋 Inicializacija aplikacije...', 'info');
+            showToast('Inicializiram aplikacijo...', 'info');
+            
+            try {
+                // Generate or load client ID
+                clientId = getOrCreateClientId();
+                document.getElementById('clientId').textContent = clientId;
+                debugLog(`🆔 Client ID: ${clientId}`, 'info');
+                
+                // Load stored license token
+                const storedToken = getStoredLicenseToken();
+                if (storedToken) {
+                    debugLog('💾 Naložen shranjeni licenčni žeton', 'success', storedToken);
+                    showToast('Naložen shranjeni licenčni žeton', 'success');
+                }
+                
+                // Load offline state
+                loadOfflineState();
+                
+                // Initialize WebSocket connection
+                initializeWebSocket();
+                
+                // Check license on startup
+                debugLog('🔍 Preverjanje licence ob zagonu...', 'license');
+                await checkLicense();
+                
+                // Render modules
+                renderModules();
+                
+                debugLog('✅ Inicializacija aplikacije dokončana', 'success');
+            } catch (error) {
+                debugLog('❌ Napaka pri inicializaciji aplikacije', 'error', error);
+                showToast('Napaka pri inicializaciji aplikacije', 'error');
+            }
+        }
+
+        // Offline state management
+        function saveOfflineState() {
+            try {
+                const offlineState = {
+                    license: currentLicense,
+                    modules: getUnlockedModules(),
+                    timestamp: new Date().toISOString(),
+                    clientId: clientId
+                };
+                
+                const encrypted = CryptoJS.AES.encrypt(JSON.stringify(offlineState), ENCRYPTION_KEY).toString();
+                localStorage.setItem('omni_offline_state', encrypted);
+                debugLog('💾 Offline stanje shranjeno', 'success', offlineState);
+            } catch (error) {
+                debugLog('❌ Napaka pri shranjevanju offline stanja', 'error', error);
+            }
+        }
+
+        function loadOfflineState() {
+            try {
+                const encrypted = localStorage.getItem('omni_offline_state');
+                if (!encrypted) {
+                    debugLog('📭 Ni shranjenega offline stanja', 'info');
+                    return null;
+                }
+                
+                const decrypted = CryptoJS.AES.decrypt(encrypted, ENCRYPTION_KEY);
+                const offlineState = JSON.parse(decrypted.toString(CryptoJS.enc.Utf8));
+                
+                debugLog('📂 Naloženo offline stanje', 'success', offlineState);
+                return offlineState;
+            } catch (error) {
+                debugLog('❌ Napaka pri nalaganju offline stanja', 'error', error);
+                return null;
+            }
+        }
+
+        function getUnlockedModules() {
+            const unlockedModules = [];
+            availableModules.forEach(module => {
+                const moduleElement = document.getElementById(`module-${module.id}`);
+                if (moduleElement && moduleElement.classList.contains('unlocked')) {
+                    unlockedModules.push(module.id);
+                }
+            });
+            return unlockedModules;
+        }
+
+        // Secure token storage using encryption
+        function storeLicenseToken(token) {
+            try {
+                const encrypted = CryptoJS.AES.encrypt(JSON.stringify(token), ENCRYPTION_KEY).toString();
+                localStorage.setItem('omni_license_token', encrypted);
+                debugLog('🔐 Licenčni žeton varno shranjen', 'success');
+                showToast('Licenčni žeton varno shranjen', 'success');
+            } catch (error) {
+                debugLog('❌ Napaka pri shranjevanju žetona', 'error', error);
+                showToast('Napaka pri shranjevanju žetona', 'error');
+            }
+        }
+
+        function getStoredLicenseToken() {
+            try {
+                const encrypted = localStorage.getItem('omni_license_token');
+                if (!encrypted) return null;
+                
+                const decrypted = CryptoJS.AES.decrypt(encrypted, ENCRYPTION_KEY);
+                return JSON.parse(decrypted.toString(CryptoJS.enc.Utf8));
+            } catch (error) {
+                debugLog('❌ Napaka pri pridobivanju žetona', 'error', error);
+                return null;
+            }
+        }
+
+        function getOrCreateClientId() {
+            let id = localStorage.getItem('omni_client_id');
+            if (!id) {
+                id = 'client_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('omni_client_id', id);
+                debugLog('🆕 Ustvarjen nov Client ID', 'success', id);
+            } else {
+                debugLog('📋 Naložen obstoječi Client ID', 'info', id);
+            }
+            return id;
+        }
+
+        // Enhanced license checking with detailed logging
+        async function checkLicense() {
+            debugLog('🔍 Začenjam preverjanje licence...', 'license');
+            
+            try {
+                let response;
+                const storedToken = getStoredLicenseToken();
+                
+                if (storedToken) {
+                    debugLog('🎫 Preverjam z licenčnim žetonom', 'license');
+                    response = await fetch(`${SERVER_URL}/api/license/check`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token: storedToken })
+                    });
+                } else {
+                    debugLog('🆔 Preverjam z Client ID', 'license');
+                    response = await fetch(`${SERVER_URL}/api/license/check`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ client_id: clientId })
+                    });
+                }
+
+                if (response.ok) {
+                    const data = await response.json();
+                    debugLog('✅ Licenca uspešno preverjena', 'success', data);
+                    
+                    if (data.license) {
+                        // Compare with previous state
+                        const previousLicense = currentLicense;
+                        currentLicense = data.license;
+                        
+                        // Log changes
+                        if (previousLicense) {
+                            const changes = compareLicenseStates(previousLicense, currentLicense);
+                            if (changes.length > 0) {
+                                debugLog('🔄 Zaznane spremembe licence:', 'license', changes);
+                                console.log(`%c${DEBUG_PREFIX} LICENSE CHANGES DETECTED:`, 'color: orange; font-weight: bold;');
+                                changes.forEach(change => console.log(`%c  - ${change}`, 'color: orange;'));
+                            }
+                        }
+                        
+                        updateLicenseDisplay();
+                        unlockModules(data.license.modules);
+                        saveOfflineState(); // Save successful state
+                        showToast('Licenca veljavna', 'success');
+                        
+                        // Clear offline mode if active
+                        if (document.body.classList.contains('offline-mode')) {
+                            document.body.classList.remove('offline-mode');
+                            showToast('Povezava obnovljena - online način', 'success');
+                        }
+                    } else {
+                        debugLog('⚠️ Licenca ni najdena, ustvarjam demo licenco', 'warn');
+                        await createDemoLicense();
+                    }
+                } else {
+                    debugLog('❌ Napaka pri preverjanju licence', 'error', response.status);
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                debugLog('❌ Napaka pri preverjanju licence - poskušam offline fallback', 'error', error);
+                
+                // Try offline fallback
+                const offlineSuccess = await handleOfflineFallback();
+                
+                if (!offlineSuccess) {
+                    showToast('API nedosegljiv - ustvarjam demo licenco', 'warning');
+                    await createDemoLicense();
+                }
+            }
+        }
+
+        // Handle offline fallback
+        async function handleOfflineFallback() {
+            debugLog('🔌 Poskušam offline fallback...', 'warn');
+            
+            try {
+                const offlineState = loadOfflineState();
+                
+                if (offlineState && offlineState.license) {
+                    const timeDiff = new Date() - new Date(offlineState.timestamp);
+                    const hoursDiff = timeDiff / (1000 * 60 * 60);
+                    
+                    // Use offline data if less than 24 hours old
+                    if (hoursDiff < 24) {
+                        debugLog('📱 Uporabljam offline podatke', 'success', offlineState);
+                        
+                        currentLicense = offlineState.license;
+                        updateLicenseDisplay();
+                        unlockModules(offlineState.license.modules);
+                        
+                        // Add offline mode indicator
+                        document.body.classList.add('offline-mode');
+                        showToast(`Offline način - podatki stari ${Math.round(hoursDiff)}h`, 'warning');
+                        
+                        return true;
+                    } else {
+                        debugLog('⏰ Offline podatki prestari (>24h)', 'warn');
+                    }
+                } else {
+                    debugLog('📭 Ni offline podatkov', 'warn');
+                }
+                
+                return false;
+            } catch (error) {
+                debugLog('❌ Napaka pri offline fallback', 'error', error);
+                return false;
+            }
+        }
+
+        // Create demo license function
+        async function createDemoLicense() {
+            debugLog('🎭 Ustvarjam demo licenco...', 'warn');
+            
+            try {
+                const response = await fetch(`${SERVER_URL}/api/license/demo`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ client_id: clientId })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentLicense = data.license;
+                    updateLicenseDisplay();
+                    unlockModules(data.license.modules);
+                    saveOfflineState();
+                    showToast('Demo licenca ustvarjena', 'success');
+                } else {
+                    throw new Error('Failed to create demo license');
+                }
+            } catch (error) {
+                debugLog('❌ Napaka pri ustvarjanju demo licence', 'error', error);
+                
+                // Create local demo license as fallback
+                currentLicense = {
+                    client_id: clientId,
+                    plan: 'demo',
+                    status: 'active',
+                    modules: ['tourism', 'reporting'],
+                    expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                    last_check: new Date().toISOString()
+                };
+                
+                updateLicenseDisplay();
+                unlockModules(currentLicense.modules);
+                saveOfflineState();
+                showToast('Lokalna demo licenca ustvarjena', 'warning');
+            }
+        }
+
+        // Compare license states for change detection
+        function compareLicenseStates(oldLicense, newLicense) {
+            const changes = [];
+            
+            if (oldLicense.status !== newLicense.status) {
+                changes.push(`Status: ${oldLicense.status} → ${newLicense.status}`);
+            }
+            
+            if (oldLicense.plan !== newLicense.plan) {
+                changes.push(`Plan: ${oldLicense.plan} → ${newLicense.plan}`);
+            }
+            
+            if (oldLicense.expires_at !== newLicense.expires_at) {
+                changes.push(`Expires: ${oldLicense.expires_at} → ${newLicense.expires_at}`);
+            }
+            
+            // Compare modules
+            const oldModules = oldLicense.modules || [];
+            const newModules = newLicense.modules || [];
+            
+            const addedModules = newModules.filter(m => !oldModules.includes(m));
+            const removedModules = oldModules.filter(m => !newModules.includes(m));
+            
+            if (addedModules.length > 0) {
+                changes.push(`Dodani moduli: ${addedModules.join(', ')}`);
+            }
+            
+            if (removedModules.length > 0) {
+                changes.push(`Odstranjeni moduli: ${removedModules.join(', ')}`);
+            }
+            
+            return changes;
+        }
+
+        // Enhanced WebSocket initialization with real-time updates
+        function initializeWebSocket() {
+            debugLog('🔌 Inicializacija WebSocket povezave...', 'info');
+            
+            try {
+                socket = io(SERVER_URL, {
+                    transports: ['websocket', 'polling'],
+                    timeout: 5000,
+                    reconnection: true,
+                    reconnectionAttempts: 5,
+                    reconnectionDelay: 1000
+                });
+
+                socket.on('connect', () => {
+                    debugLog('✅ WebSocket povezava vzpostavljena', 'success');
+                    console.log(`%c${DEBUG_PREFIX} WEBSOCKET: Connected to ${SERVER_URL}`, 'color: green; font-weight: bold;');
+                    updateConnectionStatus(true);
+                    showToast('Povezava s strežnikom vzpostavljena', 'success');
+                    
+                    // Join client room for targeted updates
+                    socket.emit('join_client', { client_id: clientId });
+                    debugLog(`📡 Pridružen client room: ${clientId}`, 'info');
+                    offlineMode = false;
+                });
+
+                socket.on('disconnect', () => {
+                    debugLog('❌ WebSocket povezava prekinjena', 'warn');
+                    updateConnectionStatus(false);
+                    showToast('Povezava s strežnikom prekinjena', 'warning');
+                });
+
+                socket.on('license_update', (data) => {
+                    debugLog('📨 Prejeto obvestilo o posodobitvi licence', 'license', data);
+                    console.log(`%c${DEBUG_PREFIX} REAL-TIME UPDATE RECEIVED:`, 'color: purple; font-weight: bold;', data);
+                    
+                    if (data.license && data.license.client_id === clientId) {
+                        debugLog('🔄 Posodabljam licenco v realnem času', 'license');
+                        console.log(`%c${DEBUG_PREFIX} REAL-TIME: License updated for client ${clientId}`, 'color: purple; font-weight: bold;');
+                        
+                        // Store previous state for comparison
+                        const previousLicense = currentLicense;
+                        currentLicense = data.license;
+                        
+                        // Log changes in real-time
+                        if (previousLicense) {
+                            const changes = compareLicenseStates(previousLicense, currentLicense);
+                            if (changes.length > 0) {
+                                console.log(`%c${DEBUG_PREFIX} REAL-TIME CHANGES:`, 'color: orange; font-weight: bold;');
+                                changes.forEach(change => console.log(`%c  ⚡ ${change}`, 'color: orange;'));
+                                showToast(`Licenca posodobljena: ${changes.length} sprememb`, 'info');
+                            }
+                        }
+                        
+                        // Update UI immediately
+                        updateLicenseDisplay();
+                        unlockModules(data.license.modules);
+                        saveOfflineState();
+                        
+                        // Show specific update notification
+                        const updateType = data.update_type || 'general';
+                        switch (updateType) {
+                            case 'status_change':
+                                showToast(`Status licence spremenjen: ${data.license.status}`, 'info');
+                                break;
+                            case 'module_update':
+                                showToast('Moduli posodobljeni v realnem času', 'info');
+                                break;
+                            case 'expiry_update':
+                                showToast('Datum poteka licence posodobljen', 'info');
+                                break;
+                            default:
+                                showToast('Licenca posodobljena v realnem času', 'info');
+                        }
+                        
+                        // Re-render modules with new permissions
+                        renderModules();
+                        
+                    } else {
+                        debugLog('ℹ️ Posodobitev licence ni za tega klienta', 'info');
+                        console.log(`%c${DEBUG_PREFIX} REAL-TIME: Update not for this client (${clientId})`, 'color: gray;');
+                    }
+                });
+
+                socket.on('connect_error', (error) => {
+                    debugLog('❌ Napaka WebSocket povezave', 'error', error);
+                    console.log(`%c${DEBUG_PREFIX} WEBSOCKET ERROR:`, 'color: red; font-weight: bold;', error);
+                    updateConnectionStatus(false);
+                    showToast('Napaka pri povezavi s strežnikom', 'error');
+                });
+
+                socket.on('reconnect', (attemptNumber) => {
+                    debugLog(`🔄 WebSocket ponovno povezan (poskus ${attemptNumber})`, 'success');
+                    console.log(`%c${DEBUG_PREFIX} WEBSOCKET: Reconnected after ${attemptNumber} attempts`, 'color: green; font-weight: bold;');
+                    updateConnectionStatus(true);
+                    showToast('Povezava obnovljena', 'success');
+                    
+                    // Re-check license after reconnection
+                    checkLicense();
+                });
+
+                socket.on('reconnect_error', (error) => {
+                    debugLog('❌ Napaka pri ponovni povezavi', 'error', error);
+                    console.log(`%c${DEBUG_PREFIX} WEBSOCKET RECONNECT ERROR:`, 'color: red; font-weight: bold;', error);
+                });
+
+                // Ping/Pong for connection monitoring with enhanced logging
+                socket.on('pong', (latency) => {
+                    debugLog(`🏓 Pong prejeto - latenca: ${latency}ms`, 'info');
+                    console.log(`%c${DEBUG_PREFIX} PING/PONG: ${latency}ms latency`, 'color: cyan;');
+                    
+                    // Update connection quality indicator
+                    updateConnectionQuality(latency);
+                });
+
+                // Send ping every 30 seconds with debug logging
+                setInterval(() => {
+                    if (socket && socket.connected) {
+                        const pingTime = Date.now();
+                        socket.emit('ping', pingTime);
+                        debugLog('🏓 Ping poslan', 'info');
+                        console.log(`%c${DEBUG_PREFIX} PING: Sent at ${new Date(pingTime).toLocaleTimeString()}`, 'color: cyan;');
+                    }
+                }, 30000);
+
+                // Module access notifications
+                socket.on('module_access_granted', (data) => {
+                    debugLog('🔓 Dostop do modula odobren', 'success', data);
+                    console.log(`%c${DEBUG_PREFIX} MODULE ACCESS: Granted for ${data.module}`, 'color: green; font-weight: bold;');
+                    showToast(`Dostop odobren: ${data.module}`, 'success');
+                    renderModules(); // Refresh module display
+                });
+
+                socket.on('module_access_denied', (data) => {
+                    debugLog('🔒 Dostop do modula zavrnjen', 'warn', data);
+                    console.log(`%c${DEBUG_PREFIX} MODULE ACCESS: Denied for ${data.module}`, 'color: red; font-weight: bold;');
+                    showToast(`Dostop zavrnjen: ${data.module}`, 'warning');
+                });
+
+                // System notifications
+                socket.on('system_notification', (data) => {
+                    debugLog('📢 Sistemsko obvestilo', 'info', data);
+                    console.log(`%c${DEBUG_PREFIX} SYSTEM NOTIFICATION:`, 'color: blue; font-weight: bold;', data);
+                    showToast(data.message, data.type || 'info');
+                });
+
+            } catch (error) {
+                debugLog('❌ Napaka pri inicializaciji WebSocket', 'error', error);
+                console.log(`%c${DEBUG_PREFIX} WEBSOCKET INIT ERROR:`, 'color: red; font-weight: bold;', error);
+                updateConnectionStatus(false);
+                showToast('Napaka pri inicializaciji WebSocket', 'error');
+            }
+        }
+
+        // Update connection quality indicator
+        function updateConnectionQuality(latency) {
+            const qualityElement = document.getElementById('connectionQuality');
+            if (!qualityElement) return;
+            
+            let quality, color;
+            if (latency < 100) {
+                quality = 'Odlična';
+                color = 'green';
+            } else if (latency < 300) {
+                quality = 'Dobra';
+                color = 'orange';
+            } else {
+                quality = 'Slaba';
+                color = 'red';
+            }
+            
+            qualityElement.textContent = `${quality} (${latency}ms)`;
+            qualityElement.style.color = color;
+        }
+
+        // Enhanced module management with logging
+        function unlockModules(modules) {
+            const moduleList = Array.isArray(modules) ? modules : modules.split(',');
+            debugLog('🔓 Odklepanje modulov', 'success', moduleList);
+            
+            availableModules.forEach(module => {
+                const moduleElement = document.getElementById(`module-${module.id}`);
+                if (moduleElement) {
+                    const wasLocked = moduleElement.classList.contains('locked');
+                    
+                    if (moduleList.includes(module.id)) {
+                        moduleElement.classList.remove('locked');
+                        moduleElement.classList.add('unlocked');
+                        moduleElement.querySelector('.module-status').innerHTML = '<i class="fas fa-unlock text-success"></i> Odklenjen';
+                        moduleElement.querySelector('button').disabled = false;
+                        
+                        if (wasLocked) {
+                            console.log(`%c${DEBUG_PREFIX} MODULE UNLOCKED: ${module.name} (${module.id})`, 'color: green; font-weight: bold;');
+                        }
+                    } else {
+                        moduleElement.classList.remove('unlocked');
+                        moduleElement.classList.add('locked');
+                        moduleElement.querySelector('.module-status').innerHTML = '<i class="fas fa-lock text-danger"></i> Zaklenjen';
+                        moduleElement.querySelector('button').disabled = true;
+                        
+                        if (!wasLocked) {
+                            console.log(`%c${DEBUG_PREFIX} MODULE LOCKED: ${module.name} (${module.id})`, 'color: red; font-weight: bold;');
+                        }
+                    }
+                }
+            });
+        }
+
+        function lockAllModules() {
+            debugLog('🔒 Zaklepanje vseh modulov', 'warn');
+            
+            availableModules.forEach(module => {
+                const moduleElement = document.getElementById(`module-${module.id}`);
+                if (moduleElement) {
+                    const wasUnlocked = moduleElement.classList.contains('unlocked');
+                    
+                    moduleElement.classList.remove('unlocked');
+                    moduleElement.classList.add('locked');
+                    moduleElement.querySelector('.module-status').innerHTML = '<i class="fas fa-lock text-danger"></i> Zaklenjen';
+                    moduleElement.querySelector('button').disabled = true;
+                    
+                    if (wasUnlocked) {
+                        console.log(`%c${DEBUG_PREFIX} MODULE LOCKED: ${module.name} (${module.id})`, 'color: red; font-weight: bold;');
+                    }
+                }
+            });
+        }
+
+        // UI Updates
+        function updateLicenseDisplay() {
+            const statusElement = document.getElementById('licenseStatus');
+            const infoElement = document.getElementById('licenseInfo');
+            const planElement = document.getElementById('licensePlan');
+            const expiryElement = document.getElementById('licenseExpiry');
+            const lastCheckElement = document.getElementById('lastCheck');
+
+            if (currentLicense) {
+                if (currentLicense.status === 'active') {
+                    statusElement.className = 'license-status license-valid';
+                    infoElement.innerHTML = '<i class="fas fa-check-circle"></i> Licenca je veljavna';
+                } else {
+                    statusElement.className = 'license-status license-invalid';
+                    infoElement.innerHTML = '<i class="fas fa-times-circle"></i> Licenca ni aktivna';
+                }
+
+                planElement.innerHTML = `<span class="badge ${currentLicense.plan === 'premium' ? 'premium-badge' : 'demo-badge'}">${currentLicense.plan.toUpperCase()}</span>`;
+                expiryElement.textContent = new Date(currentLicense.expires_at).toLocaleString('sl-SI');
+                lastCheckElement.textContent = new Date(currentLicense.last_check).toLocaleString('sl-SI');
+
+                // Check for demo license expiry
+                if (currentLicense.plan === 'demo' && new Date(currentLicense.expires_at) < new Date()) {
+                    statusElement.className = 'license-status license-demo';
+                    infoElement.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Demo licenca je potekla';
+                    lockAllModules();
+                }
+            } else {
+                statusElement.className = 'license-status license-invalid';
+                infoElement.innerHTML = '<i class="fas fa-times-circle"></i> Licenca ni najdena';
+                planElement.textContent = '-';
+                expiryElement.textContent = '-';
+                lastCheckElement.textContent = '-';
+            }
+        }
+
+        function updateConnectionStatus(connected) {
+            const statusElement = document.getElementById('connectionStatus');
+            if (connected) {
+                statusElement.className = 'badge bg-success';
+                statusElement.innerHTML = '<i class="fas fa-circle"></i> Povezan';
+            } else {
+                statusElement.className = 'badge bg-danger';
+                statusElement.innerHTML = '<i class="fas fa-circle"></i> Nepovezan';
+            }
+        }
+
+        function renderModules() {
+            const grid = document.getElementById('modulesGrid');
+            grid.innerHTML = '';
+
+            availableModules.forEach(module => {
+                const moduleCard = `
+                    <div class="col-md-4 mb-3">
+                        <div class="card module-card locked" id="module-${module.id}">
+                            <div class="card-body text-center">
+                                <i class="${module.icon} fa-3x mb-3 text-primary"></i>
+                                <h5 class="card-title">${module.name}</h5>
+                                <p class="module-status"><i class="fas fa-lock text-danger"></i> Zaklenjen</p>
+                                ${module.premium ? '<span class="badge premium-badge">Premium</span>' : '<span class="badge bg-secondary">Osnovno</span>'}
+                                <div class="mt-3">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="accessModule('${module.id}')" disabled>
+                                        Dostop
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += moduleCard;
+            });
+        }
+
+        function accessModule(moduleId) {
+            const module = availableModules.find(m => m.id === moduleId);
+            if (module) {
+                showToast(`Dostopam do modula: ${module.name}`, 'info');
+                // Here you would implement the actual module access logic
+            }
+        }
+
+        function refreshModules() {
+            showToast('Osvežujem module...', 'info');
+            checkLicense();
+        }
+
+        // Utility functions
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('liveToast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            let icon = 'fas fa-info-circle';
+            let bgClass = 'bg-info';
+            
+            switch(type) {
+                case 'success':
+                    icon = 'fas fa-check-circle';
+                    bgClass = 'bg-success';
+                    break;
+                case 'error':
+                    icon = 'fas fa-exclamation-circle';
+                    bgClass = 'bg-danger';
+                    break;
+                case 'warning':
+                    icon = 'fas fa-exclamation-triangle';
+                    bgClass = 'bg-warning';
+                    break;
+            }
+            
+            toast.querySelector('.toast-header i').className = `${icon} text-primary me-2`;
+            toastMessage.innerHTML = `<i class="${icon}"></i> ${message}`;
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+        }
+
+        // Auto-refresh license every 5 minutes
+        setInterval(() => {
+            if (currentLicense) {
+                checkLicense();
+            }
+        }, 5 * 60 * 1000);
+    </script>
+</body>
+</html>

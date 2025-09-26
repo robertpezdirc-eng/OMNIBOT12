@@ -1,0 +1,200 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "OMNI AI Platform API",
+    "version": "1.0.0",
+    "description": "Comprehensive AI platform for business and personal use"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Development server"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "System Health Check",
+        "description": "Returns the current health status of all system components",
+        "tags": [
+          "Health"
+        ],
+        "responses": {
+          "200": {
+            "description": "System is healthy",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "example": "healthy"
+                },
+                "services": {
+                  "type": "object"
+                },
+                "timestamp": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ai/chat": {
+      "post": {
+        "summary": "AI Chat Completion",
+        "description": "Send a message to the AI and receive a response",
+        "tags": [
+          "AI Core"
+        ],
+        "requestBody": {
+          "required": true,
+          "schema": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string",
+                "example": "Hello, how can you help me?"
+              },
+              "context": {
+                "type": "object"
+              },
+              "options": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "message"
+            ]
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "AI response generated successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "response": {
+                  "type": "string"
+                },
+                "confidence": {
+                  "type": "number"
+                },
+                "timestamp": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/memory/store": {
+      "post": {
+        "summary": "Store Memory",
+        "description": "Store information in the AI memory system",
+        "tags": [
+          "Memory"
+        ],
+        "requestBody": {
+          "required": true,
+          "schema": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "example": "user_preference"
+              },
+              "value": {
+                "type": "object"
+              },
+              "metadata": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "key",
+              "value"
+            ]
+          }
+        },
+        "responses": {}
+      }
+    },
+    "/api/tourism/itinerary": {
+      "post": {
+        "summary": "Generate Travel Itinerary",
+        "description": "Create a personalized travel itinerary based on preferences",
+        "tags": [
+          "Tourism"
+        ],
+        "requestBody": {
+          "required": true,
+          "schema": {
+            "type": "object",
+            "properties": {
+              "destination": {
+                "type": "string",
+                "example": "Slovenia"
+              },
+              "duration": {
+                "type": "number",
+                "example": 7
+              },
+              "budget": {
+                "type": "number",
+                "example": 1000
+              },
+              "interests": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "destination",
+              "duration"
+            ]
+          }
+        },
+        "responses": {}
+      }
+    },
+    "/api/hospitality/menu": {
+      "post": {
+        "summary": "Generate Restaurant Menu",
+        "description": "Create optimized restaurant menu with pricing and nutritional information",
+        "tags": [
+          "Hospitality"
+        ],
+        "requestBody": {
+          "required": true,
+          "schema": {
+            "type": "object",
+            "properties": {
+              "cuisine": {
+                "type": "string",
+                "example": "Mediterranean"
+              },
+              "budget": {
+                "type": "number",
+                "example": 500
+              },
+              "dietary": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {}
+      }
+    }
+  }
+}

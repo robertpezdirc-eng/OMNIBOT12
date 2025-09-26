@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniBot - Profesionalni Prototip Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: auto;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            grid-template-rows: 80px 1fr;
+            height: 100vh;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .system-status {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-green { background: #00ff88; }
+        .status-yellow { background: #ffaa00; }
+        .status-red { background: #ff4444; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .main-content {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+        }
+
+        .control-panel {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .module-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            border-color: #00ff88;
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+        }
+
+        .module-card.active {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .module-card.warning {
+            border-color: #ffaa00;
+            background: rgba(255, 170, 0, 0.1);
+        }
+
+        .module-card.error {
+            border-color: #ff4444;
+            background: rgba(255, 68, 68, 0.1);
+        }
+
+        .module-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .module-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .module-status {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .workflow-diagram {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            min-height: 300px;
+        }
+
+        .workflow-node {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            min-width: 120px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .workflow-node:hover {
+            border-color: #00ff88;
+            transform: scale(1.05);
+        }
+
+        .workflow-connection {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, #00ff88, #0088ff);
+            z-index: 1;
+        }
+
+        .control-button {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00ff88, #00cc66);
+            color: #000;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #0088ff, #0066cc);
+            color: #fff;
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #ffaa00, #ff8800);
+            color: #000;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff4444, #cc2222);
+            color: #fff;
+        }
+
+        .control-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .log-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 2px 0;
+        }
+
+        .log-success { color: #00ff88; }
+        .log-warning { color: #ffaa00; }
+        .log-error { color: #ff4444; }
+        .log-info { color: #0088ff; }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #0088ff);
+            transition: width 0.3s ease;
+        }
+
+        .roadmap-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .roadmap-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .roadmap-status {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .roadmap-completed {
+            background: #00ff88;
+            color: #000;
+        }
+
+        .roadmap-in-progress {
+            background: #ffaa00;
+            color: #000;
+        }
+
+        .roadmap-pending {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">🤖 OmniBot Prototip</div>
+            <div class="system-status">
+                <span>Sistem:</span>
+                <div class="status-indicator status-green" id="systemStatus"></div>
+                <span>AI:</span>
+                <div class="status-indicator status-green" id="aiStatus"></div>
+                <span>Moduli:</span>
+                <div class="status-indicator status-yellow" id="moduleStatus"></div>
+            </div>
+        </div>
+
+        <!-- Sidebar - Module Overview -->
+        <div class="sidebar">
+            <h3>📊 Pregled Modulov</h3>
+            <div class="module-grid" style="grid-template-columns: 1fr;">
+                <div class="module-card active" data-module="ui">
+                    <span class="module-icon">🎨</span>
+                    <div class="module-name">UI Sloj</div>
+                    <div class="module-status">Aktiven</div>
+                </div>
+                <div class="module-card active" data-module="backend">
+                    <span class="module-icon">⚙️</span>
+                    <div class="module-name">Backend</div>
+                    <div class="module-status">Aktiven</div>
+                </div>
+                <div class="module-card warning" data-module="ai">
+                    <span class="module-icon">🧠</span>
+                    <div class="module-name">AI Modul</div>
+                    <div class="module-status">Inicializacija</div>
+                </div>
+                <div class="module-card active" data-module="learning">
+                    <span class="module-icon">📚</span>
+                    <div class="module-name">Samoučenje</div>
+                    <div class="module-status">Aktiven</div>
+                </div>
+                <div class="module-card error" data-module="testing">
+                    <span class="module-icon">🧪</span>
+                    <div class="module-name">Testiranje</div>
+                    <div class="module-status">Napaka</div>
+                </div>
+            </div>
+
+            <h3>📈 Metrike</h3>
+            <div class="metrics-grid" style="grid-template-columns: 1fr;">
+                <div class="metric-card">
+                    <div class="metric-value" id="uptime">99.2%</div>
+                    <div class="metric-label">Uptime</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="performance">87%</div>
+                    <div class="metric-label">Performanse</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content - Workflow Diagram -->
+        <div class="main-content">
+            <h2>🔄 Interaktivni Workflow</h2>
+            <div class="workflow-diagram" id="workflowDiagram">
+                <!-- Workflow nodes will be dynamically positioned -->
+                <div class="workflow-node" style="top: 20px; left: 50px;" data-node="user">
+                    <div>👤 Uporabnik</div>
+                </div>
+                <div class="workflow-node" style="top: 20px; left: 250px;" data-node="ui">
+                    <div>🎨 UI Sloj</div>
+                </div>
+                <div class="workflow-node" style="top: 120px; left: 150px;" data-node="backend">
+                    <div>⚙️ Backend</div>
+                </div>
+                <div class="workflow-node" style="top: 220px; left: 50px;" data-node="ai">
+                    <div>🧠 AI Modul</div>
+                </div>
+                <div class="workflow-node" style="top: 220px; left: 250px;" data-node="modules">
+                    <div>📦 Moduli</div>
+                </div>
+                
+                <!-- Connections -->
+                <div class="workflow-connection" style="top: 35px; left: 170px; width: 80px;"></div>
+                <div class="workflow-connection" style="top: 80px; left: 280px; width: 2px; height: 40px; background: linear-gradient(180deg, #00ff88, #0088ff);"></div>
+                <div class="workflow-connection" style="top: 180px; left: 180px; width: 2px; height: 40px; background: linear-gradient(180deg, #00ff88, #0088ff);"></div>
+                <div class="workflow-connection" style="top: 235px; left: 170px; width: 80px;"></div>
+            </div>
+
+            <h2>📋 Sistem Logi</h2>
+            <div class="log-container" id="systemLogs">
+                <div class="log-entry log-success">[12:34:56] ✅ UI Sloj inicializiran</div>
+                <div class="log-entry log-success">[12:34:57] ✅ Backend moduli naloženi</div>
+                <div class="log-entry log-warning">[12:34:58] ⚠️ AI modul v inicializaciji</div>
+                <div class="log-entry log-info">[12:34:59] ℹ️ Samoučenje aktivirano</div>
+                <div class="log-entry log-error">[12:35:00] ❌ Testni modul nedostopen</div>
+                <div class="log-entry log-info">[12:35:01] ℹ️ Avtomatsko popravilo v teku...</div>
+            </div>
+
+            <h2>🗺️ Razvoj Roadmap</h2>
+            <div class="roadmap-container">
+                <div class="roadmap-item">
+                    <div class="roadmap-status roadmap-completed">✓</div>
+                    <div>Osnovna UI struktura</div>
+                </div>
+                <div class="roadmap-item">
+                    <div class="roadmap-status roadmap-completed">✓</div>
+                    <div>Backend API implementacija</div>
+                </div>
+                <div class="roadmap-item">
+                    <div class="roadmap-status roadmap-in-progress">⟳</div>
+                    <div>AI modul integracija</div>
+                </div>
+                <div class="roadmap-item">
+                    <div class="roadmap-status roadmap-pending">○</div>
+                    <div>GPT integracija</div>
+                </div>
+                <div class="roadmap-item">
+                    <div class="roadmap-status roadmap-pending">○</div>
+                    <div>Napredne simulacije</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <h3>🎛️ Nadzorna Plošča</h3>
+            
+            <button class="control-button btn-primary" onclick="runSystemTest()">
+                🧪 Test All
+            </button>
+            
+            <button class="control-button btn-secondary" onclick="runAutoFix()">
+                🔧 Run Fix
+            </button>
+            
+            <button class="control-button btn-warning" onclick="optimizeSystem()">
+                ⚡ Optimiziraj
+            </button>
+            
+            <button class="control-button btn-danger" onclick="emergencyStop()">
+                🛑 Zasilni Stop
+            </button>
+
+            <h3>📊 Performanse</h3>
+            <div class="metric-card">
+                <div>CPU Uporaba</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 45%;" id="cpuUsage"></div>
+                </div>
+                <div class="metric-value">45%</div>
+            </div>
+
+            <div class="metric-card">
+                <div>Pomnilnik</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 62%;" id="memoryUsage"></div>
+                </div>
+                <div class="metric-value">62%</div>
+            </div>
+
+            <div class="metric-card">
+                <div>Omrežje</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 28%;" id="networkUsage"></div>
+                </div>
+                <div class="metric-value">28%</div>
+            </div>
+
+            <h3>🤖 AI Status</h3>
+            <div class="metric-card">
+                <div class="metric-value" id="aiConfidence">87%</div>
+                <div class="metric-label">AI Zaupanje</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-value" id="learningProgress">23</div>
+                <div class="metric-label">Naučeni Vzorci</div>
+            </div>
+
+            <button class="control-button btn-primary" onclick="trainAI()" style="margin-top: 15px;">
+                🧠 Treniranje AI
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Global system state
+        let systemState = {
+            modules: {
+                ui: { status: 'active', health: 95 },
+                backend: { status: 'active', health: 92 },
+                ai: { status: 'warning', health: 78 },
+                learning: { status: 'active', health: 89 },
+                testing: { status: 'error', health: 23 }
+            },
+            metrics: {
+                uptime: 99.2,
+                performance: 87,
+                cpu: 45,
+                memory: 62,
+                network: 28,
+                aiConfidence: 87,
+                learningProgress: 23
+            },
+            logs: []
+        };
+
+        // Initialize dashboard
+        function initializeDashboard() {
+            updateSystemStatus();
+            startMetricsUpdater();
+            setupEventListeners();
+            addLog('info', 'Dashboard inicializiran');
+        }
+
+        // Update system status indicators
+        function updateSystemStatus() {
+            const systemStatus = document.getElementById('systemStatus');
+            const aiStatus = document.getElementById('aiStatus');
+            const moduleStatus = document.getElementById('moduleStatus');
+
+            // Calculate overall system health
+            const avgHealth = Object.values(systemState.modules)
+                .reduce((sum, module) => sum + module.health, 0) / 5;
+
+            systemStatus.className = `status-indicator ${avgHealth > 80 ? 'status-green' : avgHealth > 60 ? 'status-yellow' : 'status-red'}`;
+            aiStatus.className = `status-indicator ${systemState.modules.ai.health > 80 ? 'status-green' : 'status-yellow'}`;
+            moduleStatus.className = `status-indicator ${avgHealth > 70 ? 'status-green' : 'status-yellow'}`;
+        }
+
+        // Start metrics updater
+        function startMetricsUpdater() {
+            setInterval(() => {
+                updateMetrics();
+                updateProgressBars();
+                simulateSystemActivity();
+            }, 2000);
+        }
+
+        // Update metrics with realistic fluctuations
+        function updateMetrics() {
+            systemState.metrics.cpu = Math.max(20, Math.min(90, systemState.metrics.cpu + (Math.random() - 0.5) * 10));
+            systemState.metrics.memory = Math.max(30, Math.min(95, systemState.metrics.memory + (Math.random() - 0.5) * 8));
+            systemState.metrics.network = Math.max(5, Math.min(80, systemState.metrics.network + (Math.random() - 0.5) * 15));
+            
+            document.getElementById('cpuUsage').style.width = systemState.metrics.cpu + '%';
+            document.getElementById('memoryUsage').style.width = systemState.metrics.memory + '%';
+            document.getElementById('networkUsage').style.width = systemState.metrics.network + '%';
+            
+            document.querySelector('#cpuUsage').parentElement.nextElementSibling.textContent = Math.round(systemState.metrics.cpu) + '%';
+            document.querySelector('#memoryUsage').parentElement.nextElementSibling.textContent = Math.round(systemState.metrics.memory) + '%';
+            document.querySelector('#networkUsage').parentElement.nextElementSibling.textContent = Math.round(systemState.metrics.network) + '%';
+        }
+
+        // Update progress bars
+        function updateProgressBars() {
+            const performanceElement = document.getElementById('performance');
+            const uptimeElement = document.getElementById('uptime');
+            
+            systemState.metrics.performance = Math.max(70, Math.min(100, systemState.metrics.performance + (Math.random() - 0.5) * 5));
+            performanceElement.textContent = Math.round(systemState.metrics.performance) + '%';
+        }
+
+        // Simulate system activity
+        function simulateSystemActivity() {
+            const activities = [
+                { type: 'info', message: 'Modul sinhronizacija uspešna' },
+                { type: 'success', message: 'AI vzorec naučen' },
+                { type: 'warning', message: 'Visoka CPU uporaba zaznana' },
+                { type: 'info', message: 'Avtomatska optimizacija v teku' }
+            ];
+
+            if (Math.random() < 0.3) {
+                const activity = activities[Math.floor(Math.random() * activities.length)];
+                addLog(activity.type, activity.message);
+            }
+        }
+
+        // Add log entry
+        function addLog(type, message) {
+            const logContainer = document.getElementById('systemLogs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            
+            const icon = type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'error' ? '❌' : 'ℹ️';
+            logEntry.innerHTML = `[${timestamp}] ${icon} ${message}`;
+            
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            // Keep only last 20 logs
+            while (logContainer.children.length > 20) {
+                logContainer.removeChild(logContainer.firstChild);
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Module card interactions
+            document.querySelectorAll('.module-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const module = card.dataset.module;
+                    showModuleDetails(module);
+                });
+            });
+
+            // Workflow node interactions
+            document.querySelectorAll('.workflow-node').forEach(node => {
+                node.addEventListener('click', () => {
+                    const nodeType = node.dataset.node;
+                    highlightWorkflowPath(nodeType);
+                });
+            });
+        }
+
+        // Show module details
+        function showModuleDetails(module) {
+            const moduleData = systemState.modules[module];
+            addLog('info', `Pregled modula: ${module} (Zdravje: ${moduleData.health}%)`);
+        }
+
+        // Highlight workflow path
+        function highlightWorkflowPath(nodeType) {
+            document.querySelectorAll('.workflow-node').forEach(node => {
+                node.style.borderColor = node.dataset.node === nodeType ? '#00ff88' : 'transparent';
+            });
+            addLog('info', `Workflow vozlišče aktivirano: ${nodeType}`);
+        }
+
+        // Control panel functions
+        function runSystemTest() {
+            addLog('info', '🧪 Zagon celotnega sistema testiranja...');
+            
+            setTimeout(() => {
+                Object.keys(systemState.modules).forEach(module => {
+                    const success = Math.random() > 0.2;
+                    if (success) {
+                        addLog('success', `${module} modul: TEST USPEŠEN`);
+                        systemState.modules[module].health = Math.min(100, systemState.modules[module].health + 5);
+                    } else {
+                        addLog('error', `${module} modul: TEST NEUSPEŠEN`);
+                        systemState.modules[module].health = Math.max(0, systemState.modules[module].health - 10);
+                    }
+                });
+                updateSystemStatus();
+                addLog('success', '🧪 Sistemsko testiranje zaključeno');
+            }, 3000);
+        }
+
+        function runAutoFix() {
+            addLog('info', '🔧 Zagon avtomatskega popravila...');
+            
+            setTimeout(() => {
+                Object.keys(systemState.modules).forEach(module => {
+                    if (systemState.modules[module].health < 80) {
+                        systemState.modules[module].health = Math.min(100, systemState.modules[module].health + 15);
+                        addLog('success', `${module} modul popravljen`);
+                    }
+                });
+                updateSystemStatus();
+                addLog('success', '🔧 Avtomatsko popravilo zaključeno');
+            }, 2000);
+        }
+
+        function optimizeSystem() {
+            addLog('info', '⚡ Zagon sistemske optimizacije...');
+            
+            setTimeout(() => {
+                systemState.metrics.performance = Math.min(100, systemState.metrics.performance + 10);
+                systemState.metrics.cpu = Math.max(20, systemState.metrics.cpu - 15);
+                systemState.metrics.memory = Math.max(30, systemState.metrics.memory - 10);
+                addLog('success', '⚡ Sistemska optimizacija zaključena');
+            }, 1500);
+        }
+
+        function emergencyStop() {
+            addLog('warning', '🛑 ZASILNI STOP AKTIVIRAN');
+            
+            Object.keys(systemState.modules).forEach(module => {
+                systemState.modules[module].status = 'stopped';
+            });
+            
+            setTimeout(() => {
+                addLog('info', '🔄 Sistem se ponovno zaganja...');
+                Object.keys(systemState.modules).forEach(module => {
+                    systemState.modules[module].status = 'active';
+                });
+                updateSystemStatus();
+                addLog('success', '✅ Sistem ponovno aktiven');
+            }, 5000);
+        }
+
+        function trainAI() {
+            addLog('info', '🧠 Zagon AI treniranja...');
+            
+            const trainingSteps = 5;
+            let currentStep = 0;
+            
+            const trainingInterval = setInterval(() => {
+                currentStep++;
+                systemState.metrics.aiConfidence = Math.min(100, systemState.metrics.aiConfidence + 2);
+                systemState.metrics.learningProgress++;
+                
+                document.getElementById('aiConfidence').textContent = Math.round(systemState.metrics.aiConfidence) + '%';
+                document.getElementById('learningProgress').textContent = systemState.metrics.learningProgress;
+                
+                addLog('info', `AI treniranje korak ${currentStep}/${trainingSteps}`);
+                
+                if (currentStep >= trainingSteps) {
+                    clearInterval(trainingInterval);
+                    addLog('success', '🧠 AI treniranje zaključeno');
+                    systemState.modules.ai.health = Math.min(100, systemState.modules.ai.health + 10);
+                    updateSystemStatus();
+                }
+            }, 1000);
+        }
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+    </script>
+</body>
+</html>

@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMNI - Moduli</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .license-info {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .license-info h3 {
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-card h4 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            color: #ffd700;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .module-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .module-card.locked {
+            opacity: 0.6;
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .module-card.expired {
+            opacity: 0.4;
+            background: rgba(255, 200, 200, 0.7);
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .module-icon {
+            font-size: 2.5rem;
+            margin-right: 15px;
+        }
+
+        .module-title {
+            flex: 1;
+        }
+
+        .module-title h3 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .module-title p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .module-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-unlocked {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .status-locked {
+            background: #f44336;
+            color: white;
+        }
+
+        .status-expired {
+            background: #ff9800;
+            color: white;
+        }
+
+        .module-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .restrictions {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .restrictions h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .restrictions ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .restrictions li {
+            color: #856404;
+            margin-bottom: 5px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .restrictions li:before {
+            content: "⚠️";
+            position: absolute;
+            left: 0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .error {
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #d32f2f;
+            text-align: center;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .modules-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">← Nazaj</a>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🔧 OMNI Moduli</h1>
+            <p>Upravljanje in dostop do funkcionalnosti</p>
+        </div>
+
+        <div id="loading" class="loading">
+            Nalaganje modulov...
+        </div>
+
+        <div id="error" class="error" style="display: none;">
+            <h3>Napaka pri nalaganju modulov</h3>
+            <p id="error-message"></p>
+            <button onclick="loadModules()" class="btn btn-primary" style="margin-top: 10px;">Poskusi znova</button>
+        </div>
+
+        <div id="content" style="display: none;">
+            <div id="license-info" class="license-info">
+                <!-- Licenčne informacije -->
+            </div>
+
+            <div id="stats" class="stats-grid">
+                <!-- Statistike -->
+            </div>
+
+            <div id="modules" class="modules-grid">
+                <!-- Moduli -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let modulesData = null;
+
+        async function loadModules() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('error').style.display = 'none';
+                document.getElementById('content').style.display = 'none';
+
+                // Pridobi podatke o modulih
+                modulesData = await window.electronAPI.moduleAPI.getAllModules();
+                console.log('Podatki o modulih:', modulesData);
+
+                // Pridobi statistike
+                const stats = await window.electronAPI.moduleAPI.getStats();
+                console.log('Statistike:', stats);
+
+                // Prikaži vsebino
+                displayLicenseInfo(modulesData.license, modulesData.licenseInfo);
+                displayStats(stats);
+                displayModules(modulesData.modules);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+
+            } catch (error) {
+                console.error('Napaka pri nalaganju modulov:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error-message').textContent = error.message || 'Neznana napaka';
+            }
+        }
+
+        function displayLicenseInfo(license, licenseInfo) {
+            const container = document.getElementById('license-info');
+            
+            if (!license) {
+                container.innerHTML = `
+                    <h3>❌ Brez licence</h3>
+                    <p>Trenutno nimate veljavne licence. Na voljo so samo demo funkcionalnosti.</p>
+                `;
+                return;
+            }
+
+            const expiryInfo = license.expiresAt ? 
+                `<p><strong>Velja do:</strong> ${new Date(license.expiresAt).toLocaleDateString('sl-SI')}</p>` : 
+                '<p><strong>Veljavnost:</strong> Neomejena</p>';
+
+            container.innerHTML = `
+                <h3>✅ ${licenseInfo ? licenseInfo.name : license.type}</h3>
+                <p><strong>Tip:</strong> ${license.type}</p>
+                ${expiryInfo}
+                <p><strong>ID instalacije:</strong> ${license.installationId || 'N/A'}</p>
+            `;
+        }
+
+        function displayStats(stats) {
+            const container = document.getElementById('stats');
+            container.innerHTML = `
+                <div class="stat-card">
+                    <h4>${stats.total}</h4>
+                    <p>Skupaj modulov</p>
+                </div>
+                <div class="stat-card">
+                    <h4>${stats.unlocked}</h4>
+                    <p>Dostopnih</p>
+                </div>
+                <div class="stat-card">
+                    <h4>${stats.locked}</h4>
+                    <p>Zaklenjenih</p>
+                </div>
+                <div class="stat-card">
+                    <h4>${stats.accessRate}%</h4>
+                    <p>Dostopnost</p>
+                </div>
+            `;
+        }
+
+        function displayModules(modules) {
+            const container = document.getElementById('modules');
+            container.innerHTML = '';
+
+            Object.entries(modules).forEach(([moduleId, module]) => {
+                const card = createModuleCard(moduleId, module);
+                container.appendChild(card);
+            });
+        }
+
+        function createModuleCard(moduleId, module) {
+            const card = document.createElement('div');
+            card.className = `module-card ${module.status}`;
+
+            const statusText = {
+                'unlocked': 'Dostopen',
+                'locked': 'Zaklenjen',
+                'expired': 'Potekel'
+            };
+
+            const statusClass = `status-${module.status}`;
+
+            let actionsHTML = '';
+            if (module.status === 'unlocked') {
+                actionsHTML = `
+                    <button onclick="openModule('${moduleId}')" class="btn btn-primary">
+                        Odpri modul
+                    </button>
+                    <button onclick="showModuleInfo('${moduleId}')" class="btn btn-secondary">
+                        Podrobnosti
+                    </button>
+                `;
+            } else {
+                actionsHTML = `
+                    <button disabled class="btn btn-secondary">
+                        Ni dostopen
+                    </button>
+                    <button onclick="showModuleInfo('${moduleId}')" class="btn btn-secondary">
+                        Zakaj ni dostopen?
+                    </button>
+                `;
+            }
+
+            card.innerHTML = `
+                <div class="module-status ${statusClass}">
+                    ${statusText[module.status]}
+                </div>
+                <div class="module-header">
+                    <div class="module-icon">${module.icon}</div>
+                    <div class="module-title">
+                        <h3>${module.name}</h3>
+                        <p>${module.description}</p>
+                    </div>
+                </div>
+                <div class="module-actions">
+                    ${actionsHTML}
+                </div>
+            `;
+
+            return card;
+        }
+
+        async function openModule(moduleId) {
+            try {
+                const result = await window.electronAPI.moduleAPI.openModule(moduleId);
+                
+                if (result.success) {
+                    // Odpri modul v novem oknu ali preusmeri
+                    if (result.module.url) {
+                        window.open(result.module.url, '_blank');
+                    }
+                    
+                    await window.electronAPI.showMessageBox({
+                        type: 'info',
+                        title: 'Modul odprt',
+                        message: result.message,
+                        buttons: ['V redu']
+                    });
+                } else {
+                    await window.electronAPI.showMessageBox({
+                        type: 'error',
+                        title: 'Napaka',
+                        message: result.error,
+                        buttons: ['V redu']
+                    });
+                }
+            } catch (error) {
+                console.error('Napaka pri odpiranju modula:', error);
+                await window.electronAPI.showErrorDialog('Napaka', 'Napaka pri odpiranju modula: ' + error.message);
+            }
+        }
+
+        async function showModuleInfo(moduleId) {
+            try {
+                const moduleInfo = await window.electronAPI.moduleAPI.getModule(moduleId);
+                
+                let message = `Modul: ${moduleInfo.name}\n`;
+                message += `Opis: ${moduleInfo.description}\n`;
+                message += `Status: ${moduleInfo.canAccess ? 'Dostopen' : 'Ni dostopen'}\n`;
+                
+                if (moduleInfo.restrictions) {
+                    message += `\nOmejitve:\n`;
+                    message += `Tip: ${moduleInfo.restrictions.type}\n`;
+                    message += `Sporočilo: ${moduleInfo.restrictions.message}\n`;
+                    
+                    if (moduleInfo.restrictions.limitations) {
+                        message += `\nOmejitve licence:\n`;
+                        const limits = moduleInfo.restrictions.limitations;
+                        if (limits.maxRecords !== -1) message += `- Maksimalno zapisov: ${limits.maxRecords}\n`;
+                        if (limits.maxUsers !== -1) message += `- Maksimalno uporabnikov: ${limits.maxUsers}\n`;
+                        message += `- Formati izvoza: ${limits.exportFormats.join(', ')}\n`;
+                        if (limits.validityDays !== -1) message += `- Veljavnost: ${limits.validityDays} dni\n`;
+                    }
+                }
+
+                await window.electronAPI.showMessageBox({
+                    type: 'info',
+                    title: `Informacije o modulu: ${moduleInfo.name}`,
+                    message: message,
+                    buttons: ['V redu']
+                });
+            } catch (error) {
+                console.error('Napaka pri pridobivanju informacij o modulu:', error);
+                await window.electronAPI.showErrorDialog('Napaka', 'Napaka pri pridobivanju informacij: ' + error.message);
+            }
+        }
+
+        // Naloži module ob zagonu strani
+        document.addEventListener('DOMContentLoaded', loadModules);
+
+        // Osveži module vsakih 30 sekund
+        setInterval(loadModules, 30000);
+    </script>
+</body>
+</html>

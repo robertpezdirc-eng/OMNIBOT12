@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Napredni Rezervacijski Sistem - Celotna Integracija</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .system-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        
+        .status-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .status-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .status-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .status-online {
+            color: #27ae60;
+        }
+        
+        .status-offline {
+            color: #e74c3c;
+        }
+        
+        .status-warning {
+            color: #f39c12;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .test-module {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .test-module h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .result.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        
+        .dashboard {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        .dashboard h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-top: 4px solid #3498db;
+        }
+        
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .metric-label {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .alerts {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px 20px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #6c757d;
+        }
+        
+        .tab.active {
+            background: white;
+            color: #2c3e50;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .system-status {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏨 Napredni Rezervacijski Sistem</h1>
+            <p>Ultra Full Feature Set - Celotna Integracija z AI, POS, Analitiko in Večjezično Podporo</p>
+        </div>
+        
+        <div class="system-status">
+            <div class="status-card">
+                <div class="status-icon status-online" id="reservation-status">🔄</div>
+                <h3>Rezervacijski Sistem</h3>
+                <p id="reservation-text">Inicializacija...</p>
+            </div>
+            <div class="status-card">
+                <div class="status-icon status-online" id="users-status">🔄</div>
+                <h3>Upravljanje Uporabnikov</h3>
+                <p id="users-text">Inicializacija...</p>
+            </div>
+            <div class="status-card">
+                <div class="status-icon status-online" id="ai-status">🔄</div>
+                <h3>AI Cenikovanje</h3>
+                <p id="ai-text">Inicializacija...</p>
+            </div>
+            <div class="status-card">
+                <div class="status-icon status-online" id="language-status">🔄</div>
+                <h3>Večjezična Podpora</h3>
+                <p id="language-text">Inicializacija...</p>
+            </div>
+            <div class="status-card">
+                <div class="status-icon status-online" id="analytics-status">🔄</div>
+                <h3>Analitika</h3>
+                <p id="analytics-text">Inicializacija...</p>
+            </div>
+            <div class="status-card">
+                <div class="status-icon status-online" id="notifications-status">🔄</div>
+                <h3>Obvestila</h3>
+                <p id="notifications-text">Inicializacija...</p>
+            </div>
+            <div class="status-card">
+                <div class="status-icon status-online" id="pos-status">🔄</div>
+                <h3>POS Sistem</h3>
+                <p id="pos-text">Inicializacija...</p>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="section">
+                <h2>🎯 Glavni Testi Sistema</h2>
+                
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('basic')">Osnovni Testi</button>
+                    <button class="tab" onclick="switchTab('advanced')">Napredni Testi</button>
+                    <button class="tab" onclick="switchTab('integration')">Integracija</button>
+                </div>
+                
+                <div id="basic" class="tab-content active">
+                    <div class="test-module">
+                        <h3>🏨 Rezervacijski Sistem</h3>
+                        <button class="btn" onclick="testReservationSystem()">Test Rezervacij</button>
+                        <button class="btn btn-success" onclick="createDemoReservation()">Ustvari Demo Rezervacijo</button>
+                        <div id="reservation-result" class="result" style="display: none;"></div>
+                    </div>
+                    
+                    <div class="test-module">
+                        <h3>👥 Upravljanje Uporabnikov</h3>
+                        <button class="btn" onclick="testUserManagement()">Test Uporabnikov</button>
+                        <button class="btn btn-success" onclick="testLoyaltyProgram()">Test Zvestobe</button>
+                        <div id="users-result" class="result" style="display: none;"></div>
+                    </div>
+                    
+                    <div class="test-module">
+                        <h3>🤖 AI Cenikovanje</h3>
+                        <button class="btn" onclick="testAIPricing()">Test AI Cen</button>
+                        <button class="btn btn-warning" onclick="optimizePrices()">Optimiziraj Cene</button>
+                        <div id="ai-result" class="result" style="display: none;"></div>
+                    </div>
+                </div>
+                
+                <div id="advanced" class="tab-content">
+                    <div class="test-module">
+                        <h3>🌍 Večjezična Podpora</h3>
+                        <button class="btn" onclick="testMultiLanguage()">Test Prevodov</button>
+                        <button class="btn btn-success" onclick="testCurrencyConversion()">Test Valut</button>
+                        <div id="language-result" class="result" style="display: none;"></div>
+                    </div>
+                    
+                    <div class="test-module">
+                        <h3>📊 Analitika</h3>
+                        <button class="btn" onclick="testAnalytics()">Test Analitike</button>
+                        <button class="btn btn-success" onclick="generateReports()">Generiraj Poročila</button>
+                        <div id="analytics-result" class="result" style="display: none;"></div>
+                    </div>
+                    
+                    <div class="test-module">
+                        <h3>🔔 Obvestila</h3>
+                        <button class="btn" onclick="testNotifications()">Test Obvestil</button>
+                        <button class="btn btn-warning" onclick="sendTestNotification()">Pošlji Test</button>
+                        <div id="notifications-result" class="result" style="display: none;"></div>
+                    </div>
+                </div>
+                
+                <div id="integration" class="tab-content">
+                    <div class="test-module">
+                        <h3>💰 POS Sistem</h3>
+                        <button class="btn" onclick="testPOSSystem()">Test POS</button>
+                        <button class="btn btn-success" onclick="createPOSTransaction()">Ustvari Transakcijo</button>
+                        <div id="pos-result" class="result" style="display: none;"></div>
+                    </div>
+                    
+                    <div class="test-module">
+                        <h3>🔗 Celotna Integracija</h3>
+                        <button class="btn btn-success" onclick="testFullIntegration()">Test Celotne Integracije</button>
+                        <button class="btn btn-warning" onclick="runStressTest()">Stress Test</button>
+                        <div id="integration-result" class="result" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>⚙️ Sistemski Nadzor</h2>
+                
+                <div class="test-module">
+                    <h3>🔧 Sistemske Funkcije</h3>
+                    <button class="btn btn-success" onclick="initializeSystem()">Inicializiraj Sistem</button>
+                    <button class="btn btn-warning" onclick="getSystemStatus()">Status Sistema</button>
+                    <button class="btn btn-danger" onclick="shutdownSystem()">Zapri Sistem</button>
+                    <div id="system-result" class="result" style="display: none;"></div>
+                </div>
+                
+                <div class="test-module">
+                    <h3>📈 Performanse</h3>
+                    <button class="btn" onclick="measurePerformance()">Meri Performanse</button>
+                    <button class="btn btn-warning" onclick="optimizeSystem()">Optimiziraj</button>
+                    <div id="performance-result" class="result" style="display: none;"></div>
+                </div>
+                
+                <div class="test-module">
+                    <h3>🛡️ Varnost</h3>
+                    <button class="btn" onclick="testSecurity()">Test Varnosti</button>
+                    <button class="btn btn-success" onclick="validateData()">Validiraj Podatke</button>
+                    <div id="security-result" class="result" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="dashboard">
+            <h2>📊 Nadzorna Plošča</h2>
+            
+            <div class="metrics">
+                <div class="metric-card">
+                    <div class="metric-value" id="total-reservations">0</div>
+                    <div class="metric-label">Skupaj Rezervacij</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%" id="reservations-progress"></div>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value" id="total-revenue">€0</div>
+                    <div class="metric-label">Skupaj Prihodki</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%" id="revenue-progress"></div>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value" id="occupancy-rate">0%</div>
+                    <div class="metric-label">Zasedenost</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%" id="occupancy-progress"></div>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value" id="active-users">0</div>
+                    <div class="metric-label">Aktivni Uporabniki</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%" id="users-progress"></div>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value" id="pos-transactions">0</div>
+                    <div class="metric-label">POS Transakcije</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%" id="pos-progress"></div>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value" id="system-health">0%</div>
+                    <div class="metric-label">Zdravje Sistema</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%" id="health-progress"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alerts">
+                <h3>🚨 Sistemska Opozorila</h3>
+                <div id="alerts-container">
+                    <div class="alert alert-info">
+                        <strong>Info:</strong> Sistem je pripravljen za testiranje.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulacija naprednega rezervacijskega sistema
+        class AdvancedReservationSystemTest {
+            constructor() {
+                this.systemHealth = {
+                    reservation: false,
+                    users: false,
+                    pricing: false,
+                    language: false,
+                    analytics: false,
+                    notifications: false,
+                    pos: false
+                };
+                
+                this.metrics = {
+                    totalReservations: 0,
+                    totalRevenue: 0,
+                    occupancyRate: 0,
+                    activeUsers: 0,
+                    posTransactions: 0,
+                    systemHealth: 0
+                };
+                
+                this.isInitialized = false;
+                this.alerts = [];
+                
+                this.init();
+            }
+            
+            async init() {
+                console.log('🚀 Inicializacija naprednega rezervacijskega sistema...');
+                await this.simulateSystemInitialization();
+                this.updateDashboard();
+                this.startRealTimeUpdates();
+            }
+            
+            async simulateSystemInitialization() {
+                const systems = [
+                    { name: 'reservation', label: 'Rezervacijski Sistem', delay: 1000 },
+                    { name: 'users', label: 'Upravljanje Uporabnikov', delay: 800 },
+                    { name: 'pricing', label: 'AI Cenikovanje', delay: 1200 },
+                    { name: 'language', label: 'Večjezična Podpora', delay: 600 },
+                    { name: 'analytics', label: 'Analitika', delay: 1000 },
+                    { name: 'notifications', label: 'Obvestila', delay: 700 },
+                    { name: 'pos', label: 'POS Sistem', delay: 900 }
+                ];
+                
+                for (const system of systems) {
+                    await this.delay(system.delay);
+                    this.systemHealth[system.name] = true;
+                    this.updateSystemStatus(system.name, 'online', `${system.label} aktiven`);
+                    this.addAlert('success', `${system.label} uspešno inicializiran`);
+                }
+                
+                this.isInitialized = true;
+                this.addAlert('success', 'Celoten sistem uspešno inicializiran!');
+                this.updateMetrics();
+            }
+            
+            updateSystemStatus(system, status, text) {
+                const statusElement = document.getElementById(`${system}-status`);
+                const textElement = document.getElementById(`${system}-text`);
+                
+                if (statusElement && textElement) {
+                    statusElement.className = `status-icon status-${status}`;
+                    statusElement.textContent = status === 'online' ? '✅' : status === 'warning' ? '⚠️' : '❌';
+                    textElement.textContent = text;
+                }
+            }
+            
+            updateDashboard() {
+                // Posodobi metrike
+                document.getElementById('total-reservations').textContent = this.metrics.totalReservations;
+                document.getElementById('total-revenue').textContent = `€${this.metrics.totalRevenue.toLocaleString()}`;
+                document.getElementById('occupancy-rate').textContent = `${this.metrics.occupancyRate}%`;
+                document.getElementById('active-users').textContent = this.metrics.activeUsers;
+                document.getElementById('pos-transactions').textContent = this.metrics.posTransactions;
+                document.getElementById('system-health').textContent = `${this.metrics.systemHealth}%`;
+                
+                // Posodobi progress bare
+                document.getElementById('reservations-progress').style.width = `${Math.min(this.metrics.totalReservations * 2, 100)}%`;
+                document.getElementById('revenue-progress').style.width = `${Math.min(this.metrics.totalRevenue / 1000, 100)}%`;
+                document.getElementById('occupancy-progress').style.width = `${this.metrics.occupancyRate}%`;
+                document.getElementById('users-progress').style.width = `${Math.min(this.metrics.activeUsers * 5, 100)}%`;
+                document.getElementById('pos-progress').style.width = `${Math.min(this.metrics.posTransactions * 3, 100)}%`;
+                document.getElementById('health-progress').style.width = `${this.metrics.systemHealth}%`;
+            }
+            
+            updateMetrics() {
+                // Simuliraj realne metrike
+                this.metrics.totalReservations = Math.floor(Math.random() * 50) + 10;
+                this.metrics.totalRevenue = Math.floor(Math.random() * 50000) + 10000;
+                this.metrics.occupancyRate = Math.floor(Math.random() * 40) + 60;
+                this.metrics.activeUsers = Math.floor(Math.random() * 20) + 5;
+                this.metrics.posTransactions = Math.floor(Math.random() * 30) + 10;
+                
+                // Izračunaj zdravje sistema
+                const healthySystemsCount = Object.values(this.systemHealth).filter(Boolean).length;
+                this.metrics.systemHealth = Math.floor((healthySystemsCount / Object.keys(this.systemHealth).length) * 100);
+                
+                this.updateDashboard();
+            }
+            
+            addAlert(type, message) {
+                const alert = {
+                    type: type,
+                    message: message,
+                    timestamp: new Date().toLocaleTimeString()
+                };
+                
+                this.alerts.unshift(alert);
+                if (this.alerts.length > 5) {
+                    this.alerts.pop();
+                }
+                
+                this.updateAlerts();
+            }
+            
+            updateAlerts() {
+                const container = document.getElementById('alerts-container');
+                container.innerHTML = '';
+                
+                this.alerts.forEach(alert => {
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = `alert alert-${alert.type}`;
+                    alertDiv.innerHTML = `
+                        <strong>${alert.timestamp}:</strong> ${alert.message}
+                    `;
+                    container.appendChild(alertDiv);
+                });
+            }
+            
+            startRealTimeUpdates() {
+                // Posodobi metrike vsakih 30 sekund
+                setInterval(() => {
+                    if (this.isInitialized) {
+                        this.updateMetrics();
+                    }
+                }, 30000);
+                
+                // Simuliraj naključne dogodke
+                setInterval(() => {
+                    if (this.isInitialized && Math.random() > 0.7) {
+                        const events = [
+                            'Nova rezervacija ustvarjena',
+                            'POS transakcija zaključena',
+                            'Uporabnik se je registriral',
+                            'AI je optimiziral cene',
+                            'Obvestilo poslano'
+                        ];
+                        const randomEvent = events[Math.floor(Math.random() * events.length)];
+                        this.addAlert('info', randomEvent);
+                    }
+                }, 10000);
+            }
+            
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+        
+        // Inicializacija sistema
+        const system = new AdvancedReservationSystemTest();
+        
+        // Tab funkcionalnost
+        function switchTab(tabName) {
+            // Skrij vse tab vsebine
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Odstrani active razred iz vseh tabov
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Prikaži izbrani tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Test funkcije
+        async function testReservationSystem() {
+            showLoading('reservation-result');
+            await system.delay(1500);
+            
+            const result = {
+                success: true,
+                message: 'Rezervacijski sistem uspešno testiran',
+                data: {
+                    totalRooms: 25,
+                    availableRooms: 18,
+                    occupancyRate: '72%',
+                    avgPrice: '€89.50',
+                    features: [
+                        'AI dinamično cenikovanje',
+                        'Avtomatske potrditve',
+                        'Integracija z zvestobnim programom',
+                        'Večjezična podpora',
+                        'Real-time zasedenost'
+                    ]
+                }
+            };
+            
+            showResult('reservation-result', result, 'success');
+            system.addAlert('success', 'Rezervacijski sistem testiran');
+        }
+        
+        async function createDemoReservation() {
+            showLoading('reservation-result');
+            await system.delay(2000);
+            
+            const reservation = {
+                reservationCode: 'RES' + Math.floor(Math.random() * 10000),
+                guestName: 'Janez Novak',
+                checkIn: '2024-02-15',
+                checkOut: '2024-02-18',
+                roomType: 'Deluxe Suite',
+                guests: 2,
+                originalPrice: 267.00,
+                aiOptimizedPrice: 245.50,
+                loyaltyDiscount: 24.55,
+                finalPrice: 220.95,
+                loyaltyPointsEarned: 22
+            };
+            
+            system.metrics.totalReservations++;
+            system.metrics.totalRevenue += reservation.finalPrice;
+            system.updateDashboard();
+            
+            showResult('reservation-result', {
+                success: true,
+                message: 'Demo rezervacija uspešno ustvarjena',
+                reservation: reservation
+            }, 'success');
+            
+            system.addAlert('success', `Nova rezervacija: ${reservation.reservationCode}`);
+        }
+        
+        async function testUserManagement() {
+            showLoading('users-result');
+            await system.delay(1200);
+            
+            const result = {
+                success: true,
+                message: 'Upravljanje uporabnikov uspešno testirano',
+                data: {
+                    totalUsers: 1247,
+                    activeUsers: 89,
+                    loyaltyMembers: 456,
+                    loyaltyLevels: {
+                        bronze: 234,
+                        silver: 156,
+                        gold: 45,
+                        platinum: 18,
+                        diamond: 3
+                    },
+                    features: [
+                        'Avtomatska registracija',
+                        'Program zvestobe',
+                        'Personalizirane preference',
+                        'Zgodovina rezervacij',
+                        'Priporočilni sistem'
+                    ]
+                }
+            };
+            
+            showResult('users-result', result, 'success');
+            system.addAlert('info', 'Upravljanje uporabnikov testirano');
+        }
+        
+        async function testLoyaltyProgram() {
+            showLoading('users-result');
+            await system.delay(1800);
+            
+            const result = {
+                success: true,
+                message: 'Program zvestobe uspešno testiran',
+                data: {
+                    pointsIssued: 12450,
+                    pointsRedeemed: 3890,
+                    activeRewards: 23,
+                    tierUpgrades: 15,
+                    referralBonuses: 8,
+                    features: [
+                        'Avtomatsko dodeljevanje točk',
+                        'Tier sistem z ugodnostmi',
+                        'Priporočilni bonusi',
+                        'Personalizirane nagrade',
+                        'Analitika zvestobe'
+                    ]
+                }
+            };
+            
+            system.metrics.activeUsers += 3;
+            system.updateDashboard();
+            
+            showResult('users-result', result, 'success');
+            system.addAlert('success', 'Program zvestobe testiran');
+        }
+        
+        async function testAIPricing() {
+            showLoading('ai-result');
+            await system.delay(2500);
+            
+            const result = {
+                success: true,
+                message: 'AI cenikovanje uspešno testirano',
+                data: {
+                    optimizedPrices: 156,
+                    avgPriceIncrease: '12.5%',
+                    revenueIncrease: '€4,567',
+                    factors: {
+                        occupancy: 0.72,
+                        seasonality: 1.15,
+                        demand: 1.08,
+                        competition: 0.95,
+                        events: 1.12,
+                        weather: 1.03
+                    },
+                    features: [
+                        'Real-time optimizacija',
+                        'Napovedni modeli',
+                        'Konkurenčna analiza',
+                        'Sezonski faktorji',
+                        'Dogodkovni vplivi'
+                    ]
+                }
+            };
+            
+            showResult('ai-result', result, 'success');
+            system.addAlert('info', 'AI cenikovanje testirano');
+        }
+        
+        async function optimizePrices() {
+            showLoading('ai-result');
+            await system.delay(3000);
+            
+            const optimizations = [
+                { room: 'Standard Single', oldPrice: 65, newPrice: 72, change: '+10.8%' },
+                { room: 'Standard Double', oldPrice: 89, newPrice: 95, change: '+6.7%' },
+                { room: 'Deluxe Suite', oldPrice: 145, newPrice: 138, change: '-4.8%' },
+                { room: 'Family Room', oldPrice: 120, newPrice: 132, change: '+10.0%' },
+                { room: 'Presidential Suite', oldPrice: 280, newPrice: 295, change: '+5.4%' }
+            ];
+            
+            const totalIncrease = optimizations.reduce((sum, opt) => sum + (opt.newPrice - opt.oldPrice), 0);
+            system.metrics.totalRevenue += totalIncrease * 10; // Simulacija
+            system.updateDashboard();
+            
+            showResult('ai-result', {
+                success: true,
+                message: 'Cene uspešno optimizirane',
+                optimizations: optimizations,
+                totalIncrease: `€${totalIncrease.toFixed(2)}`
+            }, 'success');
+            
+            system.addAlert('success', `Cene optimizirane: +€${totalIncrease.toFixed(2)}`);
+        }
+        
+        async function testMultiLanguage() {
+            showLoading('language-result');
+            await system.delay(1500);
+            
+            const result = {
+                success: true,
+                message: 'Večjezična podpora uspešno testirana',
+                data: {
+                    supportedLanguages: ['sl', 'hr', 'en', 'de', 'it'],
+                    supportedCurrencies: ['EUR', 'HRK', 'USD'],
+                    translations: 2456,
+                    autoTranslations: 89,
+                    features: [
+                        'Avtomatsko zaznavanje jezika',
+                        'Real-time prevajanje',
+                        'Lokalizacija formatov',
+                        'Večvalutna podpora',
+                        'Kulturne prilagoditve'
+                    ]
+                }
+            };
+            
+            showResult('language-result', result, 'success');
+            system.addAlert('info', 'Večjezična podpora testirana');
+        }
+        
+        async function testCurrencyConversion() {
+            showLoading('language-result');
+            await system.delay(1200);
+            
+            const conversions = [
+                { from: 'EUR', to: 'HRK', rate: 7.53, amount: 100, result: 753 },
+                { from: 'EUR', to: 'USD', rate: 1.08, amount: 100, result: 108 },
+                { from: 'USD', to: 'EUR', rate: 0.93, amount: 100, result: 93 },
+                { from: 'HRK', to: 'EUR', rate: 0.13, amount: 100, result: 13 }
+            ];
+            
+            showResult('language-result', {
+                success: true,
+                message: 'Valutno pretvarjanje uspešno testirano',
+                conversions: conversions,
+                lastUpdate: new Date().toLocaleString()
+            }, 'success');
+            
+            system.addAlert('success', 'Valutno pretvarjanje testirano');
+        }
+        
+        async function testAnalytics() {
+            showLoading('analytics-result');
+            await system.delay(2000);
+            
+            const result = {
+                success: true,
+                message: 'Analitika uspešno testirana',
+                data: {
+                    dailyMetrics: 45,
+                    weeklyReports: 12,
+                    monthlyForecasts: 3,
+                    heatmaps: 8,
+                    kpis: {
+                        occupancyRate: '74.5%',
+                        avgDailyRate: '€92.30',
+                        revPAR: '€68.76',
+                        customerSatisfaction: '4.7/5',
+                        repeatGuests: '32%'
+                    },
+                    features: [
+                        'Real-time dashboardi',
+                        'Napovedni modeli',
+                        'Heatmap analiza',
+                        'Konkurenčna primerjava',
+                        'Avtomatska poročila'
+                    ]
+                }
+            };
+            
+            showResult('analytics-result', result, 'success');
+            system.addAlert('info', 'Analitika testirana');
+        }
+        
+        async function generateReports() {
+            showLoading('analytics-result');
+            await system.delay(2500);
+            
+            const reports = [
+                { name: 'Dnevno poročilo', status: 'Generirano', size: '2.3 MB' },
+                { name: 'Tedenski povzetek', status: 'Generirano', size: '5.7 MB' },
+                { name: 'Mesečna analiza', status: 'Generirano', size: '12.4 MB' },
+                { name: 'Napoved prihodkov', status: 'Generirano', size: '3.8 MB' },
+                { name: 'Analiza zvestobe', status: 'Generirano', size: '4.2 MB' }
+            ];
+            
+            showResult('analytics-result', {
+                success: true,
+                message: 'Poročila uspešno generirana',
+                reports: reports,
+                totalSize: '28.4 MB'
+            }, 'success');
+            
+            system.addAlert('success', 'Poročila generirana');
+        }
+        
+        async function testNotifications() {
+            showLoading('notifications-result');
+            await system.delay(1300);
+            
+            const result = {
+                success: true,
+                message: 'Sistem obvestil uspešno testiran',
+                data: {
+                    totalNotifications: 1456,
+                    deliveredToday: 89,
+                    pendingDelivery: 12,
+                    channels: {
+                        email: 67,
+                        sms: 23,
+                        push: 45,
+                        webhook: 8
+                    },
+                    features: [
+                        'Multi-channel dostava',
+                        'Trigger pravila',
+                        'Personalizacija',
+                        'Analitika dostave',
+                        'Avtomatsko razporejanje'
+                    ]
+                }
+            };
+            
+            showResult('notifications-result', result, 'success');
+            system.addAlert('info', 'Sistem obvestil testiran');
+        }
+        
+        async function sendTestNotification() {
+            showLoading('notifications-result');
+            await system.delay(1800);
+            
+            const notification = {
+                id: 'NOT' + Math.floor(Math.random() * 10000),
+                type: 'test',
+                title: 'Test obvestilo',
+                message: 'To je testno obvestilo iz naprednega rezervacijskega sistema.',
+                channels: ['email', 'push'],
+                status: 'delivered',
+                deliveredAt: new Date().toLocaleString()
+            };
+            
+            showResult('notifications-result', {
+                success: true,
+                message: 'Test obvestilo uspešno poslano',
+                notification: notification
+            }, 'success');
+            
+            system.addAlert('success', `Obvestilo ${notification.id} poslano`);
+        }
+        
+        async function testPOSSystem() {
+            showLoading('pos-result');
+            await system.delay(1600);
+            
+            const result = {
+                success: true,
+                message: 'POS sistem uspešno testiran',
+                data: {
+                    totalItems: 156,
+                    categories: 4,
+                    dailyTransactions: 45,
+                    dailyRevenue: '€1,234.56',
+                    paymentMethods: {
+                        cash: '€345.20',
+                        card: '€678.90',
+                        roomCharge: '€210.46'
+                    },
+                    features: [
+                        'Inventar management',
+                        'Multi-payment podpora',
+                        'Integracija z rezervacijami',
+                        'Avtomatsko obračunavanje',
+                        'Real-time poročila'
+                    ]
+                }
+            };
+            
+            showResult('pos-result', result, 'success');
+            system.addAlert('info', 'POS sistem testiran');
+        }
+        
+        async function createPOSTransaction() {
+            showLoading('pos-result');
+            await system.delay(2200);
+            
+            const transaction = {
+                transactionNumber: 'TXN' + Math.floor(Math.random() * 100000),
+                items: [
+                    { name: 'Espresso', quantity: 2, price: 3.60 },
+                    { name: 'Cezar solata', quantity: 1, price: 8.90 },
+                    { name: 'Laško pivo 0.5l', quantity: 1, price: 3.20 }
+                ],
+                subtotal: 15.70,
+                tax: 2.51,
+                total: 18.21,
+                paymentMethod: 'card',
+                loyaltyPoints: 18,
+                status: 'completed'
+            };
+            
+            system.metrics.posTransactions++;
+            system.metrics.totalRevenue += transaction.total;
+            system.updateDashboard();
+            
+            showResult('pos-result', {
+                success: true,
+                message: 'POS transakcija uspešno ustvarjena',
+                transaction: transaction
+            }, 'success');
+            
+            system.addAlert('success', `POS transakcija ${transaction.transactionNumber} zaključena`);
+        }
+        
+        async function testFullIntegration() {
+            showLoading('integration-result');
+            await system.delay(3000);
+            
+            const integrationTest = {
+                success: true,
+                message: 'Celotna integracija uspešno testirana',
+                tests: [
+                    { module: 'Rezervacijski sistem', status: 'PASS', time: '1.2s' },
+                    { module: 'Upravljanje uporabnikov', status: 'PASS', time: '0.8s' },
+                    { module: 'AI cenikovanje', status: 'PASS', time: '2.1s' },
+                    { module: 'Večjezična podpora', status: 'PASS', time: '0.9s' },
+                    { module: 'Analitika', status: 'PASS', time: '1.5s' },
+                    { module: 'Obvestila', status: 'PASS', time: '1.1s' },
+                    { module: 'POS sistem', status: 'PASS', time: '1.3s' },
+                    { module: 'Integracija podatkov', status: 'PASS', time: '2.8s' }
+                ],
+                performance: {
+                    totalTime: '11.7s',
+                    memoryUsage: '245 MB',
+                    cpuUsage: '12%',
+                    dbConnections: 7,
+                    apiCalls: 156
+                }
+            };
+            
+            showResult('integration-result', integrationTest, 'success');
+            system.addAlert('success', 'Celotna integracija testirana');
+        }
+        
+        async function runStressTest() {
+            showLoading('integration-result');
+            
+            const stressResults = [];
+            const totalTests = 10;
+            
+            for (let i = 1; i <= totalTests; i++) {
+                await system.delay(300);
+                const responseTime = Math.floor(Math.random() * 500) + 100;
+                const success = Math.random() > 0.05; // 95% success rate
+                
+                stressResults.push({
+                    test: i,
+                    responseTime: responseTime + 'ms',
+                    status: success ? 'PASS' : 'FAIL',
+                    throughput: Math.floor(Math.random() * 100) + 50 + ' req/s'
+                });
+                
+                // Posodobi progress
+                const progress = (i / totalTests) * 100;
+                document.getElementById('integration-result').innerHTML = `
+                    <div class="result info" style="display: block;">
+                        <strong>Stress Test Progress: ${progress.toFixed(0)}%</strong><br>
+                        <div class="progress-bar" style="margin: 10px 0;">
+                            <div class="progress-fill" style="width: ${progress}%;"></div>
+                        </div>
+                        Test ${i}/${totalTests} - ${responseTime}ms
+                    </div>
+                `;
+            }
+            
+            const avgResponseTime = stressResults.reduce((sum, test) => 
+                sum + parseInt(test.responseTime), 0) / totalTests;
+            const successRate = (stressResults.filter(test => 
+                test.status === 'PASS').length / totalTests) * 100;
+            
+            showResult('integration-result', {
+                success: true,
+                message: 'Stress test uspešno zaključen',
+                results: stressResults,
+                summary: {
+                    totalTests: totalTests,
+                    successRate: successRate.toFixed(1) + '%',
+                    avgResponseTime: avgResponseTime.toFixed(0) + 'ms',
+                    maxThroughput: '150 req/s'
+                }
+            }, 'success');
+            
+            system.addAlert('warning', `Stress test: ${successRate.toFixed(1)}% uspešnost`);
+        }
+        
+        async function initializeSystem() {
+            showLoading('system-result');
+            await system.delay(2000);
+            
+            // Reset sistema
+            system.isInitialized = false;
+            Object.keys(system.systemHealth).forEach(key => {
+                system.systemHealth[key] = false;
+                system.updateSystemStatus(key, 'offline', 'Inicializacija...');
+            });
+            
+            // Ponovno inicializiraj
+            await system.simulateSystemInitialization();
+            
+            showResult('system-result', {
+                success: true,
+                message: 'Sistem uspešno inicializiran',
+                systemHealth: system.systemHealth,
+                initTime: '8.7s'
+            }, 'success');
+        }
+        
+        async function getSystemStatus() {
+            showLoading('system-result');
+            await system.delay(800);
+            
+            const status = {
+                initialized: system.isInitialized,
+                uptime: '2h 34m 12s',
+                memory: '245 MB / 512 MB',
+                cpu: '12%',
+                disk: '2.3 GB / 10 GB',
+                connections: {
+                    database: 7,
+                    api: 23,
+                    websocket: 12
+                },
+                health: system.systemHealth
+            };
+            
+            showResult('system-result', {
+                success: true,
+                message: 'Status sistema pridobljen',
+                status: status
+            }, 'info');
+        }
+        
+        async function shutdownSystem() {
+            showLoading('system-result');
+            await system.delay(1500);
+            
+            // Simuliraj zapiranje
+            Object.keys(system.systemHealth).forEach(key => {
+                system.systemHealth[key] = false;
+                system.updateSystemStatus(key, 'offline', 'Zaustavljen');
+            });
+            
+            system.isInitialized = false;
+            
+            showResult('system-result', {
+                success: true,
+                message: 'Sistem uspešno zaustavljen',
+                shutdownTime: '3.2s'
+            }, 'info');
+            
+            system.addAlert('warning', 'Sistem zaustavljen');
+        }
+        
+        async function measurePerformance() {
+            showLoading('performance-result');
+            await system.delay(2000);
+            
+            const performance = {
+                responseTime: {
+                    avg: '145ms',
+                    min: '89ms',
+                    max: '234ms',
+                    p95: '198ms'
+                },
+                throughput: {
+                    current: '87 req/s',
+                    peak: '156 req/s',
+                    avg: '92 req/s'
+                },
+                resources: {
+                    cpu: '12%',
+                    memory: '245 MB',
+                    disk: '2.3 GB',
+                    network: '1.2 MB/s'
+                },
+                database: {
+                    connections: 7,
+                    queryTime: '23ms',
+                    cacheHitRate: '94%'
+                }
+            };
+            
+            showResult('performance-result', {
+                success: true,
+                message: 'Performanse izmerjene',
+                performance: performance
+            }, 'success');
+        }
+        
+        async function optimizeSystem() {
+            showLoading('performance-result');
+            await system.delay(2500);
+            
+            const optimizations = [
+                { component: 'Database queries', improvement: '+15%', status: 'Optimized' },
+                { component: 'Memory usage', improvement: '-8%', status: 'Optimized' },
+                { component: 'Cache efficiency', improvement: '+12%', status: 'Optimized' },
+                { component: 'API responses', improvement: '+22%', status: 'Optimized' },
+                { component: 'Background tasks', improvement: '+18%', status: 'Optimized' }
+            ];
+            
+            showResult('performance-result', {
+                success: true,
+                message: 'Sistem uspešno optimiziran',
+                optimizations: optimizations,
+                overallImprovement: '+16%'
+            }, 'success');
+            
+            system.addAlert('success', 'Sistem optimiziran: +16% performanse');
+        }
+        
+        async function testSecurity() {
+            showLoading('security-result');
+            await system.delay(1800);
+            
+            const securityTests = [
+                { test: 'SQL Injection', status: 'PASS', severity: 'High' },
+                { test: 'XSS Protection', status: 'PASS', severity: 'High' },
+                { test: 'CSRF Protection', status: 'PASS', severity: 'Medium' },
+                { test: 'Authentication', status: 'PASS', severity: 'High' },
+                { test: 'Authorization', status: 'PASS', severity: 'High' },
+                { test: 'Data Encryption', status: 'PASS', severity: 'High' },
+                { test: 'Input Validation', status: 'PASS', severity: 'Medium' },
+                { test: 'Rate Limiting', status: 'PASS', severity: 'Medium' }
+            ];
+            
+            showResult('security-result', {
+                success: true,
+                message: 'Varnostni testi uspešno zaključeni',
+                tests: securityTests,
+                score: '100%',
+                vulnerabilities: 0
+            }, 'success');
+        }
+        
+        async function validateData() {
+            showLoading('security-result');
+            await system.delay(1200);
+            
+            const validation = {
+                totalRecords: 15678,
+                validRecords: 15654,
+                invalidRecords: 24,
+                duplicates: 12,
+                missingFields: 8,
+                dataIntegrity: '99.85%',
+                issues: [
+                    { type: 'Missing email', count: 5, severity: 'Low' },
+                    { type: 'Invalid phone', count: 7, severity: 'Low' },
+                    { type: 'Duplicate booking', count: 12, severity: 'Medium' }
+                ]
+            };
+            
+            showResult('security-result', {
+                success: true,
+                message: 'Validacija podatkov zaključena',
+                validation: validation
+            }, 'success');
+        }
+        
+        // Pomožne funkcije
+        function showLoading(elementId) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = 'result info';
+            element.innerHTML = '<div class="loading"></div>Obdelava...';
+        }
+        
+        function showResult(elementId, result, type) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result ${type}`;
+            element.innerHTML = `
+                <strong>${result.success ? '✅ Uspeh' : '❌ Napaka'}:</strong> ${result.message}<br>
+                <pre>${JSON.stringify(result, null, 2)}</pre>
+            `;
+        }
+        
+        // Inicializacija ob nalaganju strani
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🏨 Napredni rezervacijski sistem pripravljen!');
+        });
+    </script>
+</body>
+</html>

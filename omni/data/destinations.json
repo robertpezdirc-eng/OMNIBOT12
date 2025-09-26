@@ -1,0 +1,138 @@
+[
+  {
+    "id": "DEST_BLED",
+    "name": "Bled",
+    "country": "Slovenija",
+    "region": "Gorenjska",
+    "coordinates": {
+      "lat": 46.3683,
+      "lng": 14.1147
+    },
+    "description": "Čudovito alpsko jezero z otokom in gradom",
+    "best_season": "summer",
+    "activities": [
+      "veslanje",
+      "pohodništvo",
+      "fotografiranje",
+      "obisk gradu"
+    ],
+    "accommodation_types": [
+      "hotel",
+      "guesthouse"
+    ],
+    "average_cost_per_day": 80.0,
+    "sustainability_score": 8.5,
+    "cultural_highlights": [
+      "Blejski grad",
+      "Cerkev na otoku",
+      "Kremšnita"
+    ],
+    "local_cuisine": [
+      "kremšnita",
+      "postrv",
+      "štruklji"
+    ]
+  },
+  {
+    "id": "DEST_KOLPA",
+    "name": "Kolpa",
+    "country": "Slovenija",
+    "region": "Dolenjska",
+    "coordinates": {
+      "lat": 45.5547,
+      "lng": 15.1675
+    },
+    "description": "Najčistejša in najlepša slovenska reka",
+    "best_season": "summer",
+    "activities": [
+      "kopanje",
+      "kanuiranje",
+      "ribolov",
+      "kampiranje"
+    ],
+    "accommodation_types": [
+      "camping",
+      "glamping"
+    ],
+    "average_cost_per_day": 45.0,
+    "sustainability_score": 9.2,
+    "cultural_highlights": [
+      "Stari grad Žužemberk",
+      "Kostanjevica na Krki"
+    ],
+    "local_cuisine": [
+      "cvičkova klobasa",
+      "belokranjska pogača",
+      "orehova potica"
+    ]
+  },
+  {
+    "id": "DEST_LJUBLJANA",
+    "name": "Ljubljana",
+    "country": "Slovenija",
+    "region": "Osrednjeslovenska",
+    "coordinates": {
+      "lat": 46.0569,
+      "lng": 14.5058
+    },
+    "description": "Zelena prestolnica Slovenije",
+    "best_season": "spring",
+    "activities": [
+      "mestni sprehodi",
+      "muzeji",
+      "galerije",
+      "kulinarika"
+    ],
+    "accommodation_types": [
+      "hotel",
+      "hostel",
+      "apartment"
+    ],
+    "average_cost_per_day": 65.0,
+    "sustainability_score": 8.8,
+    "cultural_highlights": [
+      "Ljubljanski grad",
+      "Tromostovje",
+      "Tivoli park"
+    ],
+    "local_cuisine": [
+      "žlikrofi",
+      "kranjska klobasa",
+      "prekmurska gibanica"
+    ]
+  },
+  {
+    "id": "DEST_PIRAN",
+    "name": "Piran",
+    "country": "Slovenija",
+    "region": "Primorska",
+    "coordinates": {
+      "lat": 45.5285,
+      "lng": 13.5683
+    },
+    "description": "Beneška arhitektura ob Jadranskem morju",
+    "best_season": "summer",
+    "activities": [
+      "kopanje",
+      "potapljanje",
+      "degustacija vin",
+      "obisk solinarjev"
+    ],
+    "accommodation_types": [
+      "hotel",
+      "apartment"
+    ],
+    "average_cost_per_day": 70.0,
+    "sustainability_score": 7.8,
+    "cultural_highlights": [
+      "Tartinijev trg",
+      "Piranske soline",
+      "Cerkev sv. Jurija"
+    ],
+    "local_cuisine": [
+      "morski sadeži",
+      "istrska malvazija",
+      "pršut"
+    ]
+  }
+]

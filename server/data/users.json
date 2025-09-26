@@ -1,0 +1,18 @@
+[
+  {
+    "id": "1758830987521",
+    "username": "",
+    "email": "test@example.com",
+    "password": "$2a$10$6oAxLPRaAOKj9bFXgXYM1.RGtl83wVMKzUeb7CJDzjEdb8Tx85x6i",
+    "role": "client",
+    "plan": "demo",
+    "plan_expires": null,
+    "createdAt": "2025-09-25T20:09:47.522Z",
+    "lastLogin": "2025-09-25T20:10:05.596Z",
+    "emailVerified": false,
+    "emailVerificationToken": null,
+    "emailVerificationExpires": null,
+    "resetPasswordToken": null,
+    "resetPasswordExpires": null
+  }
+]

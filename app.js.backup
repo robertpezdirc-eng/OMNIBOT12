@@ -1,0 +1,422 @@
+// Enhanced Live AI Preview - Full Integration
+const API_BASE_URL = 'http://localhost:3001';
+
+// DOM Elements
+const promptInput = document.getElementById('prompt');
+const generateBtn = document.getElementById('generateBtn');
+const clearBtn = document.getElementById('clearBtn');
+const randomPromptBtn = document.getElementById('randomPromptBtn');
+const output = document.getElementById('output');
+const connectionStatus = document.getElementById('connectionStatus');
+const statusText = document.getElementById('statusText');
+
+// Knowledge Base Elements
+const searchInput = document.getElementById('searchInput');
+const searchBtn = document.getElementById('searchBtn');
+const knowledgeCategories = document.getElementById('knowledgeCategories');
+const knowledgeResults = document.getElementById('knowledgeResults');
+
+// Testing Elements
+const testApiBtn = document.getElementById('testApiBtn');
+const testKnowledgeBtn = document.getElementById('testKnowledgeBtn');
+const apiTestResult = document.getElementById('apiTestResult');
+const knowledgeTestResult = document.getElementById('knowledgeTestResult');
+const localUrl = document.getElementById('localUrl');
+
+// State Management
+let currentSection = 'main';
+let knowledgeData = {};
+let isConnected = false;
+
+// Initialize the application
+document.addEventListener('DOMContentLoaded', function() {
+    initializeApp();
+    setupEventListeners();
+    checkConnection();
+    loadKnowledgeCategories();
+    checkOnboarding(); // Add onboarding check
+});
+
+function initializeApp() {
+    console.log('🚀 Initializing Omnia AI Platform...');
+    
+    // Set initial status
+    updateConnectionStatus(false, 'Connecting...');
+    
+    // Load network info
+    if (localUrl) {
+        localUrl.textContent = window.location.origin;
+    }
+    
+    // Show main section by default
+    showSection('main');
+}
+
+function setupEventListeners() {
+    // Main chat functionality
+    if (generateBtn) generateBtn.addEventListener('click', handleGenerate);
+    if (clearBtn) clearBtn.addEventListener('click', handleClear);
+    if (randomPromptBtn) randomPromptBtn.addEventListener('click', handleRandomPrompt);
+    
+    // Knowledge base functionality
+    if (searchBtn) searchBtn.addEventListener('click', handleSearch);
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') handleSearch();
+        });
+    }
+    
+    // Testing functionality
+    if (testApiBtn) testApiBtn.addEventListener('click', testAPI);
+    if (testKnowledgeBtn) testKnowledgeBtn.addEventListener('click', testKnowledgeBase);
+    
+    // Input handling
+    if (promptInput) {
+        promptInput.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                handleGenerate();
+            }
+        });
+    }
+}
+
+// Section Management
+function showSection(sectionName) {
+    // Hide all sections
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(section => section.classList.remove('active'));
+    
+    // Show selected section
+    const targetSection = document.getElementById(`${sectionName}-section`);
+    if (targetSection) {
+        targetSection.classList.add('active');
+        currentSection = sectionName;
+    }
+    
+    // Update navigation buttons
+    const navBtns = document.querySelectorAll('.nav-btn');
+    navBtns.forEach(btn => btn.classList.remove('active'));
+    
+    console.log(`📍 Switched to ${sectionName} section`);
+}
+
+// Connection Management
+async function checkConnection() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/test`);
+        if (response.ok) {
+            updateConnectionStatus(true, 'Connected');
+            isConnected = true;
+        } else {
+            throw new Error('Server not responding');
+        }
+    } catch (error) {
+        updateConnectionStatus(false, 'Disconnected');
+        isConnected = false;
+        console.error('❌ Connection failed:', error);
+    }
+}
+
+function updateConnectionStatus(connected, message) {
+    if (connectionStatus && statusText) {
+        connectionStatus.className = `status-dot ${connected ? 'online' : 'offline'}`;
+        statusText.textContent = message;
+    }
+}
+
+// Main Chat Functionality
+async function handleGenerate() {
+    const prompt = promptInput?.value?.trim();
+    
+    if (!prompt) {
+        showError('Prosim vnesite prompt!');
+        return;
+    }
+    
+    if (!isConnected) {
+        showError('Ni povezave s strežnikom. Prosim preverite povezavo.');
+        return;
+    }
+    
+    setLoadingState(true);
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/generate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ prompt })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        displayResult(data.response || data.message || 'Odgovor uspešno generiran!');
+        
+    } catch (error) {
+        console.error('❌ Generation error:', error);
+        showError(`Napaka pri generiranju: ${error.message}`);
+    } finally {
+        setLoadingState(false);
+    }
+}
+
+function handleClear() {
+    if (promptInput) promptInput.value = '';
+    if (output) output.textContent = 'Tukaj se bo prikazal AI odgovor...';
+    output?.classList.remove('error', 'success');
+    console.log('🗑️ Cleared input and output');
+}
+
+async function handleRandomPrompt() {
+    const randomPrompts = [
+        "Napiši kratko zgodbo o robotih",
+        "Explain quantum computing in simple terms",
+        "Create a recipe for chocolate cake",
+        "Tell me about the solar system",
+        "Write a poem about technology",
+        "Describe the benefits of renewable energy",
+        "Explain how machine learning works",
+        "Create a travel guide for Slovenia"
+    ];
+    
+    const randomPrompt = randomPrompts[Math.floor(Math.random() * randomPrompts.length)];
+    if (promptInput) {
+        promptInput.value = randomPrompt;
+        promptInput.focus();
+    }
+    console.log('🎲 Random prompt selected:', randomPrompt);
+}
+
+// Knowledge Base Functionality
+async function loadKnowledgeCategories() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/knowledge`);
+        if (!response.ok) throw new Error('Failed to load categories');
+        
+        const data = await response.json();
+        knowledgeData = data;
+        displayCategories(data);
+        
+    } catch (error) {
+        console.error('❌ Failed to load knowledge categories:', error);
+        if (knowledgeCategories) {
+            knowledgeCategories.innerHTML = '<p class="error">Failed to load knowledge categories</p>';
+        }
+    }
+}
+
+function displayCategories(data) {
+    if (!knowledgeCategories) return;
+    
+    const categories = Object.keys(data);
+    knowledgeCategories.innerHTML = categories.map(category => `
+        <div class="category-card" onclick="loadCategoryContent('${category}')">
+            <h3>${getCategoryIcon(category)} ${formatCategoryName(category)}</h3>
+            <p>${getCategoryDescription(category)}</p>
+        </div>
+    `).join('');
+}
+
+function getCategoryIcon(category) {
+    const icons = {
+        apps: '📱',
+        cookbook: '🍳',
+        science: '🔬',
+        technology: '💻',
+        cosmic_truths: '🌌'
+    };
+    return icons[category] || '📚';
+}
+
+function formatCategoryName(category) {
+    return category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+}
+
+function getCategoryDescription(category) {
+    const descriptions = {
+        apps: 'Mobile and web applications database',
+        cookbook: 'Delicious recipes and cooking tips',
+        science: 'Scientific facts and discoveries',
+        technology: 'Programming languages and tech info',
+        cosmic_truths: 'Universal knowledge and wisdom'
+    };
+    return descriptions[category] || 'Knowledge database';
+}
+
+async function loadCategoryContent(category) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/knowledge/${category}`);
+        if (!response.ok) throw new Error('Failed to load category content');
+        
+        const data = await response.json();
+        displayKnowledgeResults(data, `${formatCategoryName(category)} Content`);
+        
+    } catch (error) {
+        console.error('❌ Failed to load category content:', error);
+        displayKnowledgeResults({ error: 'Failed to load content' }, 'Error');
+    }
+}
+
+async function handleSearch() {
+    const query = searchInput?.value?.trim();
+    if (!query) {
+        showError('Please enter a search query');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/search?q=${encodeURIComponent(query)}`);
+        if (!response.ok) throw new Error('Search failed');
+        
+        const data = await response.json();
+        displayKnowledgeResults(data, `Search Results for "${query}"`);
+        
+    } catch (error) {
+        console.error('❌ Search error:', error);
+        displayKnowledgeResults({ error: 'Search failed' }, 'Error');
+    }
+}
+
+function displayKnowledgeResults(data, title) {
+    if (!knowledgeResults) return;
+    
+    let html = `<h3>${title}</h3>`;
+    
+    if (data.error) {
+        html += `<p class="error">${data.error}</p>`;
+    } else if (Array.isArray(data)) {
+        html += '<div class="results-list">';
+        data.forEach(item => {
+            html += `<div class="result-item">
+                <h4>${item.name || item.title || 'Item'}</h4>
+                <p>${item.description || item.content || JSON.stringify(item)}</p>
+            </div>`;
+        });
+        html += '</div>';
+    } else {
+        html += `<pre class="json-display">${JSON.stringify(data, null, 2)}</pre>`;
+    }
+    
+    knowledgeResults.innerHTML = html;
+}
+
+// Testing Functionality
+async function testAPI() {
+    if (!testApiBtn || !apiTestResult) return;
+    
+    testApiBtn.disabled = true;
+    testApiBtn.textContent = 'Testing...';
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/test`);
+        const data = await response.json();
+        
+        apiTestResult.className = 'test-result success';
+        apiTestResult.innerHTML = `
+            <strong>✅ API Test Successful</strong><br>
+            Status: ${response.status}<br>
+            Response: ${JSON.stringify(data, null, 2)}
+        `;
+        
+        updateConnectionStatus(true, 'Connected');
+        isConnected = true;
+        
+    } catch (error) {
+        apiTestResult.className = 'test-result error';
+        apiTestResult.innerHTML = `
+            <strong>❌ API Test Failed</strong><br>
+            Error: ${error.message}
+        `;
+        
+        updateConnectionStatus(false, 'Disconnected');
+        isConnected = false;
+    } finally {
+        testApiBtn.disabled = false;
+        testApiBtn.textContent = 'Test API Connection';
+    }
+}
+
+async function testKnowledgeBase() {
+    if (!testKnowledgeBtn || !knowledgeTestResult) return;
+    
+    testKnowledgeBtn.disabled = true;
+    testKnowledgeBtn.textContent = 'Testing...';
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/knowledge`);
+        const data = await response.json();
+        
+        const categories = Object.keys(data);
+        knowledgeTestResult.className = 'test-result success';
+        knowledgeTestResult.innerHTML = `
+            <strong>✅ Knowledge Base Test Successful</strong><br>
+            Categories found: ${categories.length}<br>
+            Categories: ${categories.join(', ')}
+        `;
+        
+    } catch (error) {
+        knowledgeTestResult.className = 'test-result error';
+        knowledgeTestResult.innerHTML = `
+            <strong>❌ Knowledge Base Test Failed</strong><br>
+            Error: ${error.message}
+        `;
+    } finally {
+        testKnowledgeBtn.disabled = false;
+        testKnowledgeBtn.textContent = 'Test Knowledge Base';
+    }
+}
+
+// Utility Functions
+function setLoadingState(loading) {
+    if (!generateBtn) return;
+    
+    const btnText = generateBtn.querySelector('.btn-text');
+    const loadingText = generateBtn.querySelector('.loading');
+    
+    if (loading) {
+        generateBtn.disabled = true;
+        if (btnText) btnText.style.display = 'none';
+        if (loadingText) loadingText.style.display = 'inline';
+    } else {
+        generateBtn.disabled = false;
+        if (btnText) btnText.style.display = 'inline';
+        if (loadingText) loadingText.style.display = 'none';
+    }
+}
+
+function displayResult(result) {
+    if (!output) return;
+    
+    output.textContent = result;
+    output.classList.remove('error');
+    output.classList.add('success');
+    
+    console.log('✅ Result displayed successfully');
+}
+
+function showError(message) {
+    if (!output) return;
+    
+    output.textContent = `❌ Napaka: ${message}`;
+    output.classList.remove('success');
+    output.classList.add('error');
+    
+    console.error('❌ Error displayed:', message);
+}
+
+function formatTimestamp() {
+    return new Date().toLocaleString('sl-SI');
+}
+
+// Global functions for HTML onclick handlers
+window.showSection = showSection;
+window.loadCategoryContent = loadCategoryContent;
+
+// Auto-refresh connection status
+setInterval(checkConnection, 30000); // Check every 30 seconds
+
+console.log('🎉 Omnia AI Platform initialized successfully!');

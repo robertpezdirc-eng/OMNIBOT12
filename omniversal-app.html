@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMNIVERSAL - Ena Aplikacija Za Vse</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 2rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+        }
+
+        .slogan {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        .main-container {
+            margin-top: 100px;
+            padding: 2rem;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        .capabilities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .capability-category {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .capability-category::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .capability-category:hover::before {
+            left: 100%;
+        }
+
+        .capability-category:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .category-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .category-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .category-description {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .category-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .feature-tag {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .control-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .panel-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .control-button {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 1rem;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .control-button:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.2));
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .capabilities-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .control-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">🌐 OMNIVERSAL</div>
+        <div class="slogan">Ena aplikacija za vse. Nadomesti vse ostale. Jo potrebuje vsak.</div>
+    </div>
+
+    <div class="main-container">
+        <div class="hero-section">
+            <h1 class="hero-title">OMNIVERSAL</h1>
+            <p class="hero-subtitle">
+                Popolnoma avtonomen, univerzalen, vsestranski, samoučeč in vseobsegajoč sistem, 
+                ki nadomešča vse obstoječe aplikacije, programe in sisteme na svetu.
+            </p>
+        </div>
+
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-number">∞</div>
+                <div class="stat-label">Funkcionalnosti</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Avtonomnost</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Samodejno učenje</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Potreba po drugih aplikacijah</div>
+            </div>
+        </div>
+
+        <div class="capabilities-grid">
+            <div class="capability-category" onclick="activateCategory('personal')">
+                <span class="category-icon">📱</span>
+                <h3 class="category-title">Osebne Naprave</h3>
+                <p class="category-description">Popoln nadzor nad vsemi osebnimi napravami in sistemi</p>
+                <div class="category-features">
+                    <span class="feature-tag">Telefoni</span>
+                    <span class="feature-tag">Tablice</span>
+                    <span class="feature-tag">Računalniki</span>
+                    <span class="feature-tag">Pametni dom</span>
+                    <span class="feature-tag">Avtomobili</span>
+                    <span class="feature-tag">VR/AR</span>
+                </div>
+            </div>
+
+            <div class="capability-category" onclick="activateCategory('industrial')">
+                <span class="category-icon">🏭</span>
+                <h3 class="category-title">Industrijski Sistemi</h3>
+                <p class="category-description">Avtomatizacija in optimizacija vseh industrijskih procesov</p>
+                <div class="category-features">
+                    <span class="feature-tag">Robotika</span>
+                    <span class="feature-tag">Proizvodnja</span>
+                    <span class="feature-tag">Logistika</span>
+                    <span class="feature-tag">ERP</span>
+                    <span class="feature-tag">Kakovost</span>
+                    <span class="feature-tag">Skladišča</span>
+                </div>
+            </div>
+
+            <div class="capability-category" onclick="activateCategory('medical')">
+                <span class="category-icon">🏥</span>
+                <h3 class="category-title">Medicinski Sistemi</h3>
+                <p class="category-description">Napredna zdravstvena oskrba in veterinarske storitve</p>
+                <div class="category-features">
+                    <span class="feature-tag">Kirurgija</span>
+                    <span class="feature-tag">Diagnostika</span>
+                    <span class="feature-tag">Terapije</span>
+                    <span class="feature-tag">Veterina</span>
+                    <span class="feature-tag">Simulacije</span>
+                    <span class="feature-tag">Analiza</span>
+                </div>
+            </div>
+
+            <div class="capability-category" onclick="activateCategory('agriculture')">
+                <span class="category-icon">🌾</span>
+                <h3 class="category-title">Kmetijstvo & Živinoreja</h3>
+                <p class="category-description">Optimizacija pridelave in živinorejskih procesov</p>
+                <div class="category-features">
+                    <span class="feature-tag">Setev</span>
+                    <span class="feature-tag">Žetev</span>
+                    <span class="feature-tag">Živinoreja</span>
+                    <span class="feature-tag">Zalivanje</span>
+                    <span class="feature-tag">Robotika</span>
+                    <span class="feature-tag">Analitika</span>
+                </div>
+            </div>
+
+            <div class="capability-category" onclick="activateCategory('business')">
+                <span class="category-icon">💼</span>
+                <h3 class="category-title">Poslovanje & Finance</h3>
+                <p class="category-description">Celovito upravljanje poslovnih procesov in financ</p>
+                <div class="category-features">
+                    <span class="feature-tag">Računovodstvo</span>
+                    <span class="feature-tag">CRM</span>
+                    <span class="feature-tag">Marketing</span>
+                    <span class="feature-tag">ROI</span>
+                    <span class="feature-tag">Prodaja</span>
+                    <span class="feature-tag">Analitika</span>
+                </div>
+            </div>
+
+            <div class="capability-category" onclick="activateCategory('education')">
+                <span class="category-icon">🎓</span>
+                <h3 class="category-title">Izobraževanje & Mentorstvo</h3>
+                <p class="category-description">Personalizirani učni sistemi in coaching</p>
+                <div class="category-features">
+                    <span class="feature-tag">E-learning</span>
+                    <span class="feature-tag">Virtualne učilnice</span>
+                    <span class="feature-tag">Coaching</span>
+                    <span class="feature-tag">Trening</span>
+                    <span class="feature-tag">Prilagojeno učenje</span>
+                    <span class="feature-tag">Mentorstvo</span>
+                </div>
+            </div>
+
+            <div class="capability-category" onclick="activateCategory('creative')">
+                <span class="category-icon">🎨</span>
+                <h3 class="category-title">Umetnost & Kreativnost</h3>
+                <p class="category-description">Napredna orodja za ustvarjanje vseh vrst vsebin</p>
+                <div class="category-features">
+                    <span class="feature-tag">Grafika</span>
+                    <span class="feature-tag">Video</span>
+                    <span class="feature-tag">Glasba</span>
+                    <span class="feature-tag">Animacija</span>
+                    <span class="feature-tag">Literatura</span>
+                    <span class="feature-tag">Vizualizacije</span>
+                </div>
+            </div>
+
+            <div class="capability-category" onclick="activateCategory('science')">
+                <span class="category-icon">🔬</span>
+                <h3 class="category-title">Znanost & Raziskave</h3>
+                <p class="category-description">Napredni znanstveni in raziskovalni sistemi</p>
+                <div class="category-features">
+                    <span class="feature-tag">Laboratoriji</span>
+                    <span class="feature-tag">Simulacije</span>
+                    <span class="feature-tag">Eksperimenti</span>
+                    <span class="feature-tag">Podatki</span>
+                    <span class="feature-tag">Modeli</span>
+                    <span class="feature-tag">Analiza</span>
+                </div>
+            </div>
+
+            <div class="capability-category" onclick="activateCategory('social')">
+                <span class="category-icon">👥</span>
+                <h3 class="category-title">Socialna Interakcija</h3>
+                <p class="category-description">Optimizacija medčloveških odnosov in komunikacije</p>
+                <div class="category-features">
+                    <span class="feature-tag">Mediacija</span>
+                    <span class="feature-tag">Timska dinamika</span>
+                    <span class="feature-tag">Socialna omrežja</span>
+                    <span class="feature-tag">Svetovanje</span>
+                    <span class="feature-tag">Psihologija</span>
+                    <span class="feature-tag">Komunikacija</span>
+                </div>
+            </div>
+
+            <div class="capability-category" onclick="activateCategory('future')">
+                <span class="category-icon">🚀</span>
+                <h3 class="category-title">Futuristične Tehnologije</h3>
+                <p class="category-description">Integracija najnaprednejših tehnologij prihodnosti</p>
+                <div class="category-features">
+                    <span class="feature-tag">Vesoljska tehnologija</span>
+                    <span class="feature-tag">Kvantni računalniki</span>
+                    <span class="feature-tag">AI roboti</span>
+                    <span class="feature-tag">IoT</span>
+                    <span class="feature-tag">Pametne mreže</span>
+                    <span class="feature-tag">Avtomatizacija</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <h2 class="panel-title">🎛️ Univerzalni Nadzorni Center</h2>
+            <div class="control-grid">
+                <button class="control-button" onclick="executeFunction('auto-optimize')">
+                    🔧 Avtomatska Optimizacija
+                </button>
+                <button class="control-button" onclick="executeFunction('self-repair')">
+                    🛠️ Samodejno Popravljanje
+                </button>
+                <button class="control-button" onclick="executeFunction('learn-adapt')">
+                    🧠 Učenje & Prilagajanje
+                </button>
+                <button class="control-button" onclick="executeFunction('predict-scenarios')">
+                    🔮 Napovedi & Scenariji
+                </button>
+                <button class="control-button" onclick="executeFunction('manage-devices')">
+                    📱 Upravljanje Naprav
+                </button>
+                <button class="control-button" onclick="executeFunction('automate-processes')">
+                    ⚙️ Avtomatizacija Procesov
+                </button>
+                <button class="control-button" onclick="executeFunction('security-monitor')">
+                    🔒 Varnostni Nadzor
+                </button>
+                <button class="control-button" onclick="executeFunction('performance-boost')">
+                    ⚡ Povečanje Učinkovitosti
+                </button>
+                <button class="control-button" onclick="executeFunction('data-analysis')">
+                    📊 Analiza Podatkov
+                </button>
+                <button class="control-button" onclick="executeFunction('emergency-response')">
+                    🚨 Odziv na Krize
+                </button>
+                <button class="control-button" onclick="executeFunction('resource-optimization')">
+                    💎 Optimizacija Virov
+                </button>
+                <button class="control-button" onclick="executeFunction('global-sync')">
+                    🌍 Globalna Sinhronizacija
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>© 2024 OMNIVERSAL - Ena aplikacija za vse. Nadomesti vse ostale. Jo potrebuje vsak.</p>
+        <p>Popolnoma avtonomen • Univerzalen • Vsestranski • Samoučeč • Vseobsegajoč</p>
+    </div>
+
+    <script>
+        function activateCategory(category) {
+            // Simulacija aktivacije kategorije
+            const categories = {
+                'personal': 'Aktivirane osebne naprave - popoln nadzor nad vsemi vašimi napravami',
+                'industrial': 'Aktivirani industrijski sistemi - optimizacija vseh proizvodnih procesov',
+                'medical': 'Aktivirani medicinski sistemi - napredna zdravstvena oskrba',
+                'agriculture': 'Aktivirano kmetijstvo - optimizacija pridelave in živinoreje',
+                'business': 'Aktivirano poslovanje - celovito upravljanje poslovnih procesov',
+                'education': 'Aktivirano izobraževanje - personalizirani učni sistemi',
+                'creative': 'Aktivirana kreativnost - napredna orodja za ustvarjanje',
+                'science': 'Aktivirana znanost - napredni raziskovalni sistemi',
+                'social': 'Aktivirana socialna interakcija - optimizacija odnosov',
+                'future': 'Aktivirane futuristične tehnologije - integracija najnaprednejših tehnologij'
+            };
+            
+            alert(`✅ ${categories[category]}`);
+            
+            // Vizualni efekt aktivacije
+            const element = event.target.closest('.capability-category');
+            element.style.background = 'linear-gradient(135deg, rgba(0, 255, 0, 0.3), rgba(0, 200, 0, 0.2))';
+            element.style.borderColor = 'rgba(0, 255, 0, 0.6)';
+            
+            setTimeout(() => {
+                element.style.background = 'rgba(255, 255, 255, 0.1)';
+                element.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+            }, 2000);
+        }
+
+        function executeFunction(functionName) {
+            const functions = {
+                'auto-optimize': 'Izvajam avtomatsko optimizacijo vseh sistemov...',
+                'self-repair': 'Popravljam vse odkrite napake v sistemih...',
+                'learn-adapt': 'Učim se novih vzorcev in se prilagajam...',
+                'predict-scenarios': 'Analiziram možne scenarije in napovedi...',
+                'manage-devices': 'Upravljam vse povezane naprave...',
+                'automate-processes': 'Avtomatiziram rutinske procese...',
+                'security-monitor': 'Nadzoruje varnost vseh sistemov...',
+                'performance-boost': 'Povečujem učinkovitost delovanja...',
+                'data-analysis': 'Analiziram vse razpoložljive podatke...',
+                'emergency-response': 'Pripravljam odziv na morebitne krize...',
+                'resource-optimization': 'Optimiziram uporabo vseh virov...',
+                'global-sync': 'Sinhroniziram z globalnimi sistemi...'
+            };
+            
+            alert(`🚀 ${functions[functionName]}`);
+            
+            // Simulacija izvajanja funkcije
+            const button = event.target;
+            const originalText = button.textContent;
+            button.style.background = 'linear-gradient(135deg, rgba(0, 255, 0, 0.4), rgba(0, 200, 0, 0.3))';
+            button.textContent = '⏳ Izvajam...';
+            
+            setTimeout(() => {
+                button.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1))';
+                button.textContent = originalText;
+                alert('✅ Funkcija uspešno izvedena!');
+            }, 3000);
+        }
+
+        // Self-learning system implementation
+        class SelfLearningSystem {
+            constructor() {
+                this.learningData = {
+                    userPatterns: [],
+                    systemOptimizations: [],
+                    performanceMetrics: {},
+                    adaptationHistory: []
+                };
+                this.isLearning = false;
+            }
+
+            startLearning() {
+                this.isLearning = true;
+                this.collectUserData();
+                this.optimizePerformance();
+                this.adaptToChanges();
+            }
+
+            collectUserData() {
+                // Simulate user pattern collection
+                setInterval(() => {
+                    if (this.isLearning) {
+                        const pattern = {
+                            timestamp: new Date(),
+                            action: this.generateRandomAction(),
+                            efficiency: Math.random() * 100
+                        };
+                        this.learningData.userPatterns.push(pattern);
+                        this.updateLearningIndicators();
+                    }
+                }, 2000);
+            }
+
+            generateRandomAction() {
+                const actions = [
+                    'Optimizacija UI vmesnika',
+                    'Prilagoditev algoritmov',
+                    'Izboljšanje odzivnosti',
+                    'Avtomatizacija procesov',
+                    'Varnostna posodobitev',
+                    'Energetska optimizacija'
+                ];
+                return actions[Math.floor(Math.random() * actions.length)];
+            }
+
+            optimizePerformance() {
+                setInterval(() => {
+                    if (this.isLearning) {
+                        const optimization = {
+                            area: this.generateRandomOptimization(),
+                            improvement: Math.random() * 50 + 10,
+                            timestamp: new Date()
+                        };
+                        this.learningData.systemOptimizations.push(optimization);
+                        this.displayOptimization(optimization);
+                    }
+                }, 5000);
+            }
+
+            generateRandomOptimization() {
+                const areas = [
+                    'CPU uporaba',
+                    'Pomnilniška optimizacija',
+                    'Mrežni promet',
+                    'Baterijska učinkovitost',
+                    'Odzivni čas',
+                    'Varnostni protokoli'
+                ];
+                return areas[Math.floor(Math.random() * areas.length)];
+            }
+
+            displayOptimization(optimization) {
+                // This function would display optimizations if there was an output element
+                console.log(`Optimization: ${optimization.area} improved by ${optimization.improvement.toFixed(1)}%`);
+            }
+
+            adaptToChanges() {
+                setInterval(() => {
+                    if (this.isLearning) {
+                        this.simulateAdaptation();
+                    }
+                }, 7000);
+            }
+
+            simulateAdaptation() {
+                const adaptations = [
+                    'Prilagajanje novim API-jem',
+                    'Integracija novih tehnologij',
+                    'Optimizacija za nova orodja',
+                    'Prilagoditev uporabniških preferenc',
+                    'Avtomatska posodobitev protokolov'
+                ];
+                
+                const adaptation = adaptations[Math.floor(Math.random() * adaptations.length)];
+                this.learningData.adaptationHistory.push({
+                    adaptation: adaptation,
+                    timestamp: new Date(),
+                    success: Math.random() > 0.1 // 90% success rate
+                });
+                
+                console.log(`Adaptation: ${adaptation}`);
+            }
+
+            updateLearningIndicators() {
+                // This would update learning indicators if they existed in the DOM
+                console.log('Learning indicators updated');
+            }
+
+            getLearningStats() {
+                return {
+                    patternsLearned: this.learningData.userPatterns.length,
+                    optimizationsMade: this.learningData.systemOptimizations.length,
+                    adaptationCount: this.learningData.adaptationHistory.length,
+                    learningEfficiency: this.calculateEfficiency()
+                };
+            }
+
+            calculateEfficiency() {
+                if (this.learningData.userPatterns.length === 0) return 0;
+                const avgEfficiency = this.learningData.userPatterns.reduce((sum, pattern) => 
+                    sum + pattern.efficiency, 0) / this.learningData.userPatterns.length;
+                return avgEfficiency.toFixed(1);
+            }
+        }
+
+        // Initialize self-learning system
+        const learningSystem = new SelfLearningSystem();
+
+        // Animacija ob nalaganju strani
+        window.addEventListener('load', function() {
+            const categories = document.querySelectorAll('.capability-category');
+            categories.forEach((category, index) => {
+                category.style.opacity = '0';
+                category.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    category.style.transition = 'all 0.6s ease';
+                    category.style.opacity = '1';
+                    category.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+            
+            // Start learning system after page load
+            setTimeout(() => {
+                learningSystem.startLearning();
+            }, 2000);
+        });
+
+        // Dinamični efekti
+        setInterval(() => {
+            const stats = document.querySelectorAll('.stat-number');
+            stats.forEach(stat => {
+                if (stat.textContent !== '∞' && stat.textContent !== '0') {
+                    stat.style.textShadow = '0 0 20px rgba(255, 255, 255, 0.8)';
+                    setTimeout(() => {
+                        stat.style.textShadow = '0 0 10px rgba(255, 255, 255, 0.3)';
+                    }, 500);
+                }
+            });
+        }, 3000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni-APP Priority Flow Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .dashboard-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            z-index: 100;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .module {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .module:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .module h3 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .module-status {
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .global-optimizer {
+            grid-column: 2 / 4;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border-color: #ff6b6b;
+            font-size: 1.2em;
+        }
+
+        .global-optimizer h3 {
+            font-size: 1.8em;
+        }
+
+        #links-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .link {
+            stroke: rgba(255, 255, 255, 0.3);
+            stroke-width: 2;
+            opacity: 0.6;
+        }
+
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .info-box {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 300px;
+            z-index: 1000;
+        }
+
+        .flow-stats {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 1000;
+            font-size: 0.9em;
+        }
+
+        .priority-legend {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 1000;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .modules-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .global-optimizer {
+                grid-column: 1 / 3;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>🌐 Omni-APP Priority Flow Dashboard</h1>
+            <p>Real-time modularni sistem z prioritetnimi tokovi</p>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn" onclick="testPriorityFlows()">🧪 Test Prioritete</button>
+            <button class="control-btn" onclick="resetStats()">🔄 Reset</button>
+            <button class="control-btn" onclick="toggleAnimation()">⏸️ Pause</button>
+        </div>
+
+        <div class="flow-stats">
+            <h4>📊 Flow Statistike</h4>
+            <div id="flow-count">Aktivni tokovi: 0</div>
+            <div id="priority-stats">
+                <div>🔴 Visoka: <span id="high-count">0</span></div>
+                <div>🟠 Srednja: <span id="medium-count">0</span></div>
+                <div>🟢 Nizka: <span id="low-count">0</span></div>
+            </div>
+        </div>
+
+        <div class="priority-legend">
+            <h4>🎨 Prioriteta</h4>
+            <div class="legend-item">
+                <div class="legend-color" style="background: red;"></div>
+                <span>Visoka (3)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: orange;"></div>
+                <span>Srednja (2)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: green;"></div>
+                <span>Nizka (1)</span>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h4>ℹ️ Sistem Info</h4>
+            <div id="info-content">Dashboard inicializiran. Pritisnite T za test prioritet.</div>
+        </div>
+
+        <svg id="links-svg">
+            <!-- Povezave se dodajo dinamično -->
+        </svg>
+
+        <div class="modules-grid">
+            <div class="module global-optimizer" id="global">
+                <h3>🌐 Global Optimizer</h3>
+                <p>Centralni nadzorni sistem</p>
+                <div class="module-status" id="status-global">✅ Online</div>
+            </div>
+
+            <div class="module" id="finance">
+                <h3>💰 Finance</h3>
+                <p>Finančno upravljanje</p>
+                <div class="module-status" id="status-finance">✅ Online</div>
+            </div>
+
+            <div class="module" id="logistics">
+                <h3>🚚 Logistics</h3>
+                <p>Logistični procesi</p>
+                <div class="module-status" id="status-logistics">✅ Online</div>
+            </div>
+
+            <div class="module" id="healthcare">
+                <h3>🏥 Healthcare</h3>
+                <p>Zdravstveni sistem</p>
+                <div class="module-status" id="status-healthcare">✅ Online</div>
+            </div>
+
+            <div class="module" id="tourism">
+                <h3>🏖️ Tourism</h3>
+                <p>Turistični sektor</p>
+                <div class="module-status" id="status-tourism">✅ Online</div>
+            </div>
+
+            <div class="module" id="agriculture">
+                <h3>🌾 Agriculture</h3>
+                <p>Kmetijski procesi</p>
+                <div class="module-status" id="status-agriculture">✅ Online</div>
+            </div>
+
+            <div class="module" id="industry">
+                <h3>🏭 Industry</h3>
+                <p>Industrijski sektor</p>
+                <div class="module-status" id="status-industry">✅ Online</div>
+            </div>
+
+            <div class="module" id="energy">
+                <h3>⚡ Energy</h3>
+                <p>Energetski sistem</p>
+                <div class="module-status" id="status-energy">✅ Online</div>
+            </div>
+
+            <div class="module" id="smart_home">
+                <h3>🏠 Smart Home</h3>
+                <p>Pametni dom</p>
+                <div class="module-status" id="status-smart_home">✅ Online</div>
+            </div>
+
+            <div class="module" id="vehicles">
+                <h3>🚗 Vehicles</h3>
+                <p>Vozila in transport</p>
+                <div class="module-status" id="status-vehicles">✅ Online</div>
+            </div>
+
+            <div class="module" id="robotics">
+                <h3>🤖 Robotics</h3>
+                <p>Robotski sistemi</p>
+                <div class="module-status" id="status-robotics">✅ Online</div>
+            </div>
+
+            <div class="module" id="science">
+                <h3>🔬 Science</h3>
+                <p>Znanstvene raziskave</p>
+                <div class="module-status" id="status-science">✅ Online</div>
+            </div>
+
+            <div class="module" id="communications">
+                <h3>📡 Communications</h3>
+                <p>Komunikacijski sistem</p>
+                <div class="module-status" id="status-communications">✅ Online</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const linksSVG = document.getElementById("links-svg");
+        let animationPaused = false;
+        let flowStats = { high: 0, medium: 0, low: 0, total: 0 };
+
+        const nodes = [
+            "finance", "logistics", "healthcare", "tourism", "agriculture",
+            "industry", "energy", "smart_home", "vehicles", "robotics",
+            "science", "communications"
+        ];
+
+        function connectNodes(sourceId, targetId) {
+            const source = document.getElementById(sourceId);
+            const target = document.getElementById(targetId);
+            
+            if (!source || !target) return;
+
+            const sourceRect = source.getBoundingClientRect();
+            const targetRect = target.getBoundingClientRect();
+            
+            const x1 = sourceRect.left + sourceRect.width / 2;
+            const y1 = sourceRect.top + sourceRect.height / 2;
+            const x2 = targetRect.left + targetRect.width / 2;
+            const y2 = targetRect.top + targetRect.height / 2;
+
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", x1);
+            line.setAttribute("y1", y1);
+            line.setAttribute("x2", x2);
+            line.setAttribute("y2", y2);
+            line.setAttribute("class", "link");
+
+            linksSVG.appendChild(line);
+        }
+
+        // Povežemo Global Optimizer z vsemi moduli
+        function initializeConnections() {
+            linksSVG.innerHTML = '';
+            nodes.forEach(node => connectNodes("global", node));
+        }
+
+        // Klik na modul
+        nodes.concat("global").forEach(node => {
+            const element = document.getElementById(node);
+            if (element) {
+                element.onclick = () => {
+                    const moduleName = node.replace('_', ' ').toUpperCase();
+                    updateInfoBox(`🌐 Omni Modul: ${moduleName}\nSamoučeč, optimizira in nadzoruje procese.`);
+                };
+            }
+        });
+
+        // Animacija tokov s prioriteto in hitrostjo
+        function animateFlowPriority(flow) {
+            if (animationPaused) return;
+
+            const sourceEl = document.getElementById(flow.from);
+            const targetEl = document.getElementById(flow.to);
+            if (!sourceEl || !targetEl) return;
+
+            const sourceRect = sourceEl.getBoundingClientRect();
+            const targetRect = targetEl.getBoundingClientRect();
+
+            const x1 = sourceRect.left + sourceRect.width / 2;
+            const y1 = sourceRect.top + sourceRect.height / 2;
+            const x2 = targetRect.left + targetRect.width / 2;
+            const y2 = targetRect.top + targetRect.height / 2;
+
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("r", 6 + flow.priority);
+
+            let color = "green";
+            if (flow.priority === 3) {
+                color = "red";
+                flowStats.high++;
+            } else if (flow.priority === 2) {
+                color = "orange";
+                flowStats.medium++;
+            } else {
+                flowStats.low++;
+            }
+            
+            circle.setAttribute("fill", color);
+            circle.setAttribute("opacity", "0.8");
+            linksSVG.appendChild(circle);
+
+            flowStats.total++;
+            updateFlowStats();
+
+            let t = 0;
+            const stepIncrement = 0.01 * flow.speed;
+            
+            function step() {
+                if (animationPaused) {
+                    circle.remove();
+                    return;
+                }
+                
+                t += stepIncrement;
+                if (t > 1) {
+                    circle.remove();
+                    flowStats.total--;
+                    if (flow.priority === 3) flowStats.high--;
+                    else if (flow.priority === 2) flowStats.medium--;
+                    else flowStats.low--;
+                    updateFlowStats();
+                    return;
+                }
+                
+                circle.setAttribute("cx", x1 + (x2 - x1) * t);
+                circle.setAttribute("cy", y1 + (y2 - y1) * t);
+                requestAnimationFrame(step);
+            }
+            step();
+        }
+
+        // Simulacija WebSocket sporočil
+        function startFlowSimulation() {
+            setInterval(() => {
+                if (animationPaused) return;
+                
+                const flows = [
+                    { from: "global", to: "finance", priority: 3, speed: 4 },
+                    { from: "finance", to: "logistics", priority: 2, speed: 2 },
+                    { from: "logistics", to: "tourism", priority: 1, speed: 1 },
+                    { from: "energy", to: "robotics", priority: 3, speed: 5 },
+                    { from: "global", to: "healthcare", priority: 2, speed: 3 },
+                    { from: "agriculture", to: "industry", priority: 1, speed: 2 }
+                ];
+                
+                flows.forEach(f => animateFlowPriority(f));
+            }, 2000);
+        }
+
+        // Simulacija statusov modulov
+        function startStatusSimulation() {
+            setInterval(() => {
+                const statuses = ["✅ Online", "⚠ Warning", "❌ Offline"];
+                const weights = [0.7, 0.2, 0.1]; // 70% online, 20% warning, 10% offline
+                
+                nodes.concat("global").forEach(id => {
+                    const el = document.getElementById(`status-${id}`);
+                    if (el) {
+                        const rand = Math.random();
+                        let status;
+                        if (rand < weights[0]) status = statuses[0];
+                        else if (rand < weights[0] + weights[1]) status = statuses[1];
+                        else status = statuses[2];
+                        
+                        el.textContent = status;
+                        el.style.color = status === "✅ Online" ? "green" : 
+                                        status === "⚠ Warning" ? "orange" : "red";
+                    }
+                });
+            }, 5000);
+        }
+
+        // Helper funkcije
+        function updateFlowStats() {
+            document.getElementById('flow-count').textContent = `Aktivni tokovi: ${flowStats.total}`;
+            document.getElementById('high-count').textContent = flowStats.high;
+            document.getElementById('medium-count').textContent = flowStats.medium;
+            document.getElementById('low-count').textContent = flowStats.low;
+        }
+
+        function updateInfoBox(message) {
+            document.getElementById('info-content').textContent = message;
+        }
+
+        function testPriorityFlows() {
+            updateInfoBox("🧪 Testiranje prioritetnih tokov...");
+            
+            const testFlows = [
+                { from: "global", to: "finance", priority: 3, speed: 6 },
+                { from: "global", to: "healthcare", priority: 3, speed: 5 },
+                { from: "global", to: "energy", priority: 2, speed: 4 },
+                { from: "global", to: "logistics", priority: 2, speed: 3 },
+                { from: "global", to: "tourism", priority: 1, speed: 2 },
+                { from: "global", to: "agriculture", priority: 1, speed: 1 }
+            ];
+            
+            testFlows.forEach((flow, index) => {
+                setTimeout(() => animateFlowPriority(flow), index * 200);
+            });
+            
+            setTimeout(() => {
+                updateInfoBox("✅ Test prioritet dokončan. Opazujte različne hitrosti in barve.");
+            }, 2000);
+        }
+
+        function resetStats() {
+            flowStats = { high: 0, medium: 0, low: 0, total: 0 };
+            updateFlowStats();
+            updateInfoBox("🔄 Statistike resetirane.");
+        }
+
+        function toggleAnimation() {
+            animationPaused = !animationPaused;
+            const btn = document.querySelector('.control-btn:nth-child(3)');
+            btn.textContent = animationPaused ? "▶️ Play" : "⏸️ Pause";
+            updateInfoBox(animationPaused ? "⏸️ Animacije ustavljene." : "▶️ Animacije obnovljene.");
+        }
+
+        // Tipkovne bližnjice
+        document.addEventListener('keydown', (e) => {
+            switch(e.key.toLowerCase()) {
+                case 't':
+                    testPriorityFlows();
+                    break;
+                case 'r':
+                    resetStats();
+                    break;
+                case ' ':
+                    e.preventDefault();
+                    toggleAnimation();
+                    break;
+            }
+        });
+
+        // Inicializacija
+        window.addEventListener('load', () => {
+            initializeConnections();
+            startFlowSimulation();
+            startStatusSimulation();
+            updateInfoBox("🚀 Dashboard inicializiran. Tipkovne bližnjice: T-Test, R-Reset, Space-Pause");
+        });
+
+        // Responsive povezave
+        window.addEventListener('resize', () => {
+            setTimeout(initializeConnections, 100);
+        });
+    </script>
+</body>
+</html>

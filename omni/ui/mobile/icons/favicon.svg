@@ -1,0 +1,20 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="32" height="32" rx="4" fill="#2563eb"/>
+  
+  <!-- Central Hub -->
+  <circle cx="16" cy="16" r="4" fill="#ffffff"/>
+  <circle cx="16" cy="16" r="2" fill="#2563eb"/>
+  
+  <!-- Connection Lines -->
+  <line x1="16" y1="12" x2="16" y2="6" stroke="#ffffff" stroke-width="1.5" opacity="0.8"/>
+  <line x1="20" y1="16" x2="26" y2="16" stroke="#ffffff" stroke-width="1.5" opacity="0.8"/>
+  <line x1="16" y1="20" x2="16" y2="26" stroke="#ffffff" stroke-width="1.5" opacity="0.8"/>
+  <line x1="12" y1="16" x2="6" y2="16" stroke="#ffffff" stroke-width="1.5" opacity="0.8"/>
+  
+  <!-- Device Nodes -->
+  <circle cx="16" cy="6" r="2" fill="#10b981"/>
+  <circle cx="26" cy="16" r="2" fill="#f59e0b"/>
+  <circle cx="16" cy="26" r="2" fill="#ef4444"/>
+  <circle cx="6" cy="16" r="2" fill="#8b5cf6"/>
+</svg>

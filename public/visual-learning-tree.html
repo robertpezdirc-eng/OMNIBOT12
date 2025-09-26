@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMNI - Vizualno Drevo Učenja</title>
+    <link rel="stylesheet" href="visual-tree-styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🌳 OMNI Enterprise - Vizualno Drevo Učenja</h1>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="color-indicator active"></div>
+                    <span>Aktivni moduli</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-indicator learning"></div>
+                    <span>Učenje v teku</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-indicator premium"></div>
+                    <span>Premium funkcije</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-indicator inactive"></div>
+                    <span>Neaktivni</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="controls">
+            <button id="expandAll">Razširi vse</button>
+            <button id="collapseAll">Skrči vse</button>
+            <button id="resetView">Ponastavi pogled</button>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Išči module...">
+                <button id="searchBtn">🔍</button>
+            </div>
+        </div>
+
+        <div class="tree-container">
+            <svg id="tree-svg"></svg>
+        </div>
+
+        <div class="stats-panel">
+            <h3>📊 Statistike Sistema</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-label">Aktivni moduli:</span>
+                    <span class="stat-value" id="activeCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Učenje v teku:</span>
+                    <span class="stat-value" id="learningCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Skupni napredek:</span>
+                    <span class="stat-value" id="overallProgress">0%</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Zadnja posodobitev:</span>
+                    <span class="stat-value" id="lastUpdate">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal za podrobnosti modula -->
+    <div id="moduleModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Podrobnosti Modula</h2>
+            <div class="modal-body">
+                <div class="module-info">
+                    <div class="info-section">
+                        <h3>📋 Osnovne Informacije</h3>
+                        <div id="basicInfo"></div>
+                    </div>
+                    <div class="info-section">
+                        <h3>📈 Napredek Učenja</h3>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="modalProgress"></div>
+                            </div>
+                            <span class="progress-text" id="modalProgressText">0%</span>
+                        </div>
+                    </div>
+                    <div class="info-section">
+                        <h3>📝 Zgodovina Logov</h3>
+                        <div id="logHistory" class="log-container"></div>
+                    </div>
+                    <div class="info-section">
+                        <h3>⚙️ Konfiguracija</h3>
+                        <div id="moduleConfig"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="visual-tree-script.js"></script>
+</body>
+</html>

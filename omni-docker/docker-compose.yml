@@ -1,0 +1,88 @@
+version: "3.9"
+
+services:
+  # MongoDB Database
+  mongo:
+    image: mongo:7
+    container_name: omni-mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: omni
+      MONGO_INITDB_ROOT_PASSWORD: omni123
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Omni License Server
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile-server
+    container_name: omni-server
+    restart: always
+    environment:
+      MONGO_URI: mongodb://omni:omni123@mongo:27017/omni?authSource=admin
+      JWT_SECRET: "super_secret_key"
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/license/stats"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Omni Admin GUI
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile-admin
+    container_name: omni-admin
+    restart: always
+    environment:
+      SERVER_URL: http://server:3000
+    ports:
+      - "4000:4000"
+    depends_on:
+      - server
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Omni Client Panel (Demo) - Optional
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile-client
+    container_name: omni-client
+    restart: always
+    environment:
+      SERVER_URL: http://server:3000
+    ports:
+      - "5000:5000"
+    depends_on:
+      - server
+    profiles:
+      - demo
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  mongo-data:

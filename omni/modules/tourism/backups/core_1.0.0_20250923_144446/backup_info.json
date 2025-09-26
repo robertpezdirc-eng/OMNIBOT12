@@ -1,0 +1,9 @@
+{
+  "component": "core",
+  "version": "1.0.0",
+  "backup_date": "2025-09-23T14:44:46.868553",
+  "files": [
+    "core_main.py",
+    "core_config.json"
+  ]
+}

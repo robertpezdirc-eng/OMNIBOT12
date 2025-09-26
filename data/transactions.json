@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "type": "expense",
+    "amount": 15.0,
+    "description": "kosilo EUR",
+    "category": "ostalo",
+    "date": "2025-09-22T18:15:18.583944",
+    "created": "2025-09-22T18:15:18.583949"
+  },
+  {
+    "id": 2,
+    "type": "expense",
+    "amount": 15.0,
+    "description": "kosilo EUR",
+    "category": "ostalo",
+    "date": "2025-09-22T18:17:00.111891",
+    "created": "2025-09-22T18:17:00.111896"
+  }
+]

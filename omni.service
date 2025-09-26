@@ -1,0 +1,60 @@
+# Systemd servisna datoteka za Omni Cloud Service
+# Datoteka: /etc/systemd/system/omni.service
+
+[Unit]
+Description=Omni Cloud AI Platform Service
+Documentation=https://github.com/your-repo/omni-brain
+After=network.target network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=omni
+Group=omni
+WorkingDirectory=/home/omni
+
+# Glavna aplikacija - prilagodi glede na to, ali uporabljaš Python ali Node.js
+# Za Python aplikacijo:
+ExecStart=/usr/bin/python3 /home/omni/omni-ultra-main.py
+
+# Za Node.js aplikacijo (odkomentiraj če potrebuješ):
+# ExecStart=/usr/bin/node /home/omni/omni-ultra-main.js
+
+# Restart nastavitve
+Restart=always
+RestartSec=5
+StartLimitBurst=3
+StartLimitIntervalSec=60
+
+# Okolje
+Environment="NODE_ENV=production"
+Environment="PYTHONUNBUFFERED=1"
+Environment="PORT=8080"
+Environment="HOST=127.0.0.1"
+
+# Varnostne nastavitve
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/home/omni
+ReadWritePaths=/var/log/omni
+ReadWritePaths=/tmp
+
+# Omejitve virov
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Logiranje
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=omni-service
+
+# Graceful shutdown
+TimeoutStopSec=30
+KillMode=mixed
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=multi-user.target

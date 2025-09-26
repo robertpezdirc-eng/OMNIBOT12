@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Koda - Omni Mobile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 30px 20px;
+        }
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .qr-container {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+        canvas {
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .url-display {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px 0;
+            background: #667eea;
+            color: white;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+            background: #d4edda;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>QR Generator</h1>
+            <p>Generiraj QR kodo za mobilno aplikacijo Omni</p>
+        </div>
+
+        <div class="content">
+            <label for="ipSelect">Izberi IP naslov:</label>
+            <select id="ipSelect">
+                <option value="192.168.1.100">192.168.1.100</option>
+                <option value="192.168.56.1">192.168.56.1</option>
+                <option value="192.168.99.1">192.168.99.1</option>
+                <option value="localhost">localhost</option>
+            </select>
+
+            <div class="qr-container">
+                <canvas id="qrCanvas" width="200" height="200"></canvas>
+                <div class="url-display" id="urlDisplay">
+                    Kliknite "Generiraj QR" za začetek
+                </div>
+            </div>
+
+            <button onclick="generateQR()">Generiraj QR kodo</button>
+            <button onclick="copyURL()">Kopiraj URL</button>
+
+            <div id="serverStatus" class="status">
+                QR generator pripravljen
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var currentUrl = '';
+
+        function generateQR() {
+            var select = document.getElementById('ipSelect');
+            var selectedIP = select.value;
+            var url = 'http://' + selectedIP + ':3001/mobile';
+            currentUrl = url;
+            
+            document.getElementById('urlDisplay').textContent = url;
+            
+            var canvas = document.getElementById('qrCanvas');
+            var ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, 200, 200);
+            
+            ctx.fillStyle = '#000000';
+            var cellSize = 8;
+            
+            for (var i = 0; i < 25; i++) {
+                for (var j = 0; j < 25; j++) {
+                    if (i < 7 && j < 7) {
+                        if (i === 0 || i === 6 || j === 0 || j === 6 || (i >= 2 && i <= 4 && j >= 2 && j <= 4)) {
+                            ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                        }
+                    } else if (i === 6 || j === 6) {
+                        if ((i + j) % 2 === 0) {
+                            ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                        }
+                    } else {
+                        var hash = 0;
+                        var str = url + i + j;
+                        for (var k = 0; k < str.length; k++) {
+                            hash = hash + str.charCodeAt(k);
+                        }
+                        if (hash % 2 === 0) {
+                            ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                        }
+                    }
+                }
+            }
+            
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(0, 0, 200, 200);
+            
+            document.getElementById('serverStatus').textContent = 'QR koda generirana za ' + selectedIP;
+        }
+
+        function copyURL() {
+            if (currentUrl) {
+                var textArea = document.createElement('textarea');
+                textArea.value = currentUrl;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                document.getElementById('serverStatus').textContent = 'URL kopiran v odložišče!';
+            }
+        }
+
+        document.getElementById('ipSelect').onchange = generateQR;
+        window.onload = generateQR;
+    </script>
+</body>
+</html>

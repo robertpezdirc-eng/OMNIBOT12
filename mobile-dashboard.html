@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni Brain - Mobilna Nadzorna Plošča</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --dark-color: #34495e;
+            --light-color: #ecf0f1;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .mobile-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .mobile-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 1rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 15px;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card.primary { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); }
+        .stat-card.success { background: linear-gradient(135deg, var(--success-color), #2ecc71); }
+        .stat-card.warning { background: linear-gradient(135deg, var(--warning-color), #e67e22); }
+        .stat-card.danger { background: linear-gradient(135deg, var(--danger-color), #c0392b); }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .quick-action-btn {
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 10px;
+            border: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .quick-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 0.5rem 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            text-align: center;
+            padding: 0.5rem;
+            color: var(--dark-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: var(--secondary-color);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .nav-item span {
+            font-size: 0.7rem;
+            display: block;
+        }
+
+        .content-wrapper {
+            padding-bottom: 80px;
+        }
+
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-container i {
+            font-size: 3rem;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem;
+            color: white;
+            font-weight: 500;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .security-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .security-indicator.secure { background-color: var(--success-color); }
+        .security-indicator.warning { background-color: var(--warning-color); }
+        .security-indicator.danger { background-color: var(--danger-color); }
+
+        @media (max-width: 576px) {
+            .stat-number { font-size: 1.5rem; }
+            .mobile-card { margin: 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <div class="logo-container">
+                <i class="fas fa-brain"></i>
+                <h2 class="text-primary">Omni Brain</h2>
+                <p class="text-muted">Mobilna Nadzorna Plošča</p>
+            </div>
+            
+            <form id="mobileLoginForm">
+                <div class="mb-3">
+                    <input type="email" class="form-control" id="mobileEmail" placeholder="E-pošta" required>
+                </div>
+                <div class="mb-3">
+                    <input type="password" class="form-control" id="mobilePassword" placeholder="Geslo" required>
+                </div>
+                <div id="mobile2FASection" class="mb-3 d-none">
+                    <input type="text" class="form-control" id="mobile2FAToken" placeholder="2FA Koda" maxlength="6">
+                </div>
+                <div id="mobileLoginError" class="alert alert-danger d-none"></div>
+                <button type="submit" id="mobileLoginBtn" class="btn btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Prijavi se
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboardScreen" class="d-none">
+        <!-- Header -->
+        <header class="mobile-header text-white p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0"><i class="fas fa-brain"></i> Omni Brain</h5>
+                    <small id="userInfo">Prijavljen kot: admin</small>
+                </div>
+                <div>
+                    <button class="btn btn-outline-light btn-sm" id="mobileLogoutBtn">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <div class="content-wrapper p-3">
+            <!-- Dashboard Tab -->
+            <div id="dashboardTab" class="tab-content">
+                <!-- Stats Cards -->
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <div class="stat-card primary">
+                            <div class="stat-number" id="mobileTotalLicenses">0</div>
+                            <div class="stat-label">Skupaj Licenc</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-card success">
+                            <div class="stat-number" id="mobileActiveLicenses">0</div>
+                            <div class="stat-label">Aktivne</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-card warning">
+                            <div class="stat-number" id="mobileExpiringLicenses">0</div>
+                            <div class="stat-label">Potekajo</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-card danger">
+                            <div class="stat-number" id="mobileExpiredLicenses">0</div>
+                            <div class="stat-label">Potekle</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="mobile-card p-3">
+                    <h6 class="mb-3"><i class="fas fa-bolt"></i> Hitre Akcije</h6>
+                    <button class="btn btn-primary quick-action-btn" onclick="showCreateLicense()">
+                        <i class="fas fa-plus"></i> Nova Licenca
+                    </button>
+                    <button class="btn btn-info quick-action-btn" onclick="showNotifications()">
+                        <i class="fas fa-bell"></i> Pošlji Obvestilo
+                    </button>
+                    <button class="btn btn-success quick-action-btn" onclick="refreshData()">
+                        <i class="fas fa-sync"></i> Osveži Podatke
+                    </button>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="mobile-card p-3">
+                    <h6 class="mb-3"><i class="fas fa-clock"></i> Nedavna Aktivnost</h6>
+                    <div id="recentActivity">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="security-indicator secure"></div>
+                            <small class="text-muted">Uspešna prijava - 10:30</small>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="security-indicator warning"></div>
+                            <small class="text-muted">Licenca poteka - 09:15</small>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="security-indicator secure"></div>
+                            <small class="text-muted">Nova licenca ustvarjena - 08:45</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Tab -->
+            <div id="securityTab" class="tab-content d-none">
+                <div class="mobile-card p-3">
+                    <h6 class="mb-3"><i class="fas fa-shield-alt"></i> Varnostne Informacije</h6>
+                    
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <div class="text-center">
+                                <div class="h4 text-success" id="mobileSuccessfulLogins">0</div>
+                                <small class="text-muted">Uspešne prijave</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center">
+                                <div class="h4 text-danger" id="mobileFailedLogins">0</div>
+                                <small class="text-muted">Neuspešne prijave</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>2FA Status:</strong>
+                        <span id="mobile2FAStatus" class="badge bg-secondary">Preverjam...</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Zadnja prijava:</strong>
+                        <div id="mobileLastLogin" class="text-muted">-</div>
+                    </div>
+
+                    <button class="btn btn-warning quick-action-btn" id="mobileEnable2FABtn">
+                        <i class="fas fa-key"></i> Omogoči 2FA
+                    </button>
+                </div>
+
+                <!-- Recent Security Events -->
+                <div class="mobile-card p-3">
+                    <h6 class="mb-3"><i class="fas fa-history"></i> Varnostni Dogodki</h6>
+                    <div id="mobileSecurityEvents">
+                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                            <div>
+                                <small><strong>Prijava</strong></small>
+                                <div class="text-muted" style="font-size: 0.8rem;">192.168.1.100</div>
+                            </div>
+                            <small class="text-muted">10:30</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settingsTab" class="tab-content d-none">
+                <div class="mobile-card p-3">
+                    <h6 class="mb-3"><i class="fas fa-cog"></i> Nastavitve</h6>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Tema</label>
+                        <select class="form-select" id="themeSelect">
+                            <option value="auto">Avtomatska</option>
+                            <option value="light">Svetla</option>
+                            <option value="dark">Temna</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Jezik</label>
+                        <select class="form-select" id="languageSelect">
+                            <option value="sl">Slovenščina</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="notificationsEnabled" checked>
+                        <label class="form-check-label" for="notificationsEnabled">
+                            Push obvestila
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="autoRefresh" checked>
+                        <label class="form-check-label" for="autoRefresh">
+                            Avtomatsko osvežuj podatke
+                        </label>
+                    </div>
+
+                    <button class="btn btn-danger quick-action-btn" onclick="clearCache()">
+                        <i class="fas fa-trash"></i> Počisti Predpomnilnik
+                    </button>
+                </div>
+
+                <!-- App Info -->
+                <div class="mobile-card p-3">
+                    <h6 class="mb-3"><i class="fas fa-info-circle"></i> Informacije o Aplikaciji</h6>
+                    <div class="mb-2">
+                        <strong>Verzija:</strong> 1.0.0
+                    </div>
+                    <div class="mb-2">
+                        <strong>Zadnja posodobitev:</strong> <span id="lastUpdate">-</span>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Status strežnika:</strong> 
+                        <span id="serverStatus" class="badge bg-success">Online</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="row g-0">
+                <div class="col">
+                    <a href="#" class="nav-item active" data-tab="dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Nadzorna</span>
+                    </a>
+                </div>
+                <div class="col">
+                    <a href="#" class="nav-item" data-tab="security">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Varnost</span>
+                    </a>
+                </div>
+                <div class="col">
+                    <a href="#" class="nav-item" data-tab="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Nastavitve</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Mobile Dashboard JavaScript
+        let currentUser = null;
+        let authToken = localStorage.getItem('omni_auth_token');
+
+        // Authentication functions
+        async function mobileLogin(credentials) {
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(credentials)
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (data.requiresTwoFA) {
+                        return { requiresTwoFA: true };
+                    }
+                    
+                    authToken = data.token;
+                    currentUser = data.user;
+                    localStorage.setItem('omni_auth_token', authToken);
+                    localStorage.setItem('omni_current_user', JSON.stringify(currentUser));
+                    
+                    showDashboard();
+                    loadMobileData();
+                    
+                    return { success: true };
+                } else {
+                    throw new Error(data.message || 'Prijava neuspešna');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                throw error;
+            }
+        }
+
+        async function mobileLogout() {
+            try {
+                if (authToken) {
+                    await fetch('/api/auth/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+            } finally {
+                authToken = null;
+                currentUser = null;
+                localStorage.removeItem('omni_auth_token');
+                localStorage.removeItem('omni_current_user');
+                
+                showLogin();
+            }
+        }
+
+        function showLogin() {
+            document.getElementById('loginScreen').classList.remove('d-none');
+            document.getElementById('dashboardScreen').classList.add('d-none');
+        }
+
+        function showDashboard() {
+            document.getElementById('loginScreen').classList.add('d-none');
+            document.getElementById('dashboardScreen').classList.remove('d-none');
+            
+            if (currentUser) {
+                document.getElementById('userInfo').textContent = `Prijavljen kot: ${currentUser.email}`;
+            }
+        }
+
+        function checkMobileAuth() {
+            const token = localStorage.getItem('omni_auth_token');
+            const user = localStorage.getItem('omni_current_user');
+            
+            if (token && user) {
+                authToken = token;
+                currentUser = JSON.parse(user);
+                showDashboard();
+                loadMobileData();
+            } else {
+                showLogin();
+            }
+        }
+
+        async function loadMobileData() {
+            if (!authToken) return;
+
+            try {
+                // Load stats
+                const statsResponse = await fetch('/api/admin/stats', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (statsResponse.ok) {
+                    const statsData = await statsResponse.json();
+                    if (statsData.success) {
+                        updateMobileStats(statsData.data);
+                    }
+                }
+
+                // Load security info
+                loadMobileSecurityInfo();
+            } catch (error) {
+                console.error('Error loading mobile data:', error);
+            }
+        }
+
+        function updateMobileStats(stats) {
+            if (stats.licenses) {
+                document.getElementById('mobileTotalLicenses').textContent = stats.licenses.total || 0;
+                document.getElementById('mobileActiveLicenses').textContent = stats.licenses.active || 0;
+                document.getElementById('mobileExpiringLicenses').textContent = stats.licenses.expiring || 0;
+                document.getElementById('mobileExpiredLicenses').textContent = stats.licenses.expired || 0;
+            }
+        }
+
+        async function loadMobileSecurityInfo() {
+            try {
+                const response = await fetch('/api/admin/stats', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.data.auth) {
+                        const authStats = data.data.auth;
+                        document.getElementById('mobileSuccessfulLogins').textContent = authStats.totalLogins || 0;
+                        document.getElementById('mobileFailedLogins').textContent = authStats.failedLogins || 0;
+                    }
+                }
+
+                if (currentUser) {
+                    const statusBadge = document.getElementById('mobile2FAStatus');
+                    if (currentUser.twoFAEnabled) {
+                        statusBadge.textContent = 'Omogočen';
+                        statusBadge.className = 'badge bg-success';
+                        document.getElementById('mobileEnable2FABtn').style.display = 'none';
+                    } else {
+                        statusBadge.textContent = 'Onemogočen';
+                        statusBadge.className = 'badge bg-warning';
+                    }
+                    
+                    document.getElementById('mobileLastLogin').textContent = currentUser.lastLogin ? 
+                        new Date(currentUser.lastLogin).toLocaleString() : '-';
+                }
+            } catch (error) {
+                console.error('Error loading security info:', error);
+            }
+        }
+
+        // Tab navigation
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('d-none');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + 'Tab').classList.remove('d-none');
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+        }
+
+        // Quick actions
+        function showCreateLicense() {
+            alert('Funkcija za ustvarjanje licence bo kmalu na voljo');
+        }
+
+        function showNotifications() {
+            alert('Funkcija za pošiljanje obvestil bo kmalu na voljo');
+        }
+
+        function refreshData() {
+            loadMobileData();
+            showToast('Podatki osveženi', 'success');
+        }
+
+        function clearCache() {
+            localStorage.removeItem('mobile_cache');
+            showToast('Predpomnilnik počiščen', 'info');
+        }
+
+        async function mobileEnable2FA() {
+            try {
+                const response = await fetch('/api/auth/enable-2fa', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('2FA uspešno omogočen', 'success');
+                    loadMobileSecurityInfo();
+                } else {
+                    throw new Error(data.message || 'Napaka pri omogočanju 2FA');
+                }
+            } catch (error) {
+                console.error('2FA enable error:', error);
+                showToast('Napaka pri omogočanju 2FA: ' + error.message, 'danger');
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            // Simple toast implementation for mobile
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} position-fixed`;
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 250px;';
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            checkMobileAuth();
+
+            // Login form
+            document.getElementById('mobileLoginForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('mobileEmail').value;
+                const password = document.getElementById('mobilePassword').value;
+                const twoFAToken = document.getElementById('mobile2FAToken').value;
+                
+                const loginBtn = document.getElementById('mobileLoginBtn');
+                const loginError = document.getElementById('mobileLoginError');
+                
+                loginBtn.disabled = true;
+                loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Prijavljam...';
+                loginError.classList.add('d-none');
+                
+                try {
+                    const result = await mobileLogin({ email, password, twoFAToken });
+                    
+                    if (result.requiresTwoFA) {
+                        document.getElementById('mobile2FASection').classList.remove('d-none');
+                        loginError.textContent = 'Vnesite 2FA kodo za nadaljevanje';
+                        loginError.classList.remove('d-none');
+                    }
+                } catch (error) {
+                    loginError.textContent = error.message;
+                    loginError.classList.remove('d-none');
+                } finally {
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Prijavi se';
+                }
+            });
+
+            // Logout button
+            document.getElementById('mobileLogoutBtn').addEventListener('click', mobileLogout);
+
+            // 2FA enable button
+            document.getElementById('mobileEnable2FABtn').addEventListener('click', mobileEnable2FA);
+
+            // Tab navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const tabName = this.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+
+            // Auto refresh
+            setInterval(() => {
+                if (authToken && document.getElementById('autoRefresh').checked) {
+                    loadMobileData();
+                }
+            }, 30000); // Refresh every 30 seconds
+        });
+    </script>
+</body>
+</html>

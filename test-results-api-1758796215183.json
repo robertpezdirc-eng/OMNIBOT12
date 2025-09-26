@@ -1,0 +1,46 @@
+{
+  "summary": {
+    "totalTests": 3,
+    "passedTests": 2,
+    "failedTests": 1,
+    "successRate": "66.7",
+    "duration": 536,
+    "timestamp": "2025-09-25T10:30:15.183Z"
+  },
+  "results": [
+    {
+      "test": "Health Check",
+      "success": true,
+      "message": "API je dostopen",
+      "timestamp": "2025-09-25T10:30:14.890Z",
+      "data": {
+        "success": true,
+        "message": "Omniscient AI Platform je aktiven",
+        "timestamp": "2025-09-25T10:30:14.867Z",
+        "version": "2.0.0",
+        "cache": {
+          "redis": null,
+          "status": "disconnected"
+        }
+      }
+    },
+    {
+      "test": "Create License",
+      "success": false,
+      "message": "Napaka: Request failed with status code 404",
+      "timestamp": "2025-09-25T10:30:14.933Z",
+      "data": null
+    },
+    {
+      "test": "Rate Limiting",
+      "success": true,
+      "message": "10 uspešnih, 0 omejenih zahtev",
+      "timestamp": "2025-09-25T10:30:14.991Z",
+      "data": {
+        "successCount": 10,
+        "rateLimitedCount": 0,
+        "totalRequests": 10
+      }
+    }
+  ]
+}

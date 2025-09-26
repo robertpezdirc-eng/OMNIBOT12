@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni Global - Admin Dashboard</title>
+    <link rel="stylesheet" href="admin.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="admin-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <i class="fas fa-shield-alt logo-icon"></i>
+                <h1>Omni Global Admin</h1>
+            </div>
+            <div class="header-actions">
+                <div class="connection-status" id="connectionStatus">
+                    <i class="fas fa-circle status-indicator" id="statusIndicator"></i>
+                    <span id="statusText">Povezovanje...</span>
+                </div>
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="currentUser">Administrator</span>
+                </div>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Odjava
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <!-- Dashboard Stats -->
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="totalLicenses">0</h3>
+                        <p>Skupaj licenc</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon active">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="activeLicenses">0</h3>
+                        <p>Aktivne licence</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="expiringLicenses">0</h3>
+                        <p>Potekajo v 30 dneh</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon inactive">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="inactiveLicenses">0</h3>
+                        <p>Neaktivne licence</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- License Management Section -->
+        <section class="license-management">
+            <div class="section-header">
+                <h2>
+                    <i class="fas fa-table"></i>
+                    Upravljanje licenc
+                </h2>
+                <div class="section-actions">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Išči po Client ID, planu ali statusu...">
+                    </div>
+                    <div class="filter-dropdown">
+                        <select id="statusFilter">
+                            <option value="">Vsi statusi</option>
+                            <option value="active">Aktivne</option>
+                            <option value="inactive">Neaktivne</option>
+                            <option value="expired">Potekle</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="createLicenseBtn">
+                        <i class="fas fa-plus"></i>
+                        Ustvari licenco
+                    </button>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-success" id="createBtn">
+                    <i class="fas fa-plus-circle"></i>
+                    Create
+                </button>
+                <button class="btn btn-warning" id="extendBtn" disabled>
+                    <i class="fas fa-calendar-plus"></i>
+                    Extend
+                </button>
+                <button class="btn btn-info" id="toggleBtn" disabled>
+                    <i class="fas fa-toggle-on"></i>
+                    Toggle
+                </button>
+                <button class="btn btn-danger" id="deleteBtn" disabled>
+                    <i class="fas fa-trash"></i>
+                    Izbriši
+                </button>
+                <div class="bulk-actions">
+                    <span class="selected-count" id="selectedCount">0 izbranih</span>
+                </div>
+            </div>
+
+            <!-- License Table -->
+            <div class="table-container">
+                <div class="table-loading" id="tableLoading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>Nalaganje licenc...</span>
+                </div>
+                
+                <table class="license-table" id="licenseTable">
+                    <thead>
+                        <tr>
+                            <th>
+                                <input type="checkbox" id="selectAll">
+                            </th>
+                            <th class="sortable" data-sort="client_id">
+                                Client ID
+                                <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th class="sortable" data-sort="plan">
+                                Subscription Plan
+                                <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th class="sortable" data-sort="status">
+                                Current Status
+                                <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th class="sortable" data-sort="expires_at">
+                                Expiration Date
+                                <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th>Active Modules</th>
+                            <th>Uporaba</th>
+                            <th>Akcije</th>
+                        </tr>
+                    </thead>
+                    <tbody id="licenseTableBody">
+                        <!-- Dinamično generirane vrstice -->
+                    </tbody>
+                </table>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <i class="fas fa-inbox"></i>
+                    <h3>Ni licenc</h3>
+                    <p>Trenutno ni nobenih licenc za prikaz.</p>
+                    <button class="btn btn-primary" id="createFirstLicense">
+                        <i class="fas fa-plus"></i>
+                        Ustvari prvo licenco
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    <span id="paginationInfo">Prikazujem 0-0 od 0 licenc</span>
+                </div>
+                <div class="pagination-controls">
+                    <button class="btn btn-sm" id="prevPage" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                        Prejšnja
+                    </button>
+                    <div class="page-numbers" id="pageNumbers">
+                        <!-- Dinamično generirane strani -->
+                    </div>
+                    <button class="btn btn-sm" id="nextPage" disabled>
+                        Naslednja
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                <div class="page-size-selector">
+                    <label for="pageSize">Prikaži:</label>
+                    <select id="pageSize">
+                        <option value="10">10</option>
+                        <option value="25" selected>25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <span>na stran</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Create License Modal -->
+    <div class="modal" id="createLicenseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-plus-circle"></i>
+                    Ustvari novo licenco
+                </h3>
+                <button class="modal-close" id="closeCreateModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="createLicenseForm">
+                    <div class="form-group">
+                        <label for="clientId">Client ID *</label>
+                        <input type="text" id="clientId" name="user_id" required>
+                        <small>Unikaten identifikator odjemalca</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="productName">Ime produkta *</label>
+                        <input type="text" id="productName" name="product_name" required>
+                        <small>Ime produkta ali storitve</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subscriptionPlan">Subscription Plan *</label>
+                        <select id="subscriptionPlan" name="plan" required>
+                            <option value="">Izberi plan</option>
+                            <option value="basic">Basic</option>
+                            <option value="pro">Pro</option>
+                            <option value="enterprise">Enterprise</option>
+                            <option value="premium">Premium</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="expirationDate">Datum poteka *</label>
+                        <input type="datetime-local" id="expirationDate" name="expires_at" required>
+                        <small>Kdaj licenca poteče</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="maxUsage">Maksimalna uporaba</label>
+                        <input type="number" id="maxUsage" name="max_usage" value="-1" min="-1">
+                        <small>-1 za neomejeno uporabo</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="activeModules">Aktivni moduli</label>
+                        <div class="checkbox-group" id="moduleCheckboxes">
+                            <label><input type="checkbox" value="core"> Core</label>
+                            <label><input type="checkbox" value="analytics"> Analytics</label>
+                            <label><input type="checkbox" value="reporting"> Reporting</label>
+                            <label><input type="checkbox" value="api"> API Access</label>
+                            <label><input type="checkbox" value="support"> Premium Support</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelCreate">
+                    Prekliči
+                </button>
+                <button type="submit" form="createLicenseForm" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    Ustvari licenco
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Extend License Modal -->
+    <div class="modal" id="extendLicenseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-calendar-plus"></i>
+                    Podaljšaj licenco
+                </h3>
+                <button class="modal-close" id="closeExtendModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="extendLicenseForm">
+                    <div class="current-license-info" id="currentLicenseInfo">
+                        <!-- Dinamično generirane informacije o trenutni licenci -->
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="extensionPeriod">Obdobje podaljšanja</label>
+                        <select id="extensionPeriod">
+                            <option value="30">30 dni</option>
+                            <option value="90">90 dni</option>
+                            <option value="180">180 dni</option>
+                            <option value="365">1 leto</option>
+                            <option value="custom">Poljubno</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="customDateGroup" style="display: none;">
+                        <label for="customExpirationDate">Nov datum poteka</label>
+                        <input type="datetime-local" id="customExpirationDate">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelExtend">
+                    Prekliči
+                </button>
+                <button type="submit" form="extendLicenseForm" class="btn btn-warning">
+                    <i class="fas fa-calendar-plus"></i>
+                    Podaljšaj
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Real-time Updates Toast -->
+    <div class="toast-container" id="toastContainer">
+        <!-- Dinamično generirani toast sporočila -->
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>Obdelovanje...</span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>

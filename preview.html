@@ -1,0 +1,50 @@
+<!DOCTYPE html> 
+<html lang="sl"> 
+<head> 
+<meta charset="UTF-8"> 
+<title>Omnia App Live Preview</title> 
+<style> 
+  body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f4; } 
+  #output { border: 1px solid #ccc; padding: 10px; min-height: 200px; background: #fff; } 
+  textarea { width: 100%; height: 100px; } 
+  button { margin-top: 10px; padding: 10px 20px; } 
+</style> 
+</head> 
+<body> 
+
+<h2>Omnia App – Live Preview</h2> 
+<textarea id="prompt" placeholder="Vnesi prompt..."></textarea> 
+<br> 
+<button onclick="generate()">Generiraj</button> 
+
+<h3>Rezultat:</h3> 
+<div id="output"></div> 
+
+<script> 
+async function generate() { 
+    const prompt = document.getElementById('prompt').value; 
+    const outputDiv = document.getElementById('output'); 
+    outputDiv.innerHTML = "Generiram..."; 
+
+    try { 
+        const response = await fetch('http://localhost:3000/generate', { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ prompt }) 
+        }); 
+
+        if (!response.ok) { 
+            outputDiv.innerHTML = "Napaka pri generiranju!"; 
+            return; 
+        } 
+
+        const data = await response.json(); 
+        outputDiv.innerHTML = data.generated_text || "Ni vrnjene vsebine."; 
+    } catch (err) { 
+        outputDiv.innerHTML = "Napaka: " + err.message; 
+    } 
+} 
+</script> 
+
+</body> 
+</html>

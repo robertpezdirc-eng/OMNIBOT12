@@ -1,0 +1,158 @@
+{
+  "inventory": {
+    "products": {
+      "Laptop": 17,
+      "Miška": 25,
+      "Tipkovnica": 22,
+      "Monitor": 12,
+      "Slušalke": 6,
+      "Kabel USB": 3
+    },
+    "deliveries": [
+      {
+        "time": "2025-09-22T12:12:39.631618",
+        "product": "Laptop",
+        "quantity": 5,
+        "destination": "Ljubljana",
+        "status": "completed",
+        "status_updated": "2025-09-22T12:12:40.244266"
+      },
+      {
+        "time": "2025-09-22T12:12:39.772089",
+        "product": "Miška",
+        "quantity": 10,
+        "destination": "Maribor",
+        "status": "in_transit",
+        "status_updated": "2025-09-22T12:12:40.261847"
+      },
+      {
+        "time": "2025-09-22T12:12:39.928315",
+        "product": "Tipkovnica",
+        "quantity": 8,
+        "destination": "Celje",
+        "status": "completed",
+        "status_updated": "2025-09-22T12:12:40.279932"
+      },
+      {
+        "time": "2025-09-22T12:12:39.995659",
+        "product": "Monitor",
+        "quantity": 3,
+        "destination": "Ljubljana",
+        "status": "pending"
+      },
+      {
+        "time": "2025-09-22T12:12:40.061772",
+        "product": "Slušalke",
+        "quantity": 2,
+        "destination": "Koper",
+        "status": "pending"
+      },
+      {
+        "time": "2025-09-22T12:12:40.155125",
+        "product": "Laptop",
+        "quantity": 3,
+        "destination": "Kranj",
+        "status": "pending"
+      },
+      {
+        "time": "2025-09-22T12:12:40.208221",
+        "product": "Miška",
+        "quantity": 15,
+        "destination": "Ljubljana",
+        "status": "pending"
+      }
+    ]
+  },
+  "inventory_status": {
+    "total_products": 6,
+    "products": {
+      "Laptop": 17,
+      "Miška": 25,
+      "Tipkovnica": 22,
+      "Monitor": 12,
+      "Slušalke": 6,
+      "Kabel USB": 3
+    },
+    "low_stock_products": [
+      {
+        "product": "Slušalke",
+        "quantity": 6
+      }
+    ],
+    "critical_stock_products": [
+      {
+        "product": "Kabel USB",
+        "quantity": 3
+      }
+    ],
+    "total_deliveries": 7,
+    "pending_deliveries": 4,
+    "completed_deliveries": 3
+  },
+  "logistics_stats": {
+    "period": "Zadnji mesec",
+    "total_delivered": 46,
+    "average_delivery_size": 6.571428571428571,
+    "delivery_count": 7,
+    "most_popular_destination": "Ljubljana",
+    "destinations_served": 5
+  },
+  "restock_recommendations": [
+    {
+      "product": "Slušalke",
+      "current_stock": 6,
+      "recommended_order": 25,
+      "priority": "high",
+      "reason": "Nizka zaloga"
+    },
+    {
+      "product": "Kabel USB",
+      "current_stock": 3,
+      "recommended_order": 50,
+      "priority": "critical",
+      "reason": "Kritično nizka zaloga"
+    }
+  ],
+  "route_optimization": {
+    "message": "Optimizirane poti za 3 destinacij",
+    "optimized_routes": [
+      {
+        "route_id": 1,
+        "destination": "Ljubljana",
+        "total_quantity": 18,
+        "products": [
+          "Miška",
+          "Monitor"
+        ],
+        "delivery_count": 2,
+        "estimated_time": 30,
+        "priority": "normal"
+      },
+      {
+        "route_id": 3,
+        "destination": "Kranj",
+        "total_quantity": 3,
+        "products": [
+          "Laptop"
+        ],
+        "delivery_count": 1,
+        "estimated_time": 15,
+        "priority": "normal"
+      },
+      {
+        "route_id": 2,
+        "destination": "Koper",
+        "total_quantity": 2,
+        "products": [
+          "Slušalke"
+        ],
+        "delivery_count": 1,
+        "estimated_time": 15,
+        "priority": "normal"
+      }
+    ],
+    "total_deliveries": 4,
+    "estimated_total_time": 60
+  },
+  "export_time": "2025-09-22T12:12:40.496943"
+}

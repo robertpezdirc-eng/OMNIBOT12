@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Koda - Omni Mobile App</title>
+    <script src="./qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .qr-container {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 2px dashed #ddd;
+        }
+
+        #qrcode {
+            margin: 20px auto;
+        }
+
+        .url-display {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 14px;
+            word-break: break-all;
+            color: #495057;
+        }
+
+        .ip-selector {
+            margin: 20px 0;
+        }
+
+        select {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            cursor: pointer;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .instructions {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .instructions h3 {
+            color: #1976d2;
+            margin-top: 0;
+        }
+
+        .instructions ol {
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .status.online {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .refresh-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: background 0.3s;
+        }
+
+        .refresh-btn:hover {
+            background: #5a6fd8;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Omni Mobile</h1>
+        <p class="subtitle">Skeniraj QR kodo za dostop do mobilne aplikacije</p>
+        
+        <div class="ip-selector">
+            <label for="ipSelect">Izberi IP naslov:</label>
+            <select id="ipSelect" onchange="generateQR()">
+                <option value="192.168.56.1">192.168.56.1 (VirtualBox)</option>
+                <option value="192.168.99.1">192.168.99.1 (Docker)</option>
+                <option value="192.168.185.2">192.168.185.2 (VMware)</option>
+                <option value="localhost">localhost (lokalno)</option>
+            </select>
+        </div>
+
+        <div class="qr-container">
+            <canvas id="qrcode"></canvas>
+            <div class="url-display" id="urlDisplay"></div>
+            <div class="status online" id="serverStatus">
+                🟢 Server aktiven na portu 3001
+            </div>
+        </div>
+
+        <button class="refresh-btn" onclick="checkServerStatus()">
+            🔄 Preveri status
+        </button>
+
+        <div class="instructions">
+            <h3>📋 Navodila za uporabo:</h3>
+            <ol>
+                <li><strong>Preverite omrežje:</strong> Mobilna naprava mora biti v istem WiFi omrežju</li>
+                <li><strong>Skenirajte QR kodo:</strong> Uporabite kamero ali QR skener</li>
+                <li><strong>Odprite povezavo:</strong> Aplikacija se bo odprla v brskalniku</li>
+                <li><strong>Uživajte:</strong> Upravljajte IoT naprave in spremljajte metrike!</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        let currentUrl = '';
+
+        function generateQR() {
+            const selectedIP = document.getElementById('ipSelect').value;
+            const port = '3001';
+            const url = `http://${selectedIP}:${port}/mobile`;
+            
+            currentUrl = url;
+            document.getElementById('urlDisplay').textContent = url;
+            
+            // Počisti prejšnji QR kod
+            const canvas = document.getElementById('qrcode');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Generiraj novi QR kod z enostavno metodo
+            try {
+                if (typeof QRCode !== 'undefined') {
+                    QRCode.toCanvas(canvas, url, {
+                        width: 256,
+                        height: 256,
+                        colorDark: '#000000',
+                        colorLight: '#ffffff',
+                        margin: 2,
+                        errorCorrectionLevel: 'M'
+                    }, function (error) {
+                        if (error) {
+                            console.error('Napaka pri generiranju QR kode:', error);
+                            generateSimpleQR(canvas, url);
+                        }
+                    });
+                } else {
+                    generateSimpleQR(canvas, url);
+                }
+            } catch (error) {
+                console.error('QRCode library error:', error);
+                generateSimpleQR(canvas, url);
+            }
+        }
+
+        function generateSimpleQR(canvas, text) {
+            const ctx = canvas.getContext('2d');
+            const size = 256;
+            canvas.width = size;
+            canvas.height = size;
+            
+            // Enostaven QR kod simulator
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, size, size);
+            
+            ctx.fillStyle = '#000000';
+            const cellSize = size / 25;
+            
+            // Generiraj psevdo QR vzorec
+            for (let i = 0; i < 25; i++) {
+                for (let j = 0; j < 25; j++) {
+                    // Finder patterns (vogali)
+                    if ((i < 7 && j < 7) || (i < 7 && j > 17) || (i > 17 && j < 7)) {
+                        if ((i < 6 && j < 6) || (i < 6 && j > 18) || (i > 18 && j < 6)) {
+                            ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                        }
+                    }
+                    // Naključni vzorec za podatke
+                    else if (Math.random() > 0.5) {
+                        ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                    }
+                }
+            }
+            
+            // Dodaj besedilo pod QR kodo
+            ctx.fillStyle = '#666';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('QR Koda za: ' + text, size/2, size + 20);
+        }
+
+        async function checkServerStatus() {
+            const statusElement = document.getElementById('serverStatus');
+            const selectedIP = document.getElementById('ipSelect').value;
+            const url = `http://${selectedIP}:3001/api/status`;
+            
+            try {
+                statusElement.textContent = '🔄 Preverjam...';
+                statusElement.className = 'status';
+                
+                const response = await fetch(url, { 
+                    method: 'GET',
+                    timeout: 5000 
+                });
+                
+                if (response.ok) {
+                    statusElement.textContent = '🟢 Server aktiven in dostopen';
+                    statusElement.className = 'status online';
+                } else {
+                    throw new Error('Server ni dostopen');
+                }
+            } catch (error) {
+                statusElement.textContent = '🔴 Server ni dostopen ali ni v istem omrežju';
+                statusElement.className = 'status offline';
+            }
+        }
+
+        // Generiraj QR kodo ob nalaganju strani
+        window.onload = function() {
+            generateQR();
+            checkServerStatus();
+        };
+
+        // Preveri status vsakih 30 sekund
+        setInterval(checkServerStatus, 30000);
+    </script>
+</body>
+</html>

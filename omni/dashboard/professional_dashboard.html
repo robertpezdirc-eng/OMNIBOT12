@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMNI Professional Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #06b6d4;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 0;
+            position: fixed;
+            width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 1rem;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            background: var(--dark-bg);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success-color);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--primary-color);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .stat-card.success::before {
+            background: var(--gradient-success);
+        }
+
+        .stat-card.warning::before {
+            background: var(--gradient-warning);
+        }
+
+        .stat-card.danger::before {
+            background: var(--gradient-danger);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .stat-change.positive {
+            color: var(--success-color);
+        }
+
+        .stat-change.negative {
+            color: var(--danger-color);
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chart-btn {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .chart-btn:hover,
+        .chart-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 1.125rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-placeholder::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Activity Feed */
+        .activity-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .activity-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .activity-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .activity-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .activity-list {
+            list-style: none;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .activity-icon.success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success-color);
+        }
+
+        .activity-icon.warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning-color);
+        }
+
+        .activity-icon.info {
+            background: rgba(6, 182, 212, 0.2);
+            color: var(--info-color);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            color: var(--text-primary);
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-time {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* System Status */
+        .system-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .status-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .status-item.online {
+            border-color: var(--success-color);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .status-item.offline {
+            border-color: var(--danger-color);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .status-item.warning {
+            border-color: var(--warning-color);
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .status-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .status-value {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .activity-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow-lg);
+            z-index: 9999;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .notification.error {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .notification.warning {
+            border-left: 4px solid var(--warning-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <span>OMNI Pro</span>
+                </div>
+            </div>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#dashboard" class="nav-link active">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#ai-core" class="nav-link">
+                            <i class="fas fa-robot"></i>
+                            <span>AI Core</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#memory" class="nav-link">
+                            <i class="fas fa-memory"></i>
+                            <span>Memory System</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#voice" class="nav-link">
+                            <i class="fas fa-microphone"></i>
+                            <span>Voice Assistant</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#devices" class="nav-link">
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>Devices</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#analytics" class="nav-link">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Analytics</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#settings" class="nav-link">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <h1 class="header-title">OMNI Professional Dashboard</h1>
+                <div class="header-actions">
+                    <div class="status-indicator">
+                        <div class="status-dot"></div>
+                        <span>System Online</span>
+                    </div>
+                    <button class="chart-btn" onclick="refreshDashboard()">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                </div>
+            </header>
+
+            <!-- System Status -->
+            <div class="system-status">
+                <div class="status-item online">
+                    <div class="status-label">AI Core</div>
+                    <div class="status-value">Online</div>
+                </div>
+                <div class="status-item online">
+                    <div class="status-label">Memory System</div>
+                    <div class="status-value">Active</div>
+                </div>
+                <div class="status-item warning">
+                    <div class="status-label">Voice Assistant</div>
+                    <div class="status-value">Standby</div>
+                </div>
+                <div class="status-item online">
+                    <div class="status-label">Mobile Backend</div>
+                    <div class="status-value">Running</div>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">AI Requests</div>
+                        <div class="stat-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="ai-requests">1,247</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+12.5% from last hour</span>
+                    </div>
+                </div>
+
+                <div class="stat-card success">
+                    <div class="stat-header">
+                        <div class="stat-title">Memory Usage</div>
+                        <div class="stat-icon" style="background: var(--gradient-success);">
+                            <i class="fas fa-memory"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="memory-usage">2.4 GB</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+5.2% from yesterday</span>
+                    </div>
+                </div>
+
+                <div class="stat-card warning">
+                    <div class="stat-header">
+                        <div class="stat-title">Active Devices</div>
+                        <div class="stat-icon" style="background: var(--gradient-warning);">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="active-devices">23</div>
+                    <div class="stat-change negative">
+                        <i class="fas fa-arrow-down"></i>
+                        <span>-2 from last check</span>
+                    </div>
+                </div>
+
+                <div class="stat-card danger">
+                    <div class="stat-header">
+                        <div class="stat-title">Response Time</div>
+                        <div class="stat-icon" style="background: var(--gradient-danger);">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="response-time">245ms</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-down"></i>
+                        <span>-15ms from average</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">AI Performance Metrics</h3>
+                        <div class="chart-controls">
+                            <button class="chart-btn active">1H</button>
+                            <button class="chart-btn">24H</button>
+                            <button class="chart-btn">7D</button>
+                            <button class="chart-btn">30D</button>
+                        </div>
+                    </div>
+                    <div class="chart-placeholder">
+                        <i class="fas fa-chart-line" style="font-size: 3rem; opacity: 0.3;"></i>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">System Resources</h3>
+                    </div>
+                    <div class="chart-placeholder">
+                        <i class="fas fa-server" style="font-size: 3rem; opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Feed -->
+            <div class="activity-grid">
+                <div class="activity-card">
+                    <div class="activity-header">
+                        <h3 class="activity-title">Recent Activity</h3>
+                    </div>
+                    <ul class="activity-list" id="activity-feed">
+                        <li class="activity-item">
+                            <div class="activity-icon success">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text">AI Core initialized successfully</div>
+                                <div class="activity-time">2 minutes ago</div>
+                            </div>
+                        </li>
+                        <li class="activity-item">
+                            <div class="activity-icon info">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text">New device connected: Mobile-Device-001</div>
+                                <div class="activity-time">5 minutes ago</div>
+                            </div>
+                        </li>
+                        <li class="activity-item">
+                            <div class="activity-icon warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text">Memory usage approaching 80%</div>
+                                <div class="activity-time">12 minutes ago</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="activity-card">
+                    <div class="activity-header">
+                        <h3 class="activity-title">AI Insights</h3>
+                    </div>
+                    <ul class="activity-list" id="ai-insights">
+                        <li class="activity-item">
+                            <div class="activity-icon success">
+                                <i class="fas fa-lightbulb"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text">Detected pattern in user behavior</div>
+                                <div class="activity-time">1 hour ago</div>
+                            </div>
+                        </li>
+                        <li class="activity-item">
+                            <div class="activity-icon info">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text">Memory compression completed</div>
+                                <div class="activity-time">2 hours ago</div>
+                            </div>
+                        </li>
+                        <li class="activity-item">
+                            <div class="activity-icon success">
+                                <i class="fas fa-microphone"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text">Voice command processed successfully</div>
+                                <div class="activity-time">3 hours ago</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Notification Template -->
+    <div id="notification" class="notification">
+        <div id="notification-content"></div>
+    </div>
+
+    <script>
+        // Dashboard JavaScript
+        class ProfessionalDashboard {
+            constructor() {
+                this.socket = null;
+                this.updateInterval = null;
+                this.isConnected = false;
+                
+                this.init();
+            }
+
+            init() {
+                console.log('🚀 Inicializiram Professional Dashboard...');
+                
+                // Nastavi WebSocket povezavo
+                this.setupWebSocket();
+                
+                // Nastavi event listenere
+                this.setupEventListeners();
+                
+                // Začni s posodabljanjem podatkov
+                this.startDataUpdates();
+                
+                // Nastavi navigacijo
+                this.setupNavigation();
+                
+                console.log('✅ Dashboard pripravljen');
+            }
+
+            setupWebSocket() {
+                try {
+                    // Poskusi povezavo z mobilnim backend-om
+                    this.socket = new WebSocket('ws://localhost:3001');
+                    
+                    this.socket.onopen = () => {
+                        console.log('🔗 WebSocket povezan');
+                        this.isConnected = true;
+                        this.updateConnectionStatus(true);
+                    };
+                    
+                    this.socket.onmessage = (event) => {
+                        const data = JSON.parse(event.data);
+                        this.handleWebSocketMessage(data);
+                    };
+                    
+                    this.socket.onclose = () => {
+                        console.log('🔌 WebSocket prekinjen');
+                        this.isConnected = false;
+                        this.updateConnectionStatus(false);
+                        
+                        // Poskusi ponovno povezavo čez 5 sekund
+                        setTimeout(() => this.setupWebSocket(), 5000);
+                    };
+                    
+                    this.socket.onerror = (error) => {
+                        console.error('❌ WebSocket napaka:', error);
+                        this.showNotification('WebSocket connection error', 'error');
+                    };
+                    
+                } catch (error) {
+                    console.error('❌ Napaka pri WebSocket povezavi:', error);
+                    this.updateConnectionStatus(false);
+                }
+            }
+
+            handleWebSocketMessage(data) {
+                switch (data.type) {
+                    case 'stats':
+                        this.updateStats(data.payload);
+                        break;
+                    case 'activity':
+                        this.addActivity(data.payload);
+                        break;
+                    case 'alert':
+                        this.showNotification(data.payload.message, data.payload.type);
+                        break;
+                    case 'device_update':
+                        this.updateDeviceCount(data.payload.count);
+                        break;
+                    default:
+                        console.log('📨 Neznano sporočilo:', data);
+                }
+            }
+
+            updateConnectionStatus(connected) {
+                const statusIndicator = document.querySelector('.status-indicator');
+                const statusDot = document.querySelector('.status-dot');
+                const statusText = statusIndicator.querySelector('span');
+                
+                if (connected) {
+                    statusDot.style.background = 'var(--success-color)';
+                    statusText.textContent = 'System Online';
+                } else {
+                    statusDot.style.background = 'var(--danger-color)';
+                    statusText.textContent = 'System Offline';
+                }
+            }
+
+            updateStats(stats) {
+                // Posodobi AI zahteve
+                if (stats.aiRequests) {
+                    document.getElementById('ai-requests').textContent = stats.aiRequests.toLocaleString();
+                }
+                
+                // Posodobi uporabo spomina
+                if (stats.memoryUsage) {
+                    document.getElementById('memory-usage').textContent = `${stats.memoryUsage} GB`;
+                }
+                
+                // Posodobi aktivne naprave
+                if (stats.activeDevices) {
+                    document.getElementById('active-devices').textContent = stats.activeDevices;
+                }
+                
+                // Posodobi odzivni čas
+                if (stats.responseTime) {
+                    document.getElementById('response-time').textContent = `${stats.responseTime}ms`;
+                }
+            }
+
+            addActivity(activity) {
+                const activityFeed = document.getElementById('activity-feed');
+                const activityItem = document.createElement('li');
+                activityItem.className = 'activity-item';
+                
+                const iconClass = this.getActivityIconClass(activity.type);
+                const timeAgo = this.getTimeAgo(new Date(activity.timestamp));
+                
+                activityItem.innerHTML = `
+                    <div class="activity-icon ${activity.type}">
+                        <i class="${iconClass}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-text">${activity.message}</div>
+                        <div class="activity-time">${timeAgo}</div>
+                    </div>
+                `;
+                
+                // Dodaj na vrh seznama
+                activityFeed.insertBefore(activityItem, activityFeed.firstChild);
+                
+                // Obdrži samo zadnjih 10 aktivnosti
+                while (activityFeed.children.length > 10) {
+                    activityFeed.removeChild(activityFeed.lastChild);
+                }
+            }
+
+            getActivityIconClass(type) {
+                const iconMap = {
+                    success: 'fas fa-check',
+                    error: 'fas fa-times',
+                    warning: 'fas fa-exclamation-triangle',
+                    info: 'fas fa-info-circle',
+                    user: 'fas fa-user',
+                    system: 'fas fa-cog',
+                    ai: 'fas fa-brain',
+                    device: 'fas fa-mobile-alt'
+                };
+                
+                return iconMap[type] || 'fas fa-circle';
+            }
+
+            getTimeAgo(date) {
+                const now = new Date();
+                const diffMs = now - date;
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffHours = Math.floor(diffMins / 60);
+                const diffDays = Math.floor(diffHours / 24);
+                
+                if (diffMins < 1) return 'just now';
+                if (diffMins < 60) return `${diffMins} minutes ago`;
+                if (diffHours < 24) return `${diffHours} hours ago`;
+                return `${diffDays} days ago`;
+            }
+
+            showNotification(message, type = 'info') {
+                const notification = document.getElementById('notification');
+                const content = document.getElementById('notification-content');
+                
+                content.textContent = message;
+                notification.className = `notification ${type}`;
+                notification.classList.add('show');
+                
+                // Skrij po 5 sekundah
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 5000);
+            }
+
+            startDataUpdates() {
+                // Posodobi podatke vsakih 30 sekund
+                this.updateInterval = setInterval(() => {
+                    this.updateMockData();
+                }, 30000);
+                
+                // Prva posodobitev
+                this.updateMockData();
+            }
+
+            updateMockData() {
+                // Simuliraj posodobitev podatkov
+                const mockStats = {
+                    aiRequests: Math.floor(Math.random() * 2000) + 1000,
+                    memoryUsage: (Math.random() * 2 + 1.5).toFixed(1),
+                    activeDevices: Math.floor(Math.random() * 10) + 20,
+                    responseTime: Math.floor(Math.random() * 100) + 200
+                };
+                
+                this.updateStats(mockStats);
+                
+                // Dodaj naključno aktivnost
+                if (Math.random() < 0.3) {
+                    const activities = [
+                        { type: 'success', message: 'AI model updated successfully' },
+                        { type: 'info', message: 'New user session started' },
+                        { type: 'warning', message: 'High CPU usage detected' },
+                        { type: 'ai', message: 'Learning algorithm improved' }
+                    ];
+                    
+                    const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+                    randomActivity.timestamp = new Date().toISOString();
+                    
+                    this.addActivity(randomActivity);
+                }
+            }
+
+            setupEventListeners() {
+                // Refresh gumb
+                window.refreshDashboard = () => {
+                    this.showNotification('Dashboard refreshed', 'success');
+                    this.updateMockData();
+                };
+                
+                // Chart controls
+                document.querySelectorAll('.chart-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        if (e.target.textContent === 'Refresh') return;
+                        
+                        // Odstrani active class iz vseh gumbov v isti skupini
+                        const parent = e.target.closest('.chart-controls');
+                        if (parent) {
+                            parent.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+                            e.target.classList.add('active');
+                        }
+                    });
+                });
+            }
+
+            setupNavigation() {
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        
+                        // Odstrani active class iz vseh povezav
+                        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                        
+                        // Dodaj active class na kliknjeno povezavo
+                        e.target.closest('.nav-link').classList.add('active');
+                        
+                        const section = e.target.closest('.nav-link').getAttribute('href').substring(1);
+                        console.log(`📍 Navigacija na: ${section}`);
+                        
+                        // Tukaj bi implementirali navigacijo med sekcijami
+                        this.showNotification(`Navigating to ${section}`, 'info');
+                    });
+                });
+            }
+
+            updateDeviceCount(count) {
+                document.getElementById('active-devices').textContent = count;
+            }
+
+            destroy() {
+                if (this.socket) {
+                    this.socket.close();
+                }
+                
+                if (this.updateInterval) {
+                    clearInterval(this.updateInterval);
+                }
+                
+                console.log('🔄 Dashboard zaustavljen');
+            }
+        }
+
+        // Inicializiraj dashboard ko se stran naloži
+        document.addEventListener('DOMContentLoaded', () => {
+            window.dashboard = new ProfessionalDashboard();
+        });
+
+        // Počisti ob zaprtju strani
+        window.addEventListener('beforeunload', () => {
+            if (window.dashboard) {
+                window.dashboard.destroy();
+            }
+        });
+    </script>
+</body>
+</html>

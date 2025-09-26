@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omnia App - Testni Zaslon</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #f093fb;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --dark-color: #343a40;
+            --light-color: #f8f9fa;
+            --border-radius: 12px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 50%, var(--accent-color) 100%);
+            min-height: 100vh;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            display: grid;
+            grid-template-areas: 
+                "header header"
+                "main sidebar";
+            grid-template-columns: 1fr 350px;
+            grid-template-rows: auto 1fr;
+            min-height: 100vh;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            grid-area: header;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 20px 30px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .app-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .app-logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .api-status.connected {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+            border: 2px solid rgba(40, 167, 69, 0.2);
+        }
+
+        .api-status.disconnected {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger-color);
+            border: 2px solid rgba(220, 53, 69, 0.2);
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.connected {
+            background: var(--success-color);
+        }
+
+        .status-indicator.disconnected {
+            background: var(--danger-color);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main Content */
+        .main-content {
+            grid-area: main;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            overflow: hidden;
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .prompt-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            transition: var(--transition);
+            background: #fff;
+        }
+
+        .prompt-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: var(--light-color);
+            color: var(--dark-color);
+            border: 2px solid #e9ecef;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: var(--dark-color);
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+            transform: translateY(-1px);
+        }
+
+        /* Output Section */
+        .output-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            min-height: 400px;
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .output-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .output-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .toggle-btn {
+            padding: 8px 16px;
+            border: 2px solid #e9ecef;
+            background: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .toggle-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .output-container {
+            flex: 1;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .output-content {
+            height: 100%;
+            padding: 20px;
+            overflow-y: auto;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .output-content:empty::before {
+            content: "Rezultati se bodo prikazali tukaj...";
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        /* Loading Spinner */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e9ecef;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            grid-area: sidebar;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            height: fit-content;
+        }
+
+        .sidebar-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sidebar-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 10px;
+        }
+
+        .preset-prompts {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .preset-prompt {
+            padding: 12px 16px;
+            background: var(--light-color);
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        .preset-prompt:hover {
+            background: #e9ecef;
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: #e9ecef;
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* 3D/AR/VR Viewer */
+        .viewer-container {
+            width: 100%;
+            height: 300px;
+            background: #000;
+            border-radius: var(--border-radius);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            margin: 20px 0;
+        }
+
+        .viewer-container.active {
+            display: flex;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-areas: 
+                    "header"
+                    "main"
+                    "sidebar";
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+                gap: 15px;
+            }
+
+            .header {
+                padding: 15px 20px;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .main-content, .sidebar {
+                padding: 20px;
+            }
+
+            .input-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn {
+                justify-content: center;
+            }
+
+            .output-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .output-controls {
+                justify-content: center;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: var(--border-radius);
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: var(--transition);
+            max-width: 350px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: var(--success-color);
+        }
+
+        .notification.error {
+            background: var(--danger-color);
+        }
+
+        .notification.info {
+            background: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="app-title">
+                <div class="app-logo">🧠</div>
+                <span>Omnia App - Testni Zaslon</span>
+            </div>
+            <div class="header-controls">
+                <div class="api-status" id="apiStatus">
+                    <div class="status-indicator"></div>
+                    <span>Preverjam povezavo...</span>
+                </div>
+                <button class="btn btn-secondary" onclick="resetSession()">
+                    🔄 Reset Session
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="input-section">
+                <textarea 
+                    class="prompt-input" 
+                    id="promptInput" 
+                    placeholder="Vnesite vaš prompt tukaj... (npr. 'Ustvari poslovni načrt za startup', 'Analiziraj podatke', 'Generiraj 3D model')"
+                ></textarea>
+                
+                <div class="input-controls">
+                    <button class="btn btn-primary" id="generateBtn" onclick="generateContent()">
+                        🚀 Generiraj
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearInput()">
+                        🗑️ Počisti
+                    </button>
+                    <button class="btn btn-success" id="testApiBtn" onclick="testApiConnection()">
+                        🔗 Test API
+                    </button>
+                </div>
+
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <div class="output-header">
+                    <h3 class="output-title">Rezultat / Preview</h3>
+                    <div class="output-controls">
+                        <button class="toggle-btn" id="textToggle" onclick="toggleView('text')">📝 Besedilo</button>
+                        <button class="toggle-btn" id="imageToggle" onclick="toggleView('image')">🖼️ Slika</button>
+                        <button class="toggle-btn" id="vrToggle" onclick="toggleView('3d')">🥽 3D/AR/VR</button>
+                    </div>
+                </div>
+
+                <div class="output-container">
+                    <div class="output-content" id="outputContent"></div>
+                    <div class="viewer-container" id="viewerContainer">
+                        <div>3D/AR/VR Viewer - Pripravljeno za prikaz</div>
+                    </div>
+                    <div class="loading-overlay" id="loadingOverlay">
+                        <div class="spinner"></div>
+                        <div class="loading-text">Generiram vsebino...</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Hitri Ukazi</h3>
+                <div class="sidebar-section">
+                    <button class="btn btn-warning" onclick="clearOutput()">
+                        🗑️ Clear Output
+                    </button>
+                    <button class="btn btn-success" onclick="downloadResult('pdf')">
+                        📄 Download PDF
+                    </button>
+                    <button class="btn btn-success" onclick="downloadResult('docx')">
+                        📝 Download DOCX
+                    </button>
+                    <button class="btn btn-success" onclick="downloadResult('image')">
+                        🖼️ Download Slika
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Prednastavljeni Prompti</h3>
+                <div class="preset-prompts">
+                    <div class="preset-prompt" onclick="setPrompt('Ustvari poslovni načrt za tehnološki startup v Sloveniji')">
+                        💼 Poslovni načrt startup
+                    </div>
+                    <div class="preset-prompt" onclick="setPrompt('Analiziraj prodajne podatke in ustvari graf trendov')">
+                        📊 Analiza prodajnih podatkov
+                    </div>
+                    <div class="preset-prompt" onclick="setPrompt('Generiraj kreativno besedilo za marketing kampanjo')">
+                        ✍️ Marketing besedilo
+                    </div>
+                    <div class="preset-prompt" onclick="setPrompt('Ustvari 3D vizualizacijo arhitekturnega projekta')">
+                        🏗️ 3D arhitektura
+                    </div>
+                    <div class="preset-prompt" onclick="setPrompt('Pripravi učni načrt za programiranje v Pythonu')">
+                        🎓 Učni načrt Python
+                    </div>
+                    <div class="preset-prompt" onclick="setPrompt('Analiziraj finančne podatke in pripravi poročilo')">
+                        💰 Finančno poročilo
+                    </div>
+                    <div class="preset-prompt" onclick="setPrompt('Ustvari AR aplikacijo za prikaz produktov')">
+                        🥽 AR aplikacija
+                    </div>
+                    <div class="preset-prompt" onclick="setPrompt('Generiraj personalizirane priporočila za uporabnika')">
+                        🎯 Personalizacija
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Sistem Info</h3>
+                <div style="font-size: 0.9rem; color: #6c757d; line-height: 1.4;">
+                    <div>Status: <span id="systemStatus">Pripravljeno</span></div>
+                    <div>Zadnja aktivnost: <span id="lastActivity">-</span></div>
+                    <div>Generiranih: <span id="generatedCount">0</span></div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // Global variables
+        let isGenerating = false;
+        let currentView = 'text';
+        let generatedCount = 0;
+        let apiConnected = false;
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🧠 Omnia App Test Screen initialized');
+            checkApiConnection();
+            updateSystemInfo();
+            
+            // Set initial view
+            toggleView('text');
+            
+            // Auto-resize textarea
+            const textarea = document.getElementById('promptInput');
+            textarea.addEventListener('input', autoResize);
+        });
+
+        // API Connection Management
+        async function checkApiConnection() {
+            const statusElement = document.getElementById('apiStatus');
+            const indicator = statusElement.querySelector('.status-indicator');
+            const text = statusElement.querySelector('span');
+            
+            try {
+                const response = await fetch('/api/status');
+                if (response.ok) {
+                    apiConnected = true;
+                    statusElement.className = 'api-status connected';
+                    indicator.className = 'status-indicator connected';
+                    text.textContent = 'API Povezan';
+                } else {
+                    throw new Error('API not responding');
+                }
+            } catch (error) {
+                apiConnected = false;
+                statusElement.className = 'api-status disconnected';
+                indicator.className = 'status-indicator disconnected';
+                text.textContent = 'API Nedostopen';
+            }
+        }
+
+        async function testApiConnection() {
+            const btn = document.getElementById('testApiBtn');
+            btn.disabled = true;
+            btn.innerHTML = '🔄 Testiram...';
+            
+            await checkApiConnection();
+            
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = '🔗 Test API';
+                
+                if (apiConnected) {
+                    showNotification('API povezava uspešna!', 'success');
+                } else {
+                    showNotification('API povezava neuspešna!', 'error');
+                }
+            }, 1000);
+        }
+
+        // Content Generation
+        async function generateContent() {
+            const prompt = document.getElementById('promptInput').value.trim();
+            
+            if (!prompt) {
+                showNotification('Prosim vnesite prompt!', 'error');
+                return;
+            }
+
+            if (isGenerating) {
+                showNotification('Generiranje že poteka!', 'error');
+                return;
+            }
+
+            startGeneration();
+            
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        prompt: prompt,
+                        stream: true 
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Handle streaming response
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let result = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    
+                    if (done) break;
+                    
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n');
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.slice(6));
+                                if (data.content) {
+                                    result += data.content;
+                                    updateOutput(result);
+                                    updateProgress(data.progress || 0);
+                                }
+                            } catch (e) {
+                                // Ignore parsing errors for incomplete chunks
+                            }
+                        }
+                    }
+                }
+
+                finishGeneration(result);
+                
+            } catch (error) {
+                console.error('Generation error:', error);
+                showNotification('Napaka pri generiranju: ' + error.message, 'error');
+                finishGeneration('Napaka pri generiranju vsebine. Prosim preverite API povezavo.');
+            }
+        }
+
+        function startGeneration() {
+            isGenerating = true;
+            document.getElementById('generateBtn').disabled = true;
+            document.getElementById('generateBtn').innerHTML = '⏳ Generiram...';
+            document.getElementById('loadingOverlay').classList.add('active');
+            document.getElementById('systemStatus').textContent = 'Generiranje...';
+            updateProgress(0);
+        }
+
+        function finishGeneration(result) {
+            isGenerating = false;
+            document.getElementById('generateBtn').disabled = false;
+            document.getElementById('generateBtn').innerHTML = '🚀 Generiraj';
+            document.getElementById('loadingOverlay').classList.remove('active');
+            document.getElementById('systemStatus').textContent = 'Pripravljeno';
+            
+            generatedCount++;
+            updateSystemInfo();
+            updateProgress(100);
+            
+            setTimeout(() => {
+                updateProgress(0);
+            }, 2000);
+            
+            showNotification('Generiranje uspešno končano!', 'success');
+        }
+
+        function updateOutput(content) {
+            const outputElement = document.getElementById('outputContent');
+            
+            if (currentView === 'text') {
+                // Format text with basic markdown-like styling
+                const formattedContent = content
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/\n/g, '<br>');
+                
+                outputElement.innerHTML = formattedContent;
+            } else if (currentView === 'image') {
+                // Handle image content
+                if (content.includes('http') || content.includes('data:image')) {
+                    outputElement.innerHTML = `<img src="${content}" style="max-width: 100%; height: auto; border-radius: 8px;">`;
+                } else {
+                    outputElement.innerHTML = `<div style="text-align: center; padding: 40px; color: #6c757d;">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">🖼️</div>
+                        <div>Slika se generira...</div>
+                        <div style="margin-top: 10px; font-size: 0.9rem;">${content}</div>
+                    </div>`;
+                }
+            } else if (currentView === '3d') {
+                // Handle 3D/AR/VR content
+                outputElement.innerHTML = `<div style="text-align: center; padding: 40px; color: #6c757d;">
+                    <div style="font-size: 3rem; margin-bottom: 20px;">🥽</div>
+                    <div>3D/AR/VR vsebina se pripravlj...</div>
+                    <div style="margin-top: 10px; font-size: 0.9rem;">${content}</div>
+                </div>`;
+            }
+            
+            // Auto-scroll to bottom
+            outputElement.scrollTop = outputElement.scrollHeight;
+        }
+
+        function updateProgress(percentage) {
+            document.getElementById('progressBar').style.width = percentage + '%';
+        }
+
+        // View Management
+        function toggleView(viewType) {
+            currentView = viewType;
+            
+            // Update toggle buttons
+            document.querySelectorAll('.toggle-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            if (viewType === 'text') {
+                document.getElementById('textToggle').classList.add('active');
+                document.getElementById('viewerContainer').classList.remove('active');
+            } else if (viewType === 'image') {
+                document.getElementById('imageToggle').classList.add('active');
+                document.getElementById('viewerContainer').classList.remove('active');
+            } else if (viewType === '3d') {
+                document.getElementById('vrToggle').classList.add('active');
+                document.getElementById('viewerContainer').classList.add('active');
+            }
+        }
+
+        // Utility Functions
+        function setPrompt(prompt) {
+            document.getElementById('promptInput').value = prompt;
+            autoResize();
+            showNotification('Prompt nastavljen!', 'info');
+        }
+
+        function clearInput() {
+            document.getElementById('promptInput').value = '';
+            autoResize();
+        }
+
+        function clearOutput() {
+            document.getElementById('outputContent').innerHTML = '';
+            showNotification('Output počiščen!', 'info');
+        }
+
+        function resetSession() {
+            clearInput();
+            clearOutput();
+            generatedCount = 0;
+            updateSystemInfo();
+            updateProgress(0);
+            showNotification('Session resetiran!', 'info');
+        }
+
+        function autoResize() {
+            const textarea = document.getElementById('promptInput');
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.max(120, textarea.scrollHeight) + 'px';
+        }
+
+        function updateSystemInfo() {
+            document.getElementById('lastActivity').textContent = new Date().toLocaleTimeString('sl-SI');
+            document.getElementById('generatedCount').textContent = generatedCount;
+        }
+
+        // Download Functions
+        async function downloadResult(format) {
+            const content = document.getElementById('outputContent').textContent || document.getElementById('outputContent').innerText;
+            
+            if (!content || content.trim() === '') {
+                showNotification('Ni vsebine za prenos!', 'error');
+                return;
+            }
+
+            try {
+                if (format === 'pdf') {
+                    await downloadAsPDF(content);
+                } else if (format === 'docx') {
+                    await downloadAsDOCX(content);
+                } else if (format === 'image') {
+                    await downloadAsImage(content);
+                }
+                
+                showNotification(`Datoteka prenesena kot ${format.toUpperCase()}!`, 'success');
+            } catch (error) {
+                showNotification('Napaka pri prenosu: ' + error.message, 'error');
+            }
+        }
+
+        async function downloadAsPDF(content) {
+            // Simple PDF generation using browser print
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Omnia App - Rezultat</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; }
+                            h1 { color: #667eea; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>Omnia App - Generirani Rezultat</h1>
+                        <div>${content}</div>
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        async function downloadAsDOCX(content) {
+            // Create a simple HTML file that can be opened in Word
+            const blob = new Blob([`
+                <html>
+                    <head>
+                        <meta charset="utf-8">
+                        <title>Omnia App - Rezultat</title>
+                    </head>
+                    <body>
+                        <h1>Omnia App - Generirani Rezultat</h1>
+                        <div>${content}</div>
+                    </body>
+                </html>
+            `], { type: 'application/msword' });
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'omnia-rezultat.doc';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        async function downloadAsImage(content) {
+            // Create canvas with text content
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = 800;
+            canvas.height = 600;
+            
+            // White background
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Text content
+            ctx.fillStyle = 'black';
+            ctx.font = '16px Arial';
+            
+            const lines = content.split('\n');
+            let y = 50;
+            
+            lines.forEach(line => {
+                if (y < canvas.height - 20) {
+                    ctx.fillText(line.substring(0, 80), 20, y);
+                    y += 25;
+                }
+            });
+            
+            // Download
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'omnia-rezultat.png';
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            // Hide notification
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + Enter to generate
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                generateContent();
+            }
+            
+            // Ctrl/Cmd + L to clear output
+            if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
+                e.preventDefault();
+                clearOutput();
+            }
+            
+            // Ctrl/Cmd + R to reset session
+            if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+                e.preventDefault();
+                resetSession();
+            }
+        });
+
+        // Auto-check API connection every 30 seconds
+        setInterval(checkApiConnection, 30000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniCore Global Platform</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-brain"></i>
+                <h1>OmniCore Global</h1>
+            </div>
+            <nav class="nav">
+                <button class="nav-btn active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </button>
+                <button class="nav-btn" data-section="modules">
+                    <i class="fas fa-cubes"></i> Moduli
+                </button>
+                <button class="nav-btn" data-section="analytics">
+                    <i class="fas fa-chart-line"></i> Analitika
+                </button>
+                <button class="nav-btn" data-section="settings">
+                    <i class="fas fa-cog"></i> Nastavitve
+                </button>
+            </nav>
+            <div class="user-info">
+                <span id="tenant-name">Default Tenant</span>
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <div class="section-header">
+                <h2><i class="fas fa-tachometer-alt"></i> Glavni Dashboard</h2>
+                <div class="status-indicator">
+                    <span class="status-dot online"></span>
+                    <span>Sistem aktiven</span>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon finance">
+                        <i class="fas fa-euro-sign"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="total-revenue">€0</h3>
+                        <p>Skupni prihodki</p>
+                        <span class="stat-change positive">+12.5%</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon analytics">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="total-requests">0</h3>
+                        <p>Skupne zahteve</p>
+                        <span class="stat-change positive">+8.3%</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon task">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="active-tasks">0</h3>
+                        <p>Aktivne naloge</p>
+                        <span class="stat-change neutral">0%</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon logistics">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="active-shipments">0</h3>
+                        <p>Aktivne pošiljke</p>
+                        <span class="stat-change positive">+5.2%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="charts-row">
+                <div class="chart-container">
+                    <h3><i class="fas fa-line-chart"></i> Trend prihodkov</h3>
+                    <canvas id="revenueChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3><i class="fas fa-pie-chart"></i> Porazdelitev modulov</h3>
+                    <canvas id="moduleChart"></canvas>
+                </div>
+            </div>
+
+            <!-- AI Query Interface -->
+            <div class="ai-interface">
+                <h3><i class="fas fa-robot"></i> AI Pomočnik</h3>
+                <div class="query-container">
+                    <input type="text" id="ai-query" placeholder="Vprašajte karkoli o vašem poslovanju..." />
+                    <button id="send-query" class="btn-primary">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div id="ai-response" class="ai-response"></div>
+            </div>
+        </section>
+
+        <!-- Modules Section -->
+        <section id="modules" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-cubes"></i> Moduli</h2>
+                <button class="btn-primary" id="refresh-modules">
+                    <i class="fas fa-sync-alt"></i> Osveži
+                </button>
+            </div>
+
+            <div class="modules-grid" id="modules-grid">
+                <!-- Moduli se naložijo dinamično -->
+            </div>
+        </section>
+
+        <!-- Analytics Section -->
+        <section id="analytics" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-line"></i> Analitika</h2>
+                <div class="date-range">
+                    <input type="date" id="start-date" />
+                    <input type="date" id="end-date" />
+                    <button class="btn-secondary" id="apply-filter">Uporabi</button>
+                </div>
+            </div>
+
+            <div class="analytics-content">
+                <div class="analytics-cards">
+                    <div class="analytics-card">
+                        <h4>Povprečni odzivni čas</h4>
+                        <div class="metric" id="avg-response-time">0ms</div>
+                    </div>
+                    <div class="analytics-card">
+                        <h4>Uspešnost zahtev</h4>
+                        <div class="metric" id="success-rate">0%</div>
+                    </div>
+                    <div class="analytics-card">
+                        <h4>Najbolj uporabljeni modul</h4>
+                        <div class="metric" id="top-module">-</div>
+                    </div>
+                </div>
+
+                <div class="analytics-chart">
+                    <canvas id="analyticsChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="settings" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-cog"></i> Nastavitve</h2>
+            </div>
+
+            <div class="settings-content">
+                <div class="settings-group">
+                    <h3>Sistem</h3>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="debug-mode" />
+                            Debug način
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="auto-refresh" checked />
+                            Avtomatsko osvežitev
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Moduli</h3>
+                    <div id="module-settings">
+                        <!-- Nastavitve modulov se naložijo dinamično -->
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Tenant</h3>
+                    <div class="setting-item">
+                        <label for="tenant-id">Tenant ID:</label>
+                        <input type="text" id="tenant-id" value="default" />
+                    </div>
+                    <button class="btn-primary" id="save-settings">
+                        <i class="fas fa-save"></i> Shrani
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loading" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Nalagam...</p>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notifications" class="notifications"></div>
+
+    <!-- Scripts -->
+    <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniBot - Vizualna Shema & Workflow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a2332 50%, #2d3748 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: auto;
+        }
+
+        .schema-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .schema-header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .schema-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+
+        .schema-subtitle {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        .workflow-layer {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            position: relative;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .workflow-layer:hover {
+            border-color: rgba(0, 255, 136, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
+        }
+
+        .layer-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 15px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .layer-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .ui-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .control-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .control-item:hover {
+            border-color: #00ff88;
+            transform: scale(1.05);
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .control-item.active {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.2);
+        }
+
+        .control-item.status-red {
+            border-color: #ff4444;
+            background: rgba(255, 68, 68, 0.1);
+        }
+
+        .control-item.status-yellow {
+            border-color: #ffaa00;
+            background: rgba(255, 170, 0, 0.1);
+        }
+
+        .control-item.status-green {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .control-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .control-label {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .backend-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid #0088ff;
+        }
+
+        .feature-title {
+            font-weight: bold;
+            color: #0088ff;
+            margin-bottom: 8px;
+        }
+
+        .feature-description {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .module-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .module-card:hover::before {
+            left: 100%;
+        }
+
+        .module-card:hover {
+            border-color: #00ff88;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 255, 136, 0.3);
+        }
+
+        .module-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .module-name {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #00ff88;
+        }
+
+        .module-description {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+
+        .module-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+
+        .status-warning {
+            background: rgba(255, 170, 0, 0.2);
+            color: #ffaa00;
+        }
+
+        .status-error {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+        }
+
+        .logging-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .log-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 15px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 2px 0;
+        }
+
+        .log-success { color: #00ff88; }
+        .log-warning { color: #ffaa00; }
+        .log-error { color: #ff4444; }
+        .log-info { color: #0088ff; }
+
+        .simulation-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .simulation-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .sim-button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-test {
+            background: linear-gradient(45deg, #0088ff, #0066cc);
+            color: #fff;
+        }
+
+        .btn-fix {
+            background: linear-gradient(45deg, #00ff88, #00cc66);
+            color: #000;
+        }
+
+        .btn-log {
+            background: linear-gradient(45deg, #ffaa00, #ff8800);
+            color: #000;
+        }
+
+        .btn-upgrade {
+            background: linear-gradient(45deg, #ff44aa, #cc2288);
+            color: #fff;
+        }
+
+        .sim-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .gpt-integration {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .gpt-feature {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #ff44aa;
+        }
+
+        .gpt-icon {
+            font-size: 24px;
+            color: #ff44aa;
+            margin-bottom: 10px;
+        }
+
+        .gpt-title {
+            font-weight: bold;
+            color: #ff44aa;
+            margin-bottom: 8px;
+        }
+
+        .connection-line {
+            position: absolute;
+            background: linear-gradient(90deg, #00ff88, #0088ff);
+            height: 3px;
+            z-index: 10;
+            border-radius: 2px;
+            animation: pulse-line 2s infinite;
+        }
+
+        @keyframes pulse-line {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .workflow-arrow {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: -15px;
+            font-size: 24px;
+            color: #00ff88;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .indicator-green { background: #00ff88; }
+        .indicator-yellow { background: #ffaa00; }
+        .indicator-red { background: #ff4444; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .workflow-description {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .description-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 15px;
+        }
+
+        .workflow-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .workflow-step {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid #0088ff;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: #0088ff;
+            color: #fff;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .step-text {
+            display: inline-block;
+            vertical-align: top;
+            width: calc(100% - 34px);
+            font-size: 13px;
+        }
+
+        @media (max-width: 768px) {
+            .schema-container {
+                padding: 10px;
+            }
+            
+            .modules-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .logging-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .ui-controls {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="schema-container">
+        <!-- Header -->
+        <div class="schema-header">
+            <div class="schema-title">🤖 OmniBot - Vizualna Shema & Workflow</div>
+            <div class="schema-subtitle">Kompletni prototip z modularno arhitekturo in GPT integracijo</div>
+        </div>
+
+        <!-- USER INTERFACE Layer -->
+        <div class="workflow-layer" id="uiLayer">
+            <div class="status-indicator indicator-green"></div>
+            <div class="layer-title">👤 USER INTERFACE</div>
+            <div class="layer-content">
+                <div class="ui-controls">
+                    <div class="control-item status-green" onclick="runSystemAction('status')">
+                        <span class="control-icon">🟢</span>
+                        <div class="control-label">Status Modulov<br><small>Zelena / Rumena / Rdeča</small></div>
+                    </div>
+                    <div class="control-item" onclick="runSystemAction('fix')">
+                        <span class="control-icon">🔧</span>
+                        <div class="control-label">Run Fix</div>
+                    </div>
+                    <div class="control-item" onclick="runSystemAction('test')">
+                        <span class="control-icon">🧪</span>
+                        <div class="control-label">Test All</div>
+                    </div>
+                    <div class="control-item" onclick="runSystemAction('log')">
+                        <span class="control-icon">📋</span>
+                        <div class="control-label">Prikaži Log</div>
+                    </div>
+                    <div class="control-item" onclick="runSystemAction('upgrade')">
+                        <span class="control-icon">⬆️</span>
+                        <div class="control-label">Nadgradnje</div>
+                    </div>
+                    <div class="control-item" onclick="runSystemAction('roadmap')">
+                        <span class="control-icon">🗺️</span>
+                        <div class="control-label">Vizualni Roadmap<br><small>Povezave med moduli</small></div>
+                    </div>
+                </div>
+            </div>
+            <div class="workflow-arrow">⬇️</div>
+        </div>
+
+        <!-- BACKEND Layer -->
+        <div class="workflow-layer" id="backendLayer">
+            <div class="status-indicator indicator-green"></div>
+            <div class="layer-title">⚙️ BACKEND</div>
+            <div class="layer-content">
+                <div class="backend-features">
+                    <div class="feature-card">
+                        <div class="feature-title">🎛️ Upravljanje Modulov</div>
+                        <div class="feature-description">Dinamično upravljanje in koordinacija vseh sistemskih modulov</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-title">👂 Event Listenerji</div>
+                        <div class="feature-description">Real-time monitoring in odzivanje na sistemske dogodke</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-title">🔧 Samodejne Self-Fix Simulacije</div>
+                        <div class="feature-description">Avtomatsko zaznavanje in popravljanje sistemskih napak</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-title">📊 Beleženje Logov</div>
+                        <div class="feature-description">Celovito beleženje in generiranje sistemskih statusov</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-title">🤖 GPT / AI Povezava</div>
+                        <div class="feature-description">Pripravljena integracija z AI moduli za napredne funkcionalnosti</div>
+                    </div>
+                </div>
+            </div>
+            <div class="workflow-arrow">⬇️</div>
+        </div>
+
+        <!-- MODULES Layer -->
+        <div class="workflow-layer" id="modulesLayer">
+            <div class="status-indicator indicator-yellow"></div>
+            <div class="layer-title">🔧 SISTEMSKI MODULI</div>
+            <div class="layer-content">
+                <div class="modules-grid">
+                    <div class="module-card" onclick="showModuleDetails('iot')">
+                        <span class="module-icon">🌐</span>
+                        <div class="module-name">Modul A - IoT Naprave</div>
+                        <div class="module-description">API + funkcije<br>Samodejni fix</div>
+                        <div class="module-status status-active">Aktiven</div>
+                    </div>
+                    <div class="module-card" onclick="showModuleDetails('industry')">
+                        <span class="module-icon">🏭</span>
+                        <div class="module-name">Modul B - Industrija</div>
+                        <div class="module-description">API + funkcije<br>Samodejni fix</div>
+                        <div class="module-status status-warning">Opozorilo</div>
+                    </div>
+                    <div class="module-card" onclick="showModuleDetails('agriculture')">
+                        <span class="module-icon">🌾</span>
+                        <div class="module-name">Modul C - Kmetijstvo</div>
+                        <div class="module-description">API + funkcije<br>Samodejni fix</div>
+                        <div class="module-status status-active">Aktiven</div>
+                    </div>
+                    <div class="module-card" onclick="showModuleDetails('healthcare')">
+                        <span class="module-icon">🏥</span>
+                        <div class="module-name">Modul D - Zdravstvo</div>
+                        <div class="module-description">API + funkcije<br>Samodejni fix</div>
+                        <div class="module-status status-active">Aktiven</div>
+                    </div>
+                </div>
+            </div>
+            <div class="workflow-arrow">⬇️</div>
+        </div>
+
+        <!-- LOGGING & SIMULATION Layer -->
+        <div class="workflow-layer" id="loggingLayer">
+            <div class="status-indicator indicator-green"></div>
+            <div class="layer-title">📊 LOGGING & SIMULATION</div>
+            <div class="layer-content">
+                <div class="logging-section">
+                    <div class="log-panel" id="systemLogs">
+                        <div class="log-entry log-success">[14:32:15] ✅ Sistem uspešno inicializiran</div>
+                        <div class="log-entry log-info">[14:32:16] ℹ️ Moduli naloženi (4/4)</div>
+                        <div class="log-entry log-success">[14:32:17] ✅ IoT modul aktiven</div>
+                        <div class="log-entry log-warning">[14:32:18] ⚠️ Industrija modul - nizka performanca</div>
+                        <div class="log-entry log-success">[14:32:19] ✅ Kmetijstvo modul optimiziran</div>
+                        <div class="log-entry log-success">[14:32:20] ✅ Zdravstvo modul sinhroniziran</div>
+                        <div class="log-entry log-info">[14:32:21] ℹ️ GPT integracija pripravljena</div>
+                        <div class="log-entry log-success">[14:32:22] ✅ Vsi testi uspešno zaključeni</div>
+                    </div>
+                    <div class="simulation-panel">
+                        <div class="simulation-controls">
+                            <button class="sim-button btn-test" onclick="runSimulation('test')">🧪 Test All</button>
+                            <button class="sim-button btn-fix" onclick="runSimulation('fix')">🔧 Run Fix</button>
+                            <button class="sim-button btn-log" onclick="runSimulation('log')">📋 Show Logs</button>
+                            <button class="sim-button btn-upgrade" onclick="runSimulation('upgrade')">⬆️ Upgrade</button>
+                        </div>
+                        <div style="font-size: 12px; opacity: 0.8;">
+                            <strong>Funkcionalnosti:</strong><br>
+                            • Test All: preveri vse module in workflow<br>
+                            • Logi: napake, popravki, statusi<br>
+                            • Vizualna poročila: stanje sistema<br>
+                            • Predlogi za nadgradnje in GPT integracije
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="workflow-arrow">⬇️</div>
+        </div>
+
+        <!-- GPT / AI INTEGRATION Layer -->
+        <div class="workflow-layer" id="gptLayer">
+            <div class="status-indicator indicator-yellow"></div>
+            <div class="layer-title">🤖 GPT / AI INTEGRATION</div>
+            <div class="layer-content">
+                <div class="gpt-integration">
+                    <div class="gpt-feature">
+                        <div class="gpt-icon">🧠</div>
+                        <div class="gpt-title">Inteligentno Generiranje Navodil</div>
+                        <div class="feature-description">AI ustvarja personalizirana navodila in priporočila na podlagi konteksta</div>
+                    </div>
+                    <div class="gpt-feature">
+                        <div class="gpt-icon">⚡</div>
+                        <div class="gpt-title">Predlogi Optimizacij</div>
+                        <div class="feature-description">Avtomatsko identificiranje in predlaganje sistemskih izboljšav</div>
+                    </div>
+                    <div class="gpt-feature">
+                        <div class="gpt-icon">📚</div>
+                        <div class="gpt-title">Samoučenje</div>
+                        <div class="feature-description">Dinamično učenje iz uporabniških interakcij in sistemskih podatkov</div>
+                    </div>
+                    <div class="gpt-feature">
+                        <div class="gpt-icon">🔄</div>
+                        <div class="gpt-title">Dinamično Dodajanje Modulov</div>
+                        <div class="feature-description">Avtomatsko ustvarjanje novih modulov na podlagi potreb</div>
+                    </div>
+                    <div class="gpt-feature">
+                        <div class="gpt-icon">💬</div>
+                        <div class="gpt-title">Interaktivna Komunikacija</div>
+                        <div class="feature-description">Naravna komunikacija z uporabnikom preko AI asistenta</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workflow Description -->
+        <div class="workflow-description">
+            <div class="description-title">📋 Opis Workflow-a</div>
+            <div class="workflow-steps">
+                <div class="workflow-step">
+                    <span class="step-number">1</span>
+                    <div class="step-text">Uporabnik preko UI klikne "Run Fix" ali "Test All"</div>
+                </div>
+                <div class="workflow-step">
+                    <span class="step-number">2</span>
+                    <div class="step-text">Backend posreduje ukaze modulom, vodi event listenerje, beleži loge in sproži simulacije</div>
+                </div>
+                <div class="workflow-step">
+                    <span class="step-number">3</span>
+                    <div class="step-text">Moduli izvršijo svoje funkcije, samodejno popravijo napake ali optimizirajo procese</div>
+                </div>
+                <div class="workflow-step">
+                    <span class="step-number">4</span>
+                    <div class="step-text">Log & Simulation preverja stanje vseh modulov, generira poročila in loge</div>
+                </div>
+                <div class="workflow-step">
+                    <span class="step-number">5</span>
+                    <div class="step-text">GPT / AI Integration predlaga izboljšave, optimizira workflow in omogoča samoučenje</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // OmniBot Visual Schema System
+        class OmniBotVisualSchema {
+            constructor() {
+                this.modules = {
+                    iot: { name: 'IoT Naprave', status: 'active', health: 95, api: 'connected' },
+                    industry: { name: 'Industrija', status: 'warning', health: 72, api: 'limited' },
+                    agriculture: { name: 'Kmetijstvo', status: 'active', health: 88, api: 'connected' },
+                    healthcare: { name: 'Zdravstvo', status: 'active', health: 91, api: 'connected' }
+                };
+                
+                this.logs = [];
+                this.isRunning = false;
+                
+                this.initialize();
+            }
+
+            initialize() {
+                this.addLog('success', 'OmniBot Visual Schema inicializiran');
+                this.startSystemMonitoring();
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                // Add click listeners for interactive elements
+                document.querySelectorAll('.control-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        this.highlightActiveControl(item);
+                    });
+                });
+
+                document.querySelectorAll('.module-card').forEach(card => {
+                    card.addEventListener('mouseenter', () => {
+                        this.highlightModuleConnections(card);
+                    });
+                    
+                    card.addEventListener('mouseleave', () => {
+                        this.clearHighlights();
+                    });
+                });
+            }
+
+            highlightActiveControl(activeItem) {
+                document.querySelectorAll('.control-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                activeItem.classList.add('active');
+                
+                setTimeout(() => {
+                    activeItem.classList.remove('active');
+                }, 2000);
+            }
+
+            highlightModuleConnections(moduleCard) {
+                // Visual feedback for module connections
+                moduleCard.style.boxShadow = '0 0 20px rgba(0, 255, 136, 0.5)';
+                
+                // Highlight related workflow layers
+                const layers = document.querySelectorAll('.workflow-layer');
+                layers.forEach(layer => {
+                    layer.style.borderColor = 'rgba(0, 255, 136, 0.4)';
+                });
+            }
+
+            clearHighlights() {
+                document.querySelectorAll('.module-card').forEach(card => {
+                    card.style.boxShadow = '';
+                });
+                
+                document.querySelectorAll('.workflow-layer').forEach(layer => {
+                    layer.style.borderColor = 'rgba(0, 255, 136, 0.3)';
+                });
+            }
+
+            startSystemMonitoring() {
+                setInterval(() => {
+                    this.updateSystemStatus();
+                    this.simulateSystemActivity();
+                }, 3000);
+            }
+
+            updateSystemStatus() {
+                // Update module health randomly
+                Object.keys(this.modules).forEach(key => {
+                    const module = this.modules[key];
+                    const healthChange = (Math.random() - 0.5) * 4;
+                    module.health = Math.max(60, Math.min(100, module.health + healthChange));
+                    
+                    // Update status based on health
+                    if (module.health > 85) {
+                        module.status = 'active';
+                    } else if (module.health > 70) {
+                        module.status = 'warning';
+                    } else {
+                        module.status = 'error';
+                    }
+                });
+
+                // Update UI indicators
+                this.updateStatusIndicators();
+            }
+
+            updateStatusIndicators() {
+                const avgHealth = Object.values(this.modules).reduce((sum, m) => sum + m.health, 0) / Object.keys(this.modules).length;
+                
+                // Update layer indicators
+                const indicators = {
+                    'uiLayer': avgHealth > 80 ? 'green' : avgHealth > 60 ? 'yellow' : 'red',
+                    'backendLayer': avgHealth > 75 ? 'green' : 'yellow',
+                    'modulesLayer': avgHealth > 70 ? 'green' : avgHealth > 50 ? 'yellow' : 'red',
+                    'loggingLayer': 'green',
+                    'gptLayer': 'yellow' // Simulated as not fully active
+                };
+
+                Object.entries(indicators).forEach(([layerId, status]) => {
+                    const indicator = document.querySelector(`#${layerId} .status-indicator`);
+                    if (indicator) {
+                        indicator.className = `status-indicator indicator-${status}`;
+                    }
+                });
+            }
+
+            simulateSystemActivity() {
+                const activities = [
+                    { type: 'success', message: 'Modul sinhronizacija uspešna' },
+                    { type: 'info', message: 'API povezava preverjena' },
+                    { type: 'success', message: 'Samodejno popravilo izvedeno' },
+                    { type: 'warning', message: 'Performančno opozorilo zaznano' },
+                    { type: 'info', message: 'GPT analiza v teku' },
+                    { type: 'success', message: 'Workflow optimizacija zaključena' }
+                ];
+
+                if (Math.random() < 0.3) {
+                    const activity = activities[Math.floor(Math.random() * activities.length)];
+                    this.addLog(activity.type, activity.message);
+                }
+            }
+
+            addLog(level, message) {
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = { timestamp, level, message };
+                
+                this.logs.push(logEntry);
+                if (this.logs.length > 20) {
+                    this.logs = this.logs.slice(-20);
+                }
+
+                // Update UI log
+                const logContainer = document.getElementById('systemLogs');
+                if (logContainer) {
+                    const logDiv = document.createElement('div');
+                    logDiv.className = `log-entry log-${level}`;
+                    
+                    const icon = level === 'success' ? '✅' : level === 'warning' ? '⚠️' : level === 'error' ? '❌' : 'ℹ️';
+                    logDiv.innerHTML = `[${timestamp}] ${icon} ${message}`;
+                    
+                    logContainer.appendChild(logDiv);
+                    logContainer.scrollTop = logContainer.scrollHeight;
+                    
+                    // Keep only last 10 entries visible
+                    while (logContainer.children.length > 10) {
+                        logContainer.removeChild(logContainer.firstChild);
+                    }
+                }
+            }
+        }
+
+        // Global functions for UI interactions
+        function runSystemAction(action) {
+            const actionMessages = {
+                'status': 'Preverjam status vseh modulov...',
+                'fix': 'Izvajam samodejne popravke...',
+                'test': 'Testiram vse module in povezave...',
+                'log': 'Prikazujem sistemske loge...',
+                'upgrade': 'Preverjam možne nadgradnje...',
+                'roadmap': 'Prikazujem vizualni roadmap...'
+            };
+
+            if (window.visualSchema) {
+                window.visualSchema.addLog('info', actionMessages[action] || `Izvajam akcijo: ${action}`);
+                
+                setTimeout(() => {
+                    window.visualSchema.addLog('success', `Akcija "${action}" uspešno zaključena`);
+                }, 2000);
+            }
+        }
+
+        function runSimulation(type) {
+            const simMessages = {
+                'test': 'Zagon celotnega sistemskega testiranja...',
+                'fix': 'Zagon avtomatskih popravil...',
+                'log': 'Generiranje podrobnih logov...',
+                'upgrade': 'Iskanje možnih nadgradenj...'
+            };
+
+            if (window.visualSchema) {
+                window.visualSchema.addLog('info', simMessages[type] || `Simulacija: ${type}`);
+                
+                setTimeout(() => {
+                    window.visualSchema.addLog('success', `Simulacija "${type}" zaključena`);
+                }, 1500);
+            }
+        }
+
+        function showModuleDetails(moduleId) {
+            if (window.visualSchema && window.visualSchema.modules[moduleId]) {
+                const module = window.visualSchema.modules[moduleId];
+                window.visualSchema.addLog('info', `Pregled modula: ${module.name} (Zdravje: ${Math.round(module.health)}%)`);
+            }
+        }
+
+        // Initialize the visual schema system
+        document.addEventListener('DOMContentLoaded', () => {
+            window.visualSchema = new OmniBotVisualSchema();
+        });
+    </script>
+</body>
+</html>

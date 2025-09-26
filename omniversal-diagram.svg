@@ -1,0 +1,167 @@
+<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="centralGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#764ba2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f093fb;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="nodeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4facfe;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#00f2fe;stop-opacity:0.8" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="800" fill="url(#centralGradient)" opacity="0.1"/>
+  
+  <!-- Central OMNIVERSAL Core -->
+  <circle cx="600" cy="400" r="80" fill="url(#centralGradient)" filter="url(#glow)" opacity="0.9"/>
+  <text x="600" y="395" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white">OMNIVERSAL</text>
+  <text x="600" y="415" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">Univerzalni Sistem</text>
+  
+  <!-- Connection Lines (animated) -->
+  <g stroke="rgba(255,255,255,0.6)" stroke-width="2" fill="none">
+    <!-- Personal Devices -->
+    <line x1="600" y1="400" x2="200" y2="150">
+      <animate attributeName="stroke-dasharray" values="0,10;10,0;0,10" dur="3s" repeatCount="indefinite"/>
+    </line>
+    
+    <!-- Industrial Systems -->
+    <line x1="600" y1="400" x2="1000" y2="150">
+      <animate attributeName="stroke-dasharray" values="0,10;10,0;0,10" dur="3s" repeatCount="indefinite"/>
+    </line>
+    
+    <!-- Medical Systems -->
+    <line x1="600" y1="400" x2="150" y2="400">
+      <animate attributeName="stroke-dasharray" values="0,10;10,0;0,10" dur="3s" repeatCount="indefinite"/>
+    </line>
+    
+    <!-- Agriculture -->
+    <line x1="600" y1="400" x2="1050" y2="400">
+      <animate attributeName="stroke-dasharray" values="0,10;10,0;0,10" dur="3s" repeatCount="indefinite"/>
+    </line>
+    
+    <!-- Business & Finance -->
+    <line x1="600" y1="400" x2="200" y2="650">
+      <animate attributeName="stroke-dasharray" values="0,10;10,0;0,10" dur="3s" repeatCount="indefinite"/>
+    </line>
+    
+    <!-- Education -->
+    <line x1="600" y1="400" x2="1000" y2="650">
+      <animate attributeName="stroke-dasharray" values="0,10;10,0;0,10" dur="3s" repeatCount="indefinite"/>
+    </line>
+    
+    <!-- Creative Arts -->
+    <line x1="600" y1="400" x2="400" y2="200">
+      <animate attributeName="stroke-dasharray" values="0,10;10,0;0,10" dur="3s" repeatCount="indefinite"/>
+    </line>
+    
+    <!-- Science & Research -->
+    <line x1="600" y1="400" x2="800" y2="200">
+      <animate attributeName="stroke-dasharray" values="0,10;10,0;0,10" dur="3s" repeatCount="indefinite"/>
+    </line>
+    
+    <!-- Social Interaction -->
+    <line x1="600" y1="400" x2="400" y2="600">
+      <animate attributeName="stroke-dasharray" values="0,10;10,0;0,10" dur="3s" repeatCount="indefinite"/>
+    </line>
+    
+    <!-- Future Technologies -->
+    <line x1="600" y1="400" x2="800" y2="600">
+      <animate attributeName="stroke-dasharray" values="0,10;10,0;0,10" dur="3s" repeatCount="indefinite"/>
+    </line>
+  </g>
+  
+  <!-- Category Nodes -->
+  
+  <!-- Personal Devices -->
+  <circle cx="200" cy="150" r="50" fill="url(#nodeGradient)" opacity="0.8"/>
+  <text x="200" y="145" text-anchor="middle" font-family="Arial, sans-serif" font-size="20">📱</text>
+  <text x="200" y="160" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">Osebne Naprave</text>
+  
+  <!-- Industrial Systems -->
+  <circle cx="1000" cy="150" r="50" fill="url(#nodeGradient)" opacity="0.8"/>
+  <text x="1000" y="145" text-anchor="middle" font-family="Arial, sans-serif" font-size="20">🏭</text>
+  <text x="1000" y="160" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">Industrijski Sistemi</text>
+  
+  <!-- Medical Systems -->
+  <circle cx="150" cy="400" r="50" fill="url(#nodeGradient)" opacity="0.8"/>
+  <text x="150" y="395" text-anchor="middle" font-family="Arial, sans-serif" font-size="20">🏥</text>
+  <text x="150" y="410" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">Medicinski Sistemi</text>
+  
+  <!-- Agriculture -->
+  <circle cx="1050" cy="400" r="50" fill="url(#nodeGradient)" opacity="0.8"/>
+  <text x="1050" y="395" text-anchor="middle" font-family="Arial, sans-serif" font-size="20">🌾</text>
+  <text x="1050" y="410" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">Kmetijstvo</text>
+  
+  <!-- Business & Finance -->
+  <circle cx="200" cy="650" r="50" fill="url(#nodeGradient)" opacity="0.8"/>
+  <text x="200" y="645" text-anchor="middle" font-family="Arial, sans-serif" font-size="20">💼</text>
+  <text x="200" y="660" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">Poslovanje</text>
+  
+  <!-- Education -->
+  <circle cx="1000" cy="650" r="50" fill="url(#nodeGradient)" opacity="0.8"/>
+  <text x="1000" y="645" text-anchor="middle" font-family="Arial, sans-serif" font-size="20">🎓</text>
+  <text x="1000" y="660" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">Izobraževanje</text>
+  
+  <!-- Creative Arts -->
+  <circle cx="400" cy="200" r="50" fill="url(#nodeGradient)" opacity="0.8"/>
+  <text x="400" y="195" text-anchor="middle" font-family="Arial, sans-serif" font-size="20">🎨</text>
+  <text x="400" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">Umetnost</text>
+  
+  <!-- Science & Research -->
+  <circle cx="800" cy="200" r="50" fill="url(#nodeGradient)" opacity="0.8"/>
+  <text x="800" y="195" text-anchor="middle" font-family="Arial, sans-serif" font-size="20">🔬</text>
+  <text x="800" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">Znanost</text>
+  
+  <!-- Social Interaction -->
+  <circle cx="400" cy="600" r="50" fill="url(#nodeGradient)" opacity="0.8"/>
+  <text x="400" y="595" text-anchor="middle" font-family="Arial, sans-serif" font-size="20">👥</text>
+  <text x="400" y="610" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">Socialna Interakcija</text>
+  
+  <!-- Future Technologies -->
+  <circle cx="800" cy="600" r="50" fill="url(#nodeGradient)" opacity="0.8"/>
+  <text x="800" y="595" text-anchor="middle" font-family="Arial, sans-serif" font-size="20">🚀</text>
+  <text x="800" y="610" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">Futuristične Tehnologije</text>
+  
+  <!-- Data Flow Indicators -->
+  <g fill="rgba(255,255,255,0.8)" font-family="Arial, sans-serif" font-size="8">
+    <!-- Bidirectional arrows -->
+    <text x="400" y="300" text-anchor="middle">⟷ Dvosmerni podatkovni tok</text>
+    <text x="800" y="300" text-anchor="middle">⟷ Samodejno učenje</text>
+    <text x="400" y="500" text-anchor="middle">⟷ Optimizacija v realnem času</text>
+    <text x="800" y="500" text-anchor="middle">⟷ Avtonomno upravljanje</text>
+  </g>
+  
+  <!-- Legend -->
+  <g transform="translate(50, 50)">
+    <rect x="0" y="0" width="300" height="120" fill="rgba(0,0,0,0.7)" rx="10"/>
+    <text x="10" y="20" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">OMNIVERSAL - Sistemska Arhitektura</text>
+    <text x="10" y="40" font-family="Arial, sans-serif" font-size="10" fill="white">🔵 Centralni univerzalni sistem</text>
+    <text x="10" y="55" font-family="Arial, sans-serif" font-size="10" fill="white">🔵 Specializirane kategorije funkcionalnosti</text>
+    <text x="10" y="70" font-family="Arial, sans-serif" font-size="10" fill="white">⟷ Dvosmerni podatkovni tok in komunikacija</text>
+    <text x="10" y="85" font-family="Arial, sans-serif" font-size="10" fill="white">✨ Samodejno učenje in prilagajanje</text>
+    <text x="10" y="100" font-family="Arial, sans-serif" font-size="10" fill="white">🔄 Avtonomno upravljanje in optimizacija</text>
+  </g>
+  
+  <!-- Title -->
+  <text x="600" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white">
+    OMNIVERSAL - Ena aplikacija za vse
+  </text>
+  <text x="600" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="rgba(255,255,255,0.8)">
+    Popolnoma avtonomen, univerzalen, vsestranski, samoučeč in vseobsegajoč sistem
+  </text>
+  
+  <!-- Pulsing effect for central core -->
+  <circle cx="600" cy="400" r="80" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2">
+    <animate attributeName="r" values="80;90;80" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="stroke-opacity" values="0.5;0.2;0.5" dur="2s" repeatCount="indefinite"/>
+  </circle>
+</svg>

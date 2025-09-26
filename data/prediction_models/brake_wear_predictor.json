@@ -1,0 +1,23 @@
+{
+  "name": "brake_wear_predictor",
+  "type": "failure_prediction",
+  "version": "1.0.0",
+  "accuracy": 0.82,
+  "features": [
+    "brakeWear",
+    "brakingFrequency",
+    "speed",
+    "weight",
+    "terrain"
+  ],
+  "thresholds": {
+    "critical": 0.85,
+    "warning": 0.65,
+    "normal": 0.25
+  },
+  "parameters": {
+    "algorithm": "gradient_boosting",
+    "estimators": 150,
+    "learningRate": 0.1
+  }
+}

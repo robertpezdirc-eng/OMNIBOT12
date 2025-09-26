@@ -1,0 +1,92 @@
+{
+  "name": "omni-brain-maxi-ultra",
+  "version": "2.0.0",
+  "description": "OMNI-BRAIN MAXI-ULTRA - Centralizirani sistem za upravljanje avtonomnih agentov z naprednimi varnostnimi funkcijami",
+  "main": "omni-ultra-main.js",
+  "scripts": {
+    "start": "node omni-ultra-main.js",
+    "dev": "nodemon omni-ultra-main.js",
+    "test": "jest",
+    "deploy": "node deploy-omni.js",
+    "update": "node update-omni.js",
+    "setup-ssl": "bash setup-ssl.sh",
+    "setup-cron": "bash setup-cron.sh",
+    "migrations": "node run-migrations.js",
+    "backup": "node scripts/backup.js",
+    "restore": "node scripts/restore.js"
+  },
+  "keywords": [
+    "omni-brain",
+    "ai",
+    "automation",
+    "agents",
+    "cloud",
+    "dashboard",
+    "security",
+    "2fa",
+    "https",
+    "mongodb"
+  ],
+  "author": "OMNI-BRAIN Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2",
+    "mongodb": "^6.1.0",
+    "mongoose": "^7.5.0",
+    "cors": "^2.8.5",
+    "compression": "^1.7.4",
+    "morgan": "^1.10.0",
+    "dotenv": "^16.3.1",
+    "jsonwebtoken": "^9.0.2",
+    "bcrypt": "^5.1.1",
+    "speakeasy": "^2.0.0",
+    "qrcode": "^1.5.3",
+    "express-rate-limit": "^6.10.0",
+    "helmet": "^7.0.0",
+    "express-session": "^1.17.3",
+    "cookie-parser": "^1.4.6",
+    "crypto": "^1.0.1",
+    "openssl": "^2.0.0",
+    "node-cron": "^3.0.2",
+    "nodemailer": "^6.9.4",
+    "winston": "^3.10.0",
+    "winston-daily-rotate-file": "^4.7.1",
+    "multer": "^1.4.5-lts.1",
+    "sharp": "^0.32.5",
+    "axios": "^1.5.0",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "uuid": "^9.0.0",
+    "validator": "^13.11.0",
+    "sanitize-html": "^2.11.0",
+    "rate-limiter-flexible": "^2.4.2",
+    "express-validator": "^7.0.1",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0",
+    "passport-jwt": "^4.0.1",
+    "connect-mongo": "^5.0.0",
+    "redis": "^4.6.8",
+    "ioredis": "^5.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "jest": "^29.6.4",
+    "supertest": "^6.3.3",
+    "@types/node": "^20.5.9",
+    "eslint": "^8.48.0",
+    "prettier": "^3.0.3"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/omni-brain-maxi-ultra.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/omni-brain-maxi-ultra/issues"
+  },
+  "homepage": "https://github.com/your-org/omni-brain-maxi-ultra#readme"
+}

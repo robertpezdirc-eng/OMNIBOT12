@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Generator - Omni Mobile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px 20px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            background: white;
+            transition: border-color 0.3s;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .qr-container {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        #qrCanvas {
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .url-display {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .status.online {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.offline {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .instructions {
+            background: #e7f3ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .instructions h3 {
+            color: #0066cc;
+            margin-bottom: 15px;
+        }
+
+        .instructions ol {
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .content {
+                padding: 20px 15px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 QR Generator</h1>
+            <p>Generiraj QR kodo za mobilno aplikacijo Omni</p>
+        </div>
+
+        <div class="content">
+            <div class="form-group">
+                <label for="ipSelect">Izberi IP naslov:</label>
+                <select id="ipSelect" onchange="generateQR()">
+                    <option value="192.168.1.100">192.168.1.100 (WiFi)</option>
+                    <option value="192.168.56.1">192.168.56.1 (VirtualBox)</option>
+                    <option value="192.168.99.1">192.168.99.1 (Docker)</option>
+                    <option value="192.168.185.2">192.168.185.2 (VMware)</option>
+                    <option value="localhost">localhost (lokalno)</option>
+                </select>
+            </div>
+
+            <div class="qr-container">
+                <canvas id="qrCanvas" width="200" height="200"></canvas>
+                <div class="url-display" id="urlDisplay">
+                    Izberi IP naslov za generiranje QR kode
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary" onclick="generateQR()">🔄 Generiraj QR</button>
+                <button class="btn-success" onclick="copyURL()">📋 Kopiraj URL</button>
+            </div>
+
+            <div id="serverStatus" class="status">
+                🔄 Preverjam status strežnika...
+            </div>
+
+            <div class="instructions">
+                <h3>📋 Navodila za uporabo:</h3>
+                <ol>
+                    <li>Izberi pravilen IP naslov svojega računalnika</li>
+                    <li>Skeniraj QR kodo z mobilno napravo</li>
+                    <li>Odpri povezavo v brskalniku na mobilni napravi</li>
+                    <li>Uživaj v Omni mobilni aplikaciji! 🚀</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUrl = '';
+
+        function generateQR() {
+            const selectedIP = document.getElementById('ipSelect').value;
+            const url = 'http://' + selectedIP + ':3001/mobile';
+            currentUrl = url;
+            
+            document.getElementById('urlDisplay').textContent = url;
+            
+            const canvas = document.getElementById('qrCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            drawQRCode(ctx, url, 200);
+            
+            checkServerStatus();
+        }
+
+        function drawQRCode(ctx, text, size) {
+            const gridSize = 25;
+            const cellSize = size / gridSize;
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, size, size);
+            
+            ctx.fillStyle = '#000000';
+            
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    if ((i < 7 && j < 7) || (i < 7 && j > 17) || (i > 17 && j < 7)) {
+                        if ((i === 0 || i === 6 || j === 0 || j === 6) || 
+                            (i >= 2 && i <= 4 && j >= 2 && j <= 4)) {
+                            ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                        }
+                    }
+                    else if (i === 6 || j === 6) {
+                        if ((i + j) % 2 === 0) {
+                            ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                        }
+                    }
+                    else {
+                        const hash = simpleHash(text + i + j);
+                        if (hash % 2 === 0) {
+                            ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                        }
+                    }
+                }
+            }
+            
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(0, 0, size, size);
+        }
+
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return Math.abs(hash);
+        }
+
+        function copyURL() {
+            if (currentUrl) {
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(currentUrl).then(function() {
+                        showCopySuccess();
+                    }).catch(function() {
+                        fallbackCopy();
+                    });
+                } else {
+                    fallbackCopy();
+                }
+            }
+        }
+
+        function fallbackCopy() {
+            const textArea = document.createElement('textarea');
+            textArea.value = currentUrl;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showCopySuccess();
+        }
+
+        function showCopySuccess() {
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✅ Kopirano!';
+            btn.style.background = '#28a745';
+            setTimeout(function() {
+                btn.textContent = originalText;
+                btn.style.background = '#28a745';
+            }, 2000);
+        }
+
+        function checkServerStatus() {
+            const statusElement = document.getElementById('serverStatus');
+            const selectedIP = document.getElementById('ipSelect').value;
+            const url = 'http://' + selectedIP + ':3001/api/status';
+            
+            statusElement.textContent = '🔄 Preverjam...';
+            statusElement.className = 'status';
+            
+            fetch(url, { method: 'GET' })
+                .then(function(response) {
+                    if (response.ok) {
+                        statusElement.textContent = '🟢 Server aktiven in dostopen';
+                        statusElement.className = 'status online';
+                    } else {
+                        throw new Error('Server ni dostopen');
+                    }
+                })
+                .catch(function(error) {
+                    statusElement.textContent = '🔴 Server ni dostopen ali ni v istem omrežju';
+                    statusElement.className = 'status offline';
+                });
+        }
+
+        window.onload = function() {
+            generateQR();
+            checkServerStatus();
+        };
+
+        setInterval(checkServerStatus, 30000);
+    </script>
+</body>
+</html>

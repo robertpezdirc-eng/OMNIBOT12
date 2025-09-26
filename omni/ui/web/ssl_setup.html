@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni - SSL Nastavitve</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .ssl-status {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .ssl-status.secure {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .ssl-status.warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+
+        .method {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 5px solid #007bff;
+        }
+
+        .method h3 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .method .difficulty {
+            font-size: 0.8em;
+            padding: 4px 8px;
+            border-radius: 12px;
+            color: white;
+        }
+
+        .difficulty.easy { background: #28a745; }
+        .difficulty.medium { background: #ffc107; color: #333; }
+        .difficulty.hard { background: #dc3545; }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #4a5568;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .copy-btn:hover {
+            background: #2d3748;
+        }
+
+        .steps {
+            counter-reset: step-counter;
+        }
+
+        .step {
+            counter-increment: step-counter;
+            background: #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            position: relative;
+            padding-left: 60px;
+        }
+
+        .step::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background: #007bff;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .button {
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .button:hover {
+            background: #0056b3;
+        }
+
+        .button.success {
+            background: #28a745;
+        }
+
+        .button.success:hover {
+            background: #1e7e34;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .warning-box h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info-box h4 {
+            color: #0c5460;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 SSL Nastavitve</h1>
+            <p>Varni HTTPS dostop za Omni sistem</p>
+        </div>
+
+        <div class="ssl-status" id="sslStatus">
+            <h3>❌ HTTP (nezaščiteno)</h3>
+            <p>Trenutno uporabljaš nezaščiteno HTTP povezavo. Za produkcijo priporočamo HTTPS.</p>
+        </div>
+
+        <div class="method">
+            <h3>
+                🚀 Metoda 1: Let's Encrypt (Brezplačno)
+                <span class="difficulty easy">ENOSTAVNO</span>
+            </h3>
+            <p>Avtomatski SSL certifikati z Let's Encrypt preko Certbot.</p>
+            
+            <div class="steps">
+                <div class="step">
+                    <h4>Namesti Certbot</h4>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Kopiraj</button>
+# Windows (Chocolatey)
+choco install certbot
+
+# Ali prenesi z https://certbot.eff.org/
+                    </div>
+                </div>
+
+                <div class="step">
+                    <h4>Generiraj certifikat</h4>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Kopiraj</button>
+certbot certonly --standalone -d yourdomain.com
+                    </div>
+                </div>
+
+                <div class="step">
+                    <h4>Posodobi Omni backend</h4>
+                    <p>Dodaj SSL konfiguracijo v mobile_backend.js</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="method">
+            <h3>
+                🔧 Metoda 2: Samopodpisani certifikat
+                <span class="difficulty medium">SREDNJE</span>
+            </h3>
+            <p>Hitro za testiranje, vendar brskalniki bodo prikazali opozorilo.</p>
+            
+            <div class="steps">
+                <div class="step">
+                    <h4>Generiraj ključe</h4>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Kopiraj</button>
+# Ustvari SSL direktorij
+mkdir certs
+cd certs
+
+# Generiraj privatni ključ
+openssl genrsa -out private-key.pem 2048
+
+# Generiraj certifikat
+openssl req -new -x509 -key private-key.pem -out certificate.pem -days 365
+                    </div>
+                </div>
+
+                <div class="step">
+                    <h4>Posodobi backend</h4>
+                    <p>Dodaj HTTPS server v mobile_backend.js</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="method">
+            <h3>
+                ☁️ Metoda 3: Cloudflare Tunnel
+                <span class="difficulty easy">ENOSTAVNO</span>
+            </h3>
+            <p>Brezplačen SSL preko Cloudflare brez potrebe po certifikatih.</p>
+            
+            <div class="steps">
+                <div class="step">
+                    <h4>Namesti Cloudflared</h4>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Kopiraj</button>
+# Windows
+winget install --id Cloudflare.cloudflared
+
+# Ali prenesi z https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation/
+                    </div>
+                </div>
+
+                <div class="step">
+                    <h4>Ustvari tunel</h4>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Kopiraj</button>
+# Prijavi se
+cloudflared tunnel login
+
+# Ustvari tunel
+cloudflared tunnel create omni
+
+# Zaženi tunel
+cloudflared tunnel --url http://localhost:3001
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="warning-box">
+            <h4>⚠️ Pomembno opozorilo</h4>
+            <ul>
+                <li>Za produkcijo vedno uporabljaj veljavne SSL certifikate</li>
+                <li>Samopodpisani certifikati so primerni le za testiranje</li>
+                <li>Redno posodabljaj certifikate (Let's Encrypt se posodobi vsakih 90 dni)</li>
+                <li>Nikoli ne deli privatnih ključev</li>
+            </ul>
+        </div>
+
+        <div class="info-box">
+            <h4>ℹ️ Priporočila</h4>
+            <ul>
+                <li><strong>Za testiranje:</strong> Samopodpisani certifikat ali Cloudflare Tunnel</li>
+                <li><strong>Za produkcijo:</strong> Let's Encrypt ali komercialni certifikat</li>
+                <li><strong>Za enostavnost:</strong> Cloudflare Tunnel (avtomatski SSL)</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="button" onclick="generateSelfSigned()">🔧 Generiraj samopodpisani</button>
+            <button class="button success" onclick="checkSSL()">🔍 Preveri SSL</button>
+            <a href="/public" class="button">🌐 Nazaj na javni dostop</a>
+        </div>
+
+        <div id="sslResult" style="display: none; margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.parentElement;
+            const code = codeBlock.textContent.replace('Kopiraj', '').trim();
+            
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Kopirano!';
+                setTimeout(() => {
+                    button.textContent = 'Kopiraj';
+                }, 2000);
+            });
+        }
+
+        function checkSSL() {
+            const sslStatus = document.getElementById('sslStatus');
+            const isHTTPS = window.location.protocol === 'https:';
+            
+            if (isHTTPS) {
+                sslStatus.className = 'ssl-status secure';
+                sslStatus.innerHTML = `
+                    <h3>✅ HTTPS (varno)</h3>
+                    <p>Povezava je zaščitena z SSL certifikatom.</p>
+                `;
+            } else {
+                sslStatus.className = 'ssl-status';
+                sslStatus.innerHTML = `
+                    <h3>❌ HTTP (nezaščiteno)</h3>
+                    <p>Povezava ni zaščitena. Sledi navodilom za SSL nastavitev.</p>
+                `;
+            }
+        }
+
+        function generateSelfSigned() {
+            const result = document.getElementById('sslResult');
+            result.style.display = 'block';
+            result.innerHTML = `
+                <div class="info-box">
+                    <h4>🔧 Generiranje samopodpisanega certifikata</h4>
+                    <p>Zaženi naslednje ukaze v terminalu:</p>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Kopiraj</button>
+mkdir certs
+cd certs
+openssl genrsa -out private-key.pem 2048
+openssl req -new -x509 -key private-key.pem -out certificate.pem -days 365 -subj "/C=SI/ST=Slovenia/L=Ljubljana/O=Omni/CN=localhost"
+                    </div>
+                    <p>Nato posodobi mobile_backend.js za HTTPS podporo.</p>
+                </div>
+            `;
+        }
+
+        // Preveri SSL ob nalaganju
+        window.onload = checkSSL;
+    </script>
+</body>
+</html>

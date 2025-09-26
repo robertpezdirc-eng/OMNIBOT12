@@ -1,0 +1,61 @@
+{
+  "summary": {
+    "totalTests": 6,
+    "passedTests": 2,
+    "failedTests": 4,
+    "successRate": "33.3",
+    "duration": 25929,
+    "timestamp": "2025-09-25T10:31:48.334Z"
+  },
+  "results": [
+    {
+      "test": "Basic Connection",
+      "success": true,
+      "message": "WebSocket povezava uspešna",
+      "timestamp": "2025-09-25T10:31:22.474Z",
+      "data": null
+    },
+    {
+      "test": "Ping/Pong",
+      "success": false,
+      "message": "Pong odgovor ni prejel v 5s",
+      "timestamp": "2025-09-25T10:31:27.491Z",
+      "data": null
+    },
+    {
+      "test": "License Update",
+      "success": false,
+      "message": "License update potrditev ni prejel v 5s",
+      "timestamp": "2025-09-25T10:31:32.494Z",
+      "data": null
+    },
+    {
+      "test": "Multiple Connections",
+      "success": true,
+      "message": "Vseh 5 povezav uspešnih",
+      "timestamp": "2025-09-25T10:31:32.507Z",
+      "data": {
+        "connectedCount": 5,
+        "totalCount": 5
+      }
+    },
+    {
+      "test": "Message Broadcasting",
+      "success": false,
+      "message": "Broadcast timeout - samo 0/3 povezav prejelo sporočilo",
+      "timestamp": "2025-09-25T10:31:37.522Z",
+      "data": null
+    },
+    {
+      "test": "Connection Stability",
+      "success": false,
+      "message": "Nizka stabilnost 0.0% (0/50)",
+      "timestamp": "2025-09-25T10:31:48.329Z",
+      "data": {
+        "successRate": 0,
+        "receivedCount": 0,
+        "sentCount": 50
+      }
+    }
+  ]
+}

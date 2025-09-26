@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni Client - WebSocket Demo</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .connected { background: #38a169; }
+        .disconnected { background: #e53e3e; }
+        .reconnecting { background: #d69e2e; }
+
+        .license-info {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .license-status {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 12px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .status-active { background: #c6f6d5; color: #22543d; }
+        .status-demo { background: #bee3f8; color: #2a4365; }
+        .status-expired { background: #fed7d7; color: #742a2a; }
+        .status-suspended { background: #fbb6ce; color: #702459; }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .module-card {
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .module-unlocked {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 2px solid #38a169;
+        }
+
+        .module-locked {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 2px solid #e53e3e;
+            opacity: 0.6;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary { background: #667eea; color: white; }
+        .btn-success { background: #38a169; color: white; }
+        .btn-warning { background: #d69e2e; color: white; }
+
+        .log-panel {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 2px 0;
+        }
+
+        .log-timestamp {
+            color: #a0aec0;
+        }
+
+        .log-info { color: #63b3ed; }
+        .log-success { color: #68d391; }
+        .log-warning { color: #fbb6ce; }
+        .log-error { color: #fc8181; }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .heartbeat-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #e53e3e;
+            animation: pulse 2s infinite;
+        }
+
+        .heartbeat-active {
+            background: #38a169;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .notification-popup {
+            position: fixed;
+            top: 50px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border-left: 4px solid #667eea;
+            max-width: 300px;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification-popup.show {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="heartbeat-indicator" id="heartbeatIndicator"></div>
+    
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🚀 Omni Client - WebSocket Demo</h1>
+            <p>Demonstracija WebSocket povezave, heartbeat sistema in real-time posodobitev</p>
+        </div>
+
+        <!-- Status Grid -->
+        <div class="status-grid">
+            <div class="status-card">
+                <h3>🔌 Povezava</h3>
+                <p>
+                    <span class="status-indicator disconnected" id="connectionIndicator"></span>
+                    <span id="connectionStatus">Ni povezave</span>
+                </p>
+                <p><small>Zadnji heartbeat: <span id="lastHeartbeat">-</span></small></p>
+            </div>
+
+            <div class="status-card">
+                <h3>👤 Klient</h3>
+                <p><strong>ID:</strong> <span id="clientId">client_demo</span></p>
+                <p><strong>Vloga:</strong> <span id="clientRole">client</span></p>
+            </div>
+
+            <div class="status-card">
+                <h3>📊 Statistike</h3>
+                <p><strong>Reconnect poskusi:</strong> <span id="reconnectCount">0</span></p>
+                <p><strong>Prejeta sporočila:</strong> <span id="messageCount">0</span></p>
+            </div>
+        </div>
+
+        <!-- License Info -->
+        <div class="license-info">
+            <h3>📄 Informacije o licenci</h3>
+            <div id="licenseDetails">
+                <p>Nalaganje podatkov o licenci...</p>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <h3>🎛️ Kontrole</h3>
+            
+            <div class="input-group">
+                <label>Client ID</label>
+                <input type="text" id="clientIdInput" value="client_demo" placeholder="Vnesite Client ID">
+            </div>
+
+            <button class="btn btn-primary" onclick="connectWebSocket()">🔌 Poveži</button>
+            <button class="btn btn-warning" onclick="disconnectWebSocket()">🔌 Prekini</button>
+            <button class="btn btn-success" onclick="checkLicense()">🔄 Preveri licenco</button>
+            <button class="btn btn-primary" onclick="sendPing()">💓 Pošlji ping</button>
+            <button class="btn btn-success" onclick="clearLog()">🗑️ Počisti log</button>
+        </div>
+
+        <!-- Activity Log -->
+        <div class="log-panel" id="activityLog">
+            <div class="log-entry">
+                <span class="log-timestamp">[Sistem]</span> 
+                <span class="log-info">Klient inicializiran</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Popup -->
+    <div class="notification-popup" id="notificationPopup">
+        <div id="notificationContent"></div>
+    </div>
+
+    <script>
+        // Global variables
+        let socket = null;
+        let reconnectAttempts = 0;
+        let messageCount = 0;
+        let heartbeatInterval = null;
+        let currentClientId = 'client_demo';
+        let currentLicense = null;
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            connectWebSocket();
+            startHeartbeat();
+        });
+
+        // WebSocket connection
+        function connectWebSocket() {
+            const SERVER_URL = 'http://localhost:3000';
+            
+            if (socket && socket.connected) {
+                logActivity('Že povezan', 'warning');
+                return;
+            }
+
+            currentClientId = document.getElementById('clientIdInput').value || 'client_demo';
+            document.getElementById('clientId').textContent = currentClientId;
+
+            logActivity(`Povezovanje na ${SERVER_URL}...`, 'info');
+            
+            socket = io(SERVER_URL, {
+                transports: ['websocket', 'polling'],
+                timeout: 5000,
+                reconnection: true,
+                reconnectionDelay: 2000,
+                reconnectionAttempts: 5
+            });
+
+            // Connection events
+            socket.on('connect', function() {
+                updateConnectionStatus(true);
+                logActivity('WebSocket povezan ✅', 'success');
+                reconnectAttempts = 0;
+                
+                // Identify client
+                socket.emit('identify', {
+                    client_id: currentClientId,
+                    role: 'client'
+                });
+                
+                // Request license status
+                checkLicense();
+            });
+
+            socket.on('disconnect', function(reason) {
+                updateConnectionStatus(false);
+                logActivity(`WebSocket prekinjen: ${reason}`, 'error');
+            });
+
+            socket.on('connect_error', function(error) {
+                logActivity(`Napaka pri povezavi: ${error.message}`, 'error');
+            });
+
+            socket.on('reconnect', function(attemptNumber) {
+                logActivity(`Ponovno povezan po ${attemptNumber} poskusih`, 'success');
+                reconnectAttempts = attemptNumber;
+                updateReconnectCount();
+            });
+
+            socket.on('reconnect_attempt', function(attemptNumber) {
+                logActivity(`Poskus ponovne povezave #${attemptNumber}`, 'warning');
+                reconnectAttempts = attemptNumber;
+                updateReconnectCount();
+                updateConnectionStatus('reconnecting');
+            });
+
+            socket.on('reconnect_failed', function() {
+                logActivity('Ponovna povezava neuspešna', 'error');
+                updateConnectionStatus(false);
+            });
+
+            // License events
+            socket.on('license_status', function(license) {
+                messageCount++;
+                updateMessageCount();
+                
+                if (license.error) {
+                    logActivity(`Napaka licence: ${license.error}`, 'error');
+                    return;
+                }
+                
+                currentLicense = license;
+                updateLicenseDisplay(license);
+                logActivity(`Licenca posodobljena: ${license.status}`, 'info');
+            });
+
+            socket.on('license_update', function(data) {
+                messageCount++;
+                updateMessageCount();
+                
+                logActivity(`Licenca ${data.type}: ${data.license.client_id}`, 'info');
+                
+                // If this update is for current client, refresh license
+                if (data.license.client_id === currentClientId) {
+                    currentLicense = data.license;
+                    updateLicenseDisplay(data.license);
+                    showNotification(`Licenca ${data.type}`, `Vaša licenca je bila ${data.type}`);
+                }
+            });
+
+            // System messages
+            socket.on('system_message', function(data) {
+                messageCount++;
+                updateMessageCount();
+                
+                logActivity(`Sistemsko sporočilo: ${data.message}`, 'info');
+                showNotification('Sistemsko sporočilo', data.message);
+            });
+
+            // Heartbeat response
+            socket.on('pong', function(data) {
+                const now = new Date();
+                const latency = now.getTime() - data.timestamp;
+                document.getElementById('lastHeartbeat').textContent = 
+                    `${now.toLocaleTimeString()} (${latency}ms)`;
+                
+                // Update heartbeat indicator
+                const indicator = document.getElementById('heartbeatIndicator');
+                indicator.classList.add('heartbeat-active');
+                setTimeout(() => {
+                    indicator.classList.remove('heartbeat-active');
+                }, 500);
+            });
+
+            // Rate limiting
+            socket.on('rate_limit_exceeded', function() {
+                logActivity('Rate limit presežen!', 'warning');
+            });
+
+            // Access control
+            socket.on('access_denied', function(data) {
+                logActivity(`Dostop zavrnjen: ${data.message}`, 'error');
+            });
+        }
+
+        // Disconnect WebSocket
+        function disconnectWebSocket() {
+            if (socket) {
+                socket.disconnect();
+                logActivity('WebSocket ročno prekinjen', 'warning');
+            }
+        }
+
+        // Check license
+        function checkLicense() {
+            if (!socket || !socket.connected) {
+                logActivity('Ni povezave za preverjanje licence', 'error');
+                return;
+            }
+
+            socket.emit('check_license', {
+                client_id: currentClientId
+            });
+            
+            logActivity('Zahteva za preverjanje licence poslana', 'info');
+        }
+
+        // Send ping manually
+        function sendPing() {
+            if (!socket || !socket.connected) {
+                logActivity('Ni povezave za ping', 'error');
+                return;
+            }
+
+            socket.emit('ping');
+            logActivity('Ping poslan', 'info');
+        }
+
+        // Start automatic heartbeat
+        function startHeartbeat() {
+            if (heartbeatInterval) {
+                clearInterval(heartbeatInterval);
+            }
+
+            heartbeatInterval = setInterval(() => {
+                if (socket && socket.connected) {
+                    socket.emit('ping');
+                }
+            }, 30000); // Every 30 seconds
+        }
+
+        // Update connection status
+        function updateConnectionStatus(connected) {
+            const indicator = document.getElementById('connectionIndicator');
+            const status = document.getElementById('connectionStatus');
+            
+            if (connected === 'reconnecting') {
+                indicator.className = 'status-indicator reconnecting';
+                status.textContent = 'Ponovno povezovanje...';
+            } else if (connected) {
+                indicator.className = 'status-indicator connected';
+                status.textContent = 'Povezano';
+            } else {
+                indicator.className = 'status-indicator disconnected';
+                status.textContent = 'Ni povezave';
+            }
+        }
+
+        // Update license display
+        function updateLicenseDisplay(license) {
+            const container = document.getElementById('licenseDetails');
+            
+            const expiryDate = new Date(license.expires_at);
+            const isExpired = expiryDate < new Date();
+            const daysLeft = Math.ceil((expiryDate - new Date()) / (1000 * 60 * 60 * 24));
+            
+            container.innerHTML = `
+                <div>
+                    <span class="license-status status-${license.status}">${license.status}</span>
+                    <p><strong>Plan:</strong> ${license.plan}</p>
+                    <p><strong>Poteče:</strong> ${expiryDate.toLocaleDateString('sl-SI')} 
+                       ${isExpired ? '(POTEKLA)' : `(${daysLeft} dni)`}</p>
+                    <p><strong>Ustvarjena:</strong> ${new Date(license.created_at).toLocaleDateString('sl-SI')}</p>
+                </div>
+                
+                <div class="modules-grid">
+                    ${generateModulesDisplay(license)}
+                </div>
+            `;
+        }
+
+        // Generate modules display
+        function generateModulesDisplay(license) {
+            const allModules = ['ai', 'analytics', 'automation', 'enterprise', 'premium'];
+            const isActive = license.status === 'active';
+            
+            return allModules.map(module => {
+                const isUnlocked = isActive && license.modules.includes(module);
+                const className = isUnlocked ? 'module-unlocked' : 'module-locked';
+                const icon = isUnlocked ? '🔓' : '🔒';
+                
+                return `
+                    <div class="module-card ${className}">
+                        ${icon} ${module.toUpperCase()}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Show notification popup
+        function showNotification(title, message) {
+            const popup = document.getElementById('notificationPopup');
+            const content = document.getElementById('notificationContent');
+            
+            content.innerHTML = `
+                <strong>${title}</strong><br>
+                <small>${message}</small>
+            `;
+            
+            popup.classList.add('show');
+            
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 5000);
+        }
+
+        // Update counters
+        function updateReconnectCount() {
+            document.getElementById('reconnectCount').textContent = reconnectAttempts;
+        }
+
+        function updateMessageCount() {
+            document.getElementById('messageCount').textContent = messageCount;
+        }
+
+        // Logging
+        function logActivity(message, type = 'info') {
+            const logPanel = document.getElementById('activityLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `
+                <span class="log-timestamp">[${timestamp}]</span> 
+                <span class="log-${type}">${message}</span>
+            `;
+            
+            logPanel.insertBefore(logEntry, logPanel.firstChild);
+            
+            // Keep only last 100 entries
+            while (logPanel.children.length > 100) {
+                logPanel.removeChild(logPanel.lastChild);
+            }
+        }
+
+        // Clear log
+        function clearLog() {
+            const logPanel = document.getElementById('activityLog');
+            logPanel.innerHTML = `
+                <div class="log-entry">
+                    <span class="log-timestamp">[Sistem]</span> 
+                    <span class="log-info">Log počiščen</span>
+                </div>
+            `;
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (heartbeatInterval) {
+                clearInterval(heartbeatInterval);
+            }
+            if (socket) {
+                socket.disconnect();
+            }
+        });
+    </script>
+</body>
+</html>

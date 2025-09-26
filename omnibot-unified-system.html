@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniBot - Kompletni Prototip Sistem</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: auto;
+        }
+
+        .system-container {
+            display: grid;
+            grid-template-columns: 280px 1fr 320px;
+            grid-template-rows: 70px 1fr 60px;
+            height: 100vh;
+            gap: 15px;
+            padding: 15px;
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00ff88;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .system-status {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .status-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-green { background: #00ff88; }
+        .status-yellow { background: #ffaa00; }
+        .status-red { background: #ff4444; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+        }
+
+        .main-content {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+        }
+
+        .control-panel {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+        }
+
+        .footer {
+            grid-column: 1 / -1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+            backdrop-filter: blur(10px);
+            font-size: 12px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #00ff88;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .module-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .module-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .module-item:hover {
+            border-color: #00ff88;
+            transform: translateX(5px);
+        }
+
+        .module-item.active {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .module-item.warning {
+            border-color: #ffaa00;
+            background: rgba(255, 170, 0, 0.1);
+        }
+
+        .module-item.error {
+            border-color: #ff4444;
+            background: rgba(255, 68, 68, 0.1);
+        }
+
+        .module-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .module-icon {
+            font-size: 18px;
+        }
+
+        .module-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .module-name {
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .module-status {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        .module-health {
+            font-size: 12px;
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .workflow-area {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            min-height: 200px;
+            position: relative;
+        }
+
+        .workflow-node {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            min-width: 80px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            font-size: 11px;
+        }
+
+        .workflow-node:hover {
+            border-color: #00ff88;
+            transform: scale(1.05);
+        }
+
+        .workflow-connection {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, #00ff88, #0088ff);
+            z-index: 1;
+        }
+
+        .ai-chat-area {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            height: 250px;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+
+        .chat-message {
+            margin-bottom: 8px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            max-width: 90%;
+        }
+
+        .chat-user {
+            background: rgba(0, 136, 255, 0.2);
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .chat-ai {
+            background: rgba(0, 255, 136, 0.2);
+            align-self: flex-start;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 8px;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .chat-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .chat-send {
+            background: #00ff88;
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .control-button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00ff88, #00cc66);
+            color: #000;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #0088ff, #0066cc);
+            color: #fff;
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #ffaa00, #ff8800);
+            color: #000;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff4444, #cc2222);
+            color: #fff;
+        }
+
+        .control-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .metric-label {
+            font-size: 10px;
+            opacity: 0.8;
+            margin-top: 3px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #0088ff);
+            transition: width 0.3s ease;
+        }
+
+        .log-container {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 6px;
+            padding: 10px;
+            height: 150px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            margin-bottom: 15px;
+        }
+
+        .log-entry {
+            margin-bottom: 3px;
+            padding: 1px 0;
+        }
+
+        .log-success { color: #00ff88; }
+        .log-warning { color: #ffaa00; }
+        .log-error { color: #ff4444; }
+        .log-info { color: #0088ff; }
+
+        .gpt-status {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .gpt-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        @media (max-width: 1200px) {
+            .system-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto auto auto;
+            }
+
+        }
+        
+        .openFullSchema {
+            /* Method moved to JavaScript class */
+        }
+    </style>
+</head>
+<body>
+    <div class="system-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                🤖 OmniBot Kompletni Sistem
+                <span style="font-size: 12px; opacity: 0.7;">v2.0</span>
+            </div>
+            <div class="system-status">
+                <div class="status-group">
+                    <span>Core:</span>
+                    <div class="status-indicator status-green" id="coreStatus"></div>
+                </div>
+                <div class="status-group">
+                    <span>AI:</span>
+                    <div class="status-indicator status-yellow" id="aiStatus"></div>
+                </div>
+                <div class="status-group">
+                    <span>GPT:</span>
+                    <div class="status-indicator status-yellow" id="gptStatus"></div>
+                </div>
+                <div class="status-group">
+                    <span>Moduli:</span>
+                    <div class="status-indicator status-green" id="moduleStatus"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar - Module Management -->
+        <div class="sidebar">
+            <div class="section-title">📊 Sistemski Moduli</div>
+            <div class="module-list" id="moduleList">
+                <!-- Modules will be populated by JavaScript -->
+            </div>
+
+            <div class="section-title">📈 Performanse</div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value" id="systemUptime">99.8%</div>
+                    <div class="metric-label">Uptime</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="overallHealth">91%</div>
+                    <div class="metric-label">Zdravje</div>
+                </div>
+            </div>
+
+            <div class="section-title">🔧 Hitri Ukrepi</div>
+            <button class="control-button btn-primary" onclick="omniBotSystem.runQuickTest()">
+                🧪 Hitri Test
+            </button>
+            <button class="control-button btn-secondary" onclick="omniBotSystem.runAutoFix()">
+                🔧 Auto Fix
+            </button>
+        </div>
+
+        <!-- Main Content - Workflow & AI Chat -->
+        <div class="main-content">
+            <div class="section-title">🔄 Sistemski Workflow</div>
+            <div class="workflow-area" id="workflowArea">
+                <!-- Workflow nodes -->
+                <div class="workflow-node" style="top: 10px; left: 20px;" data-node="user">
+                    👤<br>Uporabnik
+                </div>
+                <div class="workflow-node" style="top: 10px; left: 150px;" data-node="ui">
+                    🎨<br>UI
+                </div>
+                <div class="workflow-node" style="top: 80px; left: 85px;" data-node="backend">
+                    ⚙️<br>Backend
+                </div>
+                <div class="workflow-node" style="top: 150px; left: 20px;" data-node="ai">
+                    🧠<br>AI
+                </div>
+                <div class="workflow-node" style="top: 150px; left: 150px;" data-node="gpt">
+                    🤖<br>GPT
+                </div>
+                
+                <!-- Connections -->
+                <div class="workflow-connection" style="top: 25px; left: 80px; width: 70px;"></div>
+                <div class="workflow-connection" style="top: 50px; left: 180px; width: 2px; height: 30px; background: linear-gradient(180deg, #00ff88, #0088ff);"></div>
+                <div class="workflow-connection" style="top: 120px; left: 115px; width: 2px; height: 30px; background: linear-gradient(180deg, #00ff88, #0088ff);"></div>
+                <div class="workflow-connection" style="top: 165px; left: 80px; width: 70px;"></div>
+            </div>
+
+            <div class="section-title">🗺️ Vizualna Shema & Workflow</div>
+            <div class="visual-schema-container" style="background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                <iframe src="omnibot-visual-schema-enhanced.html" 
+                        style="width: 100%; height: 300px; border: none; border-radius: 8px; background: #0f1419;">
+                </iframe>
+                <div class="schema-controls" style="margin-top: 10px; text-align: center;">
+                    <button onclick="omniBotSystem.openFullSchema()" class="control-button btn-secondary" style="padding: 8px 16px; font-size: 12px;">
+                        🔍 Odpri Polno Shemo
+                    </button>
+                </div>
+            </div>
+
+            <div class="section-title">🤖 AI Asistent Chat</div>
+            <div class="ai-chat-area">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="chat-message chat-ai">
+                        🤖 Pozdravljeni! Sem OmniBot AI asistent. Kako vam lahko pomagam pri upravljanju sistema?
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Vprašajte me karkoli o sistemu...">
+                    <button class="chat-send" onclick="omniBotSystem.sendChatMessage()">Pošlji</button>
+                </div>
+            </div>
+
+            <div class="section-title">📋 Sistemski Logi</div>
+            <div class="log-container" id="systemLogs">
+                <!-- Logs will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="section-title">🎛️ Nadzor</div>
+            
+            <div class="gpt-status">
+                <div class="gpt-indicator status-yellow"></div>
+                <span>GPT Simulacija</span>
+            </div>
+
+            <button class="control-button btn-primary" onclick="omniBotSystem.runFullSystemTest()">
+                🧪 Celoten Test
+            </button>
+            
+            <button class="control-button btn-secondary" onclick="omniBotSystem.optimizeSystem()">
+                ⚡ Optimiziraj
+            </button>
+            
+            <button class="control-button btn-warning" onclick="omniBotSystem.trainAI()">
+                🧠 Treniraj AI
+            </button>
+            
+            <button class="control-button btn-danger" onclick="omniBotSystem.emergencyStop()">
+                🛑 Zasilni Stop
+            </button>
+
+            <div class="section-title">📊 Viri</div>
+            <div class="metric-card">
+                <div>CPU</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 42%;" id="cpuProgress"></div>
+                </div>
+                <div class="metric-value" id="cpuValue">42%</div>
+            </div>
+
+            <div class="metric-card">
+                <div>RAM</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 58%;" id="ramProgress"></div>
+                </div>
+                <div class="metric-value" id="ramValue">58%</div>
+            </div>
+
+            <div class="metric-card">
+                <div>Omrežje</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 23%;" id="networkProgress"></div>
+                </div>
+                <div class="metric-value" id="networkValue">23%</div>
+            </div>
+
+            <div class="section-title">🤖 AI Metrike</div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value" id="aiConfidence">84%</div>
+                    <div class="metric-label">AI Zaupanje</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="learningProgress">127</div>
+                    <div class="metric-label">Naučeni Vzorci</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div>
+                <span>OmniBot v2.0 - Kompletni Prototip</span>
+                <span style="margin-left: 20px;">Uptime: <span id="uptimeDisplay">2h 34m</span></span>
+            </div>
+            <div>
+                <span>Moduli: <span id="activeModules">6/6</span></span>
+                <span style="margin-left: 20px;">Zadnja sinhronizacija: <span id="lastSync">pred 2s</span></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include backend systems -->
+    <script src="omnibot-backend-core.js"></script>
+    <script src="omnibot-gpt-integration.js"></script>
+
+    <script>
+        // OmniBot Unified System
+        class OmniBotUnifiedSystem {
+            constructor() {
+                this.backendCore = null;
+                this.gptIntegration = null;
+                this.initialized = false;
+                this.startTime = Date.now();
+                
+                this.modules = {
+                    ui: { name: 'UI Sloj', icon: '🎨', status: 'active', health: 95 },
+                    backend: { name: 'Backend Core', icon: '⚙️', status: 'active', health: 92 },
+                    ai: { name: 'AI Modul', icon: '🧠', status: 'warning', health: 78 },
+                    learning: { name: 'Samoučenje', icon: '📚', status: 'active', health: 89 },
+                    testing: { name: 'Testiranje', icon: '🧪', status: 'active', health: 85 },
+                    security: { name: 'Varnost', icon: '🔒', status: 'active', health: 96 }
+                };
+
+                this.metrics = {
+                    cpu: 42,
+                    ram: 58,
+                    network: 23,
+                    aiConfidence: 84,
+                    learningProgress: 127
+                };
+
+                this.chatHistory = [];
+                this.logs = [];
+                
+                this.initialize();
+            }
+
+            async initialize() {
+                try {
+                    this.addLog('info', '🚀 OmniBot Unified System inicializacija...');
+                    
+                    // Initialize backend core
+                    if (typeof OmniBotBackendCore !== 'undefined') {
+                        this.backendCore = new OmniBotBackendCore();
+                        this.addLog('success', '✅ Backend Core inicializiran');
+                    }
+                    
+                    // Initialize GPT integration
+                    if (typeof OmniBotGPTIntegration !== 'undefined' && this.backendCore) {
+                        this.gptIntegration = new OmniBotGPTIntegration(this.backendCore);
+                        await this.gptIntegration.initialize();
+                        this.addLog('success', '✅ GPT Integration inicializiran');
+                    }
+                    
+                    // Setup UI
+                    this.setupUI();
+                    this.startMonitoring();
+                    
+                    this.initialized = true;
+                    this.addLog('success', '🎉 OmniBot Unified System pripravljen!');
+                    
+                } catch (error) {
+                    this.addLog('error', `❌ Napaka pri inicializaciji: ${error.message}`);
+                }
+            }
+
+            setupUI() {
+                this.updateModuleList();
+                this.updateSystemStatus();
+                this.setupEventListeners();
+                
+                // Setup chat input
+                const chatInput = document.getElementById('chatInput');
+                if (chatInput) {
+                    chatInput.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            this.sendChatMessage();
+                        }
+                    });
+                }
+            }
+
+            updateModuleList() {
+                const moduleList = document.getElementById('moduleList');
+                if (!moduleList) return;
+
+                moduleList.innerHTML = '';
+                
+                Object.entries(this.modules).forEach(([key, module]) => {
+                    const moduleItem = document.createElement('div');
+                    moduleItem.className = `module-item ${module.status}`;
+                    moduleItem.innerHTML = `
+                        <div class="module-info">
+                            <span class="module-icon">${module.icon}</span>
+                            <div class="module-details">
+                                <div class="module-name">${module.name}</div>
+                                <div class="module-status">${this.getStatusText(module.status)}</div>
+                            </div>
+                        </div>
+                        <div class="module-health">${module.health}%</div>
+                    `;
+                    
+                    moduleItem.addEventListener('click', () => {
+                        this.showModuleDetails(key, module);
+                    });
+                    
+                    moduleList.appendChild(moduleItem);
+                });
+            }
+
+            getStatusText(status) {
+                const statusMap = {
+                    'active': 'Aktiven',
+                    'warning': 'Opozorilo',
+                    'error': 'Napaka',
+                    'stopped': 'Ustavljen'
+                };
+                return statusMap[status] || status;
+            }
+
+            updateSystemStatus() {
+                // Update status indicators
+                const avgHealth = Object.values(this.modules).reduce((sum, m) => sum + m.health, 0) / Object.keys(this.modules).length;
+                
+                this.updateStatusIndicator('coreStatus', avgHealth > 80 ? 'green' : avgHealth > 60 ? 'yellow' : 'red');
+                this.updateStatusIndicator('aiStatus', this.modules.ai.health > 80 ? 'green' : 'yellow');
+                this.updateStatusIndicator('gptStatus', this.gptIntegration ? 'green' : 'yellow');
+                this.updateStatusIndicator('moduleStatus', avgHealth > 70 ? 'green' : 'yellow');
+
+                // Update metrics
+                document.getElementById('overallHealth').textContent = Math.round(avgHealth) + '%';
+                
+                // Update uptime
+                const uptime = Date.now() - this.startTime;
+                const hours = Math.floor(uptime / (1000 * 60 * 60));
+                const minutes = Math.floor((uptime % (1000 * 60 * 60)) / (1000 * 60));
+                document.getElementById('uptimeDisplay').textContent = `${hours}h ${minutes}m`;
+                
+                // Update active modules count
+                const activeCount = Object.values(this.modules).filter(m => m.status === 'active').length;
+                document.getElementById('activeModules').textContent = `${activeCount}/${Object.keys(this.modules).length}`;
+            }
+
+            updateStatusIndicator(elementId, status) {
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.className = `status-indicator status-${status}`;
+                }
+            }
+
+            startMonitoring() {
+                // Update metrics every 3 seconds
+                setInterval(() => {
+                    this.updateMetrics();
+                    this.updateSystemStatus();
+                    this.simulateSystemActivity();
+                }, 3000);
+
+                // Update last sync time
+                setInterval(() => {
+                    document.getElementById('lastSync').textContent = 'pred 2s';
+                }, 2000);
+            }
+
+            updateMetrics() {
+                // Simulate realistic metric changes
+                this.metrics.cpu = Math.max(15, Math.min(85, this.metrics.cpu + (Math.random() - 0.5) * 8));
+                this.metrics.ram = Math.max(25, Math.min(90, this.metrics.ram + (Math.random() - 0.5) * 6));
+                this.metrics.network = Math.max(5, Math.min(75, this.metrics.network + (Math.random() - 0.5) * 12));
+                
+                // Update UI
+                this.updateProgressBar('cpuProgress', 'cpuValue', this.metrics.cpu);
+                this.updateProgressBar('ramProgress', 'ramValue', this.metrics.ram);
+                this.updateProgressBar('networkProgress', 'networkValue', this.metrics.network);
+                
+                // Update AI metrics
+                this.metrics.aiConfidence = Math.max(70, Math.min(98, this.metrics.aiConfidence + (Math.random() - 0.5) * 3));
+                document.getElementById('aiConfidence').textContent = Math.round(this.metrics.aiConfidence) + '%';
+                
+                if (Math.random() < 0.1) {
+                    this.metrics.learningProgress++;
+                    document.getElementById('learningProgress').textContent = this.metrics.learningProgress;
+                }
+            }
+
+            updateProgressBar(progressId, valueId, value) {
+                const progressElement = document.getElementById(progressId);
+                const valueElement = document.getElementById(valueId);
+                
+                if (progressElement) progressElement.style.width = value + '%';
+                if (valueElement) valueElement.textContent = Math.round(value) + '%';
+            }
+
+            simulateSystemActivity() {
+                const activities = [
+                    { type: 'info', message: 'Modul sinhronizacija uspešna' },
+                    { type: 'success', message: 'AI vzorec uspešno naučen' },
+                    { type: 'info', message: 'Performančna optimizacija izvedena' },
+                    { type: 'warning', message: 'Visoka CPU uporaba zaznana' },
+                    { type: 'success', message: 'Avtomatsko popravilo uspešno' },
+                    { type: 'info', message: 'GPT analiza zaključena' }
+                ];
+
+                if (Math.random() < 0.4) {
+                    const activity = activities[Math.floor(Math.random() * activities.length)];
+                    this.addLog(activity.type, activity.message);
+                }
+            }
+
+            setupEventListeners() {
+                // Workflow node interactions
+                document.querySelectorAll('.workflow-node').forEach(node => {
+                    node.addEventListener('click', () => {
+                        this.highlightWorkflowPath(node.dataset.node);
+                    });
+                });
+            }
+
+            highlightWorkflowPath(nodeType) {
+                document.querySelectorAll('.workflow-node').forEach(node => {
+                    node.style.borderColor = node.dataset.node === nodeType ? '#00ff88' : 'transparent';
+                });
+                this.addLog('info', `Workflow vozlišče aktivirano: ${nodeType}`);
+            }
+
+            // Chat functionality
+            async sendChatMessage() {
+                const chatInput = document.getElementById('chatInput');
+                const chatMessages = document.getElementById('chatMessages');
+                
+                if (!chatInput || !chatMessages) return;
+                
+                const message = chatInput.value.trim();
+                if (!message) return;
+                
+                // Add user message
+                this.addChatMessage('user', message);
+                chatInput.value = '';
+                
+                // Show typing indicator
+                this.addChatMessage('ai', '🤖 Razmišljam...');
+                
+                try {
+                    let response;
+                    
+                    if (this.gptIntegration) {
+                        // Use actual GPT integration
+                        if (message.toLowerCase().includes('analiz')) {
+                            response = await this.gptIntegration.analyzeSystem(this.getSystemData());
+                            response = response.analysis;
+                        } else if (message.toLowerCase().includes('optimiz')) {
+                            response = await this.gptIntegration.optimizeSystem(this.metrics, { performance: 'high' });
+                            response = response.optimization;
+                        } else if (message.toLowerCase().includes('problem') || message.toLowerCase().includes('napaka')) {
+                            response = await this.gptIntegration.solveProblem(message, this.getSystemData());
+                            response = response.solution;
+                        } else {
+                            response = await this.gptIntegration.makeAutonomousDecision(
+                                { userQuery: message, systemState: this.getSystemData() },
+                                ['analyze', 'optimize', 'fix', 'explain']
+                            );
+                            response = response.decision;
+                        }
+                    } else {
+                        // Fallback responses
+                        response = this.generateFallbackResponse(message);
+                    }
+                    
+                    // Remove typing indicator and add response
+                    setTimeout(() => {
+                        this.removeChatMessage();
+                        this.addChatMessage('ai', response);
+                    }, 1500);
+                    
+                } catch (error) {
+                    setTimeout(() => {
+                        this.removeChatMessage();
+                        this.addChatMessage('ai', `❌ Oprostite, prišlo je do napake: ${error.message}`);
+                    }, 1000);
+                }
+            }
+
+            addChatMessage(sender, message) {
+                const chatMessages = document.getElementById('chatMessages');
+                if (!chatMessages) return;
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `chat-message chat-${sender}`;
+                messageDiv.innerHTML = sender === 'user' ? `👤 ${message}` : message;
+                
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            removeChatMessage() {
+                const chatMessages = document.getElementById('chatMessages');
+                if (chatMessages && chatMessages.lastChild) {
+                    chatMessages.removeChild(chatMessages.lastChild);
+                }
+            }
+
+            generateFallbackResponse(message) {
+                const responses = {
+                    'analiz': `## Sistemska Analiza
+                    
+**Trenutno stanje:**
+- Sistem deluje stabilno z ${Math.round(this.metrics.aiConfidence)}% AI zaupanjem
+- CPU: ${Math.round(this.metrics.cpu)}%, RAM: ${Math.round(this.metrics.ram)}%
+- Vsi ključni moduli so aktivni
+
+**Priporočila:**
+1. Nadaljuj z rednim monitoringom
+2. Razmisli o optimizaciji AI modula
+3. Pripravi se na povečano obremenitev`,
+
+                    'optimiz': `## Optimizacijske Možnosti
+                    
+**Identificirane priložnosti:**
+- Zmanjšaj CPU uporabo z lazy loading
+- Optimiziraj pomnilniško upravljanje
+- Implementiraj intelligent caching
+
+**Pričakovani rezultati:**
+- 15-25% izboljšanje performanc
+- Zmanjšana uporaba virov
+- Boljša odzivnost sistema`,
+
+                    'problem': `## Diagnostika Problema
+                    
+**Analiza:**
+Sistem trenutno deluje stabilno, vendar sem zaznal možnosti za izboljšave.
+
+**Priporočeni ukrepi:**
+1. Izvedi preventivno vzdrževanje
+2. Optimiziraj performančno kritične module
+3. Implementiraj dodatno monitoring
+
+**Potrebujem več informacij o specifičnem problemu za podrobnejšo analizo.**`
+                };
+
+                for (const [key, response] of Object.entries(responses)) {
+                    if (message.toLowerCase().includes(key)) {
+                        return response;
+                    }
+                }
+
+                return `🤖 Razumem vašo zahtevo: "${message}"
+
+Trenutno lahko pomagam z:
+- Sistemsko analizo (napišite "analiziraj sistem")
+- Optimizacijo performanc (napišite "optimiziraj sistem")
+- Reševanjem problemov (opišite problem)
+- Upravljanjem modulov
+
+Kako vam lahko pomagam?`;
+            }
+
+            getSystemData() {
+                return {
+                    modules: this.modules,
+                    metrics: this.metrics,
+                    uptime: Date.now() - this.startTime,
+                    logs: this.logs.slice(-10)
+                };
+            }
+
+            // Control panel functions
+            async runQuickTest() {
+                this.addLog('info', '🧪 Zagon hitrega testa...');
+                
+                setTimeout(() => {
+                    const results = Object.keys(this.modules).map(module => {
+                        const success = Math.random() > 0.1;
+                        if (success) {
+                            this.addLog('success', `✅ ${module} test uspešen`);
+                            this.modules[module].health = Math.min(100, this.modules[module].health + 2);
+                        } else {
+                            this.addLog('warning', `⚠️ ${module} test opozorilo`);
+                        }
+                        return success;
+                    });
+                    
+                    const successRate = results.filter(r => r).length / results.length * 100;
+                    this.addLog('info', `🧪 Hitri test zaključen (${Math.round(successRate)}% uspešnost)`);
+                    this.updateModuleList();
+                }, 2000);
+            }
+
+            async runAutoFix() {
+                this.addLog('info', '🔧 Zagon avtomatskega popravila...');
+                
+                setTimeout(() => {
+                    Object.keys(this.modules).forEach(module => {
+                        if (this.modules[module].health < 90) {
+                            this.modules[module].health = Math.min(100, this.modules[module].health + 10);
+                            this.modules[module].status = 'active';
+                            this.addLog('success', `🔧 ${module} modul popravljen`);
+                        }
+                    });
+                    
+                    this.addLog('success', '🔧 Avtomatsko popravilo zaključeno');
+                    this.updateModuleList();
+                }, 1500);
+            }
+
+            async runFullSystemTest() {
+                this.addLog('info', '🧪 Zagon celotnega sistemskega testiranja...');
+                
+                if (this.backendCore) {
+                    try {
+                        const result = await this.backendCore.runSystemTest();
+                        this.addLog('success', `🧪 Sistemski test zaključen (${Math.round(result.data.overallScore)}% uspešnost)`);
+                    } catch (error) {
+                        this.addLog('error', `❌ Sistemski test neuspešen: ${error.message}`);
+                    }
+                } else {
+                    // Fallback simulation
+                    setTimeout(() => {
+                        this.addLog('success', '🧪 Celoten sistemski test uspešno zaključen (89% uspešnost)');
+                    }, 3000);
+                }
+            }
+
+            async optimizeSystem() {
+                this.addLog('info', '⚡ Zagon sistemske optimizacije...');
+                
+                if (this.backendCore) {
+                    try {
+                        await this.backendCore.optimizeSystem();
+                        this.addLog('success', '⚡ Sistemska optimizacija uspešno zaključena');
+                    } catch (error) {
+                        this.addLog('error', `❌ Optimizacija neuspešna: ${error.message}`);
+                    }
+                } else {
+                    setTimeout(() => {
+                        this.metrics.cpu = Math.max(15, this.metrics.cpu - 10);
+                        this.metrics.ram = Math.max(20, this.metrics.ram - 8);
+                        Object.keys(this.modules).forEach(module => {
+                            this.modules[module].health = Math.min(100, this.modules[module].health + 3);
+                        });
+                        this.addLog('success', '⚡ Sistemska optimizacija zaključena');
+                        this.updateModuleList();
+                    }, 2000);
+                }
+            }
+
+            async trainAI() {
+                this.addLog('info', '🧠 Zagon AI treniranja...');
+                
+                const steps = 5;
+                let currentStep = 0;
+                
+                const trainingInterval = setInterval(() => {
+                    currentStep++;
+                    this.metrics.aiConfidence = Math.min(98, this.metrics.aiConfidence + 1);
+                    this.metrics.learningProgress += 2;
+                    
+                    document.getElementById('aiConfidence').textContent = Math.round(this.metrics.aiConfidence) + '%';
+                    document.getElementById('learningProgress').textContent = this.metrics.learningProgress;
+                    
+                    this.addLog('info', `🧠 AI treniranje korak ${currentStep}/${steps}`);
+                    
+                    if (currentStep >= steps) {
+                        clearInterval(trainingInterval);
+                        this.addLog('success', '🧠 AI treniranje uspešno zaključeno');
+                        this.modules.ai.health = Math.min(100, this.modules.ai.health + 8);
+                        this.modules.ai.status = 'active';
+                        this.updateModuleList();
+                    }
+                }, 1000);
+            }
+
+            async emergencyStop() {
+                this.addLog('warning', '🛑 ZASILNI STOP AKTIVIRAN');
+                
+                Object.keys(this.modules).forEach(module => {
+                    this.modules[module].status = 'stopped';
+                });
+                this.updateModuleList();
+                
+                setTimeout(() => {
+                    this.addLog('info', '🔄 Sistem se ponovno zaganja...');
+                    Object.keys(this.modules).forEach(module => {
+                        this.modules[module].status = 'active';
+                        this.modules[module].health = Math.max(80, this.modules[module].health);
+                    });
+                    this.updateModuleList();
+                    this.addLog('success', '✅ Sistem ponovno aktiven');
+                }, 4000);
+            }
+
+            showModuleDetails(key, module) {
+                this.addLog('info', `📊 Pregled modula: ${module.name} (Zdravje: ${module.health}%)`);
+                
+                // Highlight module in workflow if applicable
+                const workflowNode = document.querySelector(`[data-node="${key}"]`);
+                if (workflowNode) {
+                    this.highlightWorkflowPath(key);
+                }
+            }
+
+            addLog(level, message) {
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = {
+                    timestamp,
+                    level,
+                    message,
+                    id: Date.now() + Math.random()
+                };
+                
+                this.logs.push(logEntry);
+                
+                // Keep only last 50 logs
+                if (this.logs.length > 50) {
+                    this.logs = this.logs.slice(-50);
+                }
+                
+                // Update UI
+                const logContainer = document.getElementById('systemLogs');
+                if (logContainer) {
+                    const logDiv = document.createElement('div');
+                    logDiv.className = `log-entry log-${level}`;
+                    
+                    const icon = level === 'success' ? '✅' : level === 'warning' ? '⚠️' : level === 'error' ? '❌' : 'ℹ️';
+                    logDiv.innerHTML = `[${timestamp}] ${icon} ${message}`;
+                    
+                    logContainer.appendChild(logDiv);
+                    logContainer.scrollTop = logContainer.scrollHeight;
+                    
+                    // Keep only last 20 log entries in UI
+                    while (logContainer.children.length > 20) {
+                        logContainer.removeChild(logContainer.firstChild);
+                    }
+                }
+                
+                console.log(`[${timestamp}] [${level.toUpperCase()}] ${message}`);
+            }
+        }
+
+        // Initialize the unified system
+        let omniBotSystem;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            omniBotSystem = new OmniBotUnifiedSystem();
+        });
+    </script>
+</body>
+</html>

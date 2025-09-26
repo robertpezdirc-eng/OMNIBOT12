@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni-APP Enhanced Dynamic Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #links {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .link {
+            stroke: #ffffff;
+            stroke-width: 3;
+            stroke-dasharray: 15,10;
+            animation: dash 3s linear infinite;
+            opacity: 0.8;
+            filter: drop-shadow(0 0 5px rgba(255,255,255,0.5));
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -25;
+            }
+        }
+
+        #dashboard {
+            position: relative;
+            z-index: 2;
+            padding: 20px;
+            width: 100vw;
+            height: 100vh;
+            overflow: auto;
+        }
+
+        .node {
+            position: absolute;
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            border: 3px solid #ddd;
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            min-width: 200px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+            user-select: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .node:hover {
+            transform: translateY(-10px) scale(1.08);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border-color: #4CAF50;
+            background: linear-gradient(145deg, #ffffff, #e8f5e8);
+        }
+
+        .node#global {
+            background: linear-gradient(145deg, #FFD700, #FFA500);
+            border-color: #FF8C00;
+            font-size: 18px;
+            font-weight: bold;
+            animation: pulse 2.5s infinite;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+            }
+            50% { 
+                transform: scale(1.05); 
+                box-shadow: 0 0 50px rgba(255, 215, 0, 0.8);
+            }
+        }
+
+        .status {
+            display: block;
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 8px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.9);
+            transition: all 0.3s ease;
+        }
+
+        .node-remove {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(244, 67, 54, 0.5);
+        }
+
+        .node:hover .node-remove {
+            display: block;
+            animation: bounceIn 0.3s ease;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        #info-box {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: rgba(255,255,255,0.95);
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 350px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            font-size: 15px;
+            z-index: 1000;
+            backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
+        }
+
+        #controls {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(255,255,255,0.95);
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            padding: 20px;
+            width: 320px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            z-index: 1000;
+            backdrop-filter: blur(15px);
+        }
+
+        #controls h3 {
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        #controls input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        #controls input:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        #controls button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add {
+            background: linear-gradient(145deg, #4CAF50, #45a049);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-remove {
+            background: linear-gradient(145deg, #f44336, #da190b);
+            color: white;
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+        }
+
+        .btn-remove:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
+        }
+
+        .btn-preset {
+            background: linear-gradient(145deg, #2196F3, #1976D2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        .btn-preset:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+        }
+
+        .stats {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            z-index: 1000;
+            font-size: 15px;
+            backdrop-filter: blur(15px);
+            min-width: 200px;
+        }
+
+        .stats h4 {
+            margin-bottom: 15px;
+            color: #333;
+            text-align: center;
+        }
+
+        .stats div {
+            margin: 8px 0;
+            padding: 5px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 5px;
+        }
+
+        .animated-dot {
+            filter: drop-shadow(0 0 8px currentColor);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { opacity: 0.8; }
+            to { opacity: 1; }
+        }
+
+        /* Responsive design */
+        @media (max-width: 1400px) {
+            #controls {
+                width: 280px;
+                right: 20px;
+                top: 20px;
+            }
+            
+            .stats {
+                left: 20px;
+                top: 20px;
+            }
+            
+            #info-box {
+                left: 20px;
+                bottom: 20px;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <svg id="links" width="100%" height="100%">
+        <defs>
+            <marker id="arrowhead" markerWidth="12" markerHeight="8" 
+                    refX="11" refY="4" orient="auto">
+                <polygon points="0 0, 12 4, 0 8" fill="#ffffff" opacity="0.8"/>
+            </marker>
+            <filter id="glow">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                <feMerge> 
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+        </defs>
+    </svg>
+
+    <div class="stats">
+        <h4>📊 Live Statistike</h4>
+        <div>🔧 Moduli: <span id="module-count">1</span></div>
+        <div>🔗 Povezave: <span id="connection-count">0</span></div>
+        <div>✅ Online: <span id="online-count">0</span></div>
+        <div>⚠️ Opozorila: <span id="warning-count">0</span></div>
+        <div>❌ Offline: <span id="offline-count">0</span></div>
+    </div>
+
+    <div id="dashboard">
+        <div class="node" id="global" style="top: 100px; left: 50%; transform: translateX(-50%);">
+            🌐 Global Optimizer
+            <span class="status" id="status-global">⏳ Inicializacija...</span>
+        </div>
+    </div>
+
+    <div id="info-box">
+        <strong>🎯 Omni-APP Dynamic Dashboard</strong><br>
+        Kliknite na modul za podrobne informacije o njegovem delovanju in trenutnem statusu.
+    </div>
+
+    <div id="controls">
+        <h3>🎛️ Upravljanje Modulov</h3>
+        
+        <strong>➕ Dodaj nov modul:</strong>
+        <input type="text" id="new-node-name" placeholder="Ime modula (npr. AI_Assistant)"/>
+        <input type="text" id="new-node-icon" placeholder="Emoji ikona (npr. 🤖)"/>
+        <button class="btn-add" id="add-node">Dodaj modul</button>
+        
+        <strong>➖ Odstrani modul:</strong>
+        <input type="text" id="remove-node-name" placeholder="Ime modula za odstranitev"/>
+        <button class="btn-remove" id="remove-node">Odstrani modul</button>
+        
+        <strong>🚀 Hitre akcije:</strong>
+        <button class="btn-preset" onclick="addPresetModules()">Dodaj osnovne module</button>
+        <button class="btn-preset" onclick="addAdvancedModules()">Dodaj napredne module</button>
+        <button class="btn-remove" onclick="clearAllModules()">Počisti vse module</button>
+    </div>
+
+    <script>
+        const linksSVG = document.getElementById("links");
+        const dashboard = document.getElementById("dashboard");
+        const infoBox = document.getElementById("info-box");
+
+        let nodes = [{id:"global", icon:"🌐", top:100, left:window.innerWidth/2-100, type:"core"}];
+        let lines = [];
+        let nodeStatuses = {global:"⏳ Inicializacija..."};
+        let animatedDots = [];
+
+        const moduleDescriptions = {
+            global: "Centralni optimizator sistema, ki koordinira vse module in zagotavlja sinhronizirano delovanje celotne Omni-APP platforme.",
+            finance: "Finančni modul za upravljanje proračunov, analizo stroškov, napovedovanje prihodkov in optimizacijo finančnih procesov.",
+            logistics: "Logistični sistem za optimizacijo transportnih poti, upravljanje zalog, sledenje pošiljkam in analizo dobavnih verig.",
+            healthcare: "Zdravstveni modul za spremljanje vitalnih znakov, upravljanje zdravil, preventivno diagnostiko in telemedicino.",
+            tourism: "Turistični asistent za kreiranje itinerarjev, rezervacije, lokalne aktivnosti in personalizirane priporočila.",
+            agriculture: "Pametno kmetijstvo z analizo tal, vremenskimi napovedmi, optimizacijo pridelave in IoT senzorji.",
+            industry: "Industrijska avtomatizacija, nadzor proizvodnje, kontrola kakovosti in optimizacija proizvodnih procesov.",
+            energy: "Energetski management z obnovljivimi viri, pametnimi mrežami in optimizacijo porabe energije.",
+            ai_assistant: "AI pomočnik z naravno jezikovno obdelavo, strojnim učenjem in avtomatizacijo nalog.",
+            security: "Kibernetska varnost z nadzorom dostopa, zaščito podatkov, odkrivanjem groženj in varnostnimi protokoli.",
+            communications: "Komunikacijski center za 5G/6G tehnologije, IoT povezljivost in upravljanje omrežnih protokolov.",
+            analytics: "Napredna analitika podatkov z vizualizacijo, napovednim modeliranjem in poslovnim inteligenco."
+        };
+
+        // Funkcija za kreiranje novega modula
+        function createNode(id, icon, top=null, left=null) {
+            if (document.getElementById(id)) {
+                alert(`Modul "${id}" že obstaja v sistemu!`);
+                return;
+            }
+
+            // Avtomatsko pozicioniranje
+            if (top === null || left === null) {
+                const positions = generateNodePosition();
+                top = positions.top;
+                left = positions.left;
+            }
+
+            const div = document.createElement("div");
+            div.className = "node";
+            div.id = id;
+            div.style.top = top + "px";
+            div.style.left = left + "px";
+            div.innerHTML = `
+                ${icon} ${id.replace(/_/g, ' ').toUpperCase()}
+                <span class="status" id="status-${id}">⏳ Inicializacija...</span>
+                <button class="node-remove" onclick="removeNode('${id}')">×</button>
+            `;
+            
+            dashboard.appendChild(div);
+            nodes.push({id, icon, top, left, type:"module"});
+            nodeStatuses[id] = "⏳ Inicializacija...";
+            
+            updateConnections();
+            attachNodeClick(div);
+            updateStats();
+            
+            // Simulacija inicializacije
+            setTimeout(() => {
+                fetchStatus(id);
+            }, 1500);
+        }
+
+        // Generiranje pozicije za novi modul
+        function generateNodePosition() {
+            const existingNodes = nodes.filter(n => n.id !== "global");
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const radius = 250;
+            const angle = (existingNodes.length * 2 * Math.PI) / 8; // Razporedi v krogu
+            
+            return {
+                top: centerY + Math.sin(angle) * radius - 50,
+                left: centerX + Math.cos(angle) * radius - 100
+            };
+        }
+
+        // Funkcija za odstranjevanje modula
+        function removeNode(id) {
+            if (id === "global") {
+                alert("Global Optimizer je jedro sistema in ne more biti odstranjen!");
+                return;
+            }
+            
+            const div = document.getElementById(id);
+            if (div) {
+                // Animacija odstranjevanja
+                div.style.transform = "scale(0) rotate(180deg)";
+                div.style.opacity = "0";
+                
+                setTimeout(() => {
+                    if (div.parentNode) {
+                        dashboard.removeChild(div);
+                    }
+                }, 300);
+                
+                nodes = nodes.filter(n => n.id !== id);
+                delete nodeStatuses[id];
+                
+                // Odstrani animirane dot-e za ta modul
+                animatedDots = animatedDots.filter(dot => {
+                    if (dot.targetId === id) {
+                        if (dot.element.parentNode) {
+                            linksSVG.removeChild(dot.element);
+                        }
+                        return false;
+                    }
+                    return true;
+                });
+                
+                updateConnections();
+                updateStats();
+            }
+        }
+
+        // Povezovanje vseh modulov z Global Optimizer
+        function updateConnections() {
+            // Izbriši stare linije
+            lines.forEach(l => {
+                if (l.line.parentNode) {
+                    linksSVG.removeChild(l.line);
+                }
+            });
+            lines = [];
+
+            // Ustvari nove povezave
+            nodes.filter(n => n.id !== "global").forEach(n => {
+                const source = document.getElementById("global");
+                const target = document.getElementById(n.id);
+                
+                if (!source || !target) return;
+                
+                const sourceRect = source.getBoundingClientRect();
+                const targetRect = target.getBoundingClientRect();
+                
+                const x1 = sourceRect.left + sourceRect.width / 2;
+                const y1 = sourceRect.top + sourceRect.height / 2;
+                const x2 = targetRect.left + targetRect.width / 2;
+                const y2 = targetRect.top + targetRect.height / 2;
+
+                // FIXED: Proper SVG namespace with correct quotes
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", x1);
+                line.setAttribute("y1", y1);
+                line.setAttribute("x2", x2);
+                line.setAttribute("y2", y2);
+                line.setAttribute("class", "link");
+                line.setAttribute("marker-end", "url(#arrowhead)");
+                line.setAttribute("filter", "url(#glow)");
+                
+                linksSVG.appendChild(line);
+                lines.push({line, sourceId: "global", targetId: n.id});
+            });
+        }
+
+        // Pripni click event na modul
+        function attachNodeClick(div) {
+            div.onclick = (e) => {
+                if (e.target.classList.contains('node-remove')) return;
+                
+                const id = div.id;
+                const status = nodeStatuses[id] || "⏳ Inicializacija...";
+                const description = moduleDescriptions[id] || "Specializiran modul za specifične naloge v Omni-APP ekosistemu.";
+                
+                infoBox.innerHTML = `
+                    <strong>🔧 ${id.replace(/_/g, ' ').toUpperCase()}</strong><br><br>
+                    <strong>📊 Status:</strong> ${status}<br><br>
+                    <strong>📝 Opis:</strong> ${description}<br><br>
+                    <small>🕒 Zadnja posodobitev: ${new Date().toLocaleTimeString('sl-SI')}</small>
+                `;
+                
+                // Vizualni feedback
+                div.style.transform = "scale(1.1)";
+                setTimeout(() => {
+                    div.style.transform = "";
+                }, 200);
+            };
+        }
+
+        // Simulacija statusov
+        function fetchStatus(nodeId) {
+            const statuses = ["✅ Online", "⚠️ Warning", "❌ Offline", "🔄 Updating"];
+            const weights = [0.7, 0.15, 0.1, 0.05]; // Večja verjetnost za Online
+            
+            let random = Math.random();
+            let status = statuses[0];
+            
+            for (let i = 0; i < statuses.length; i++) {
+                if (random < weights[i]) {
+                    status = statuses[i];
+                    break;
+                }
+                random -= weights[i];
+            }
+            
+            nodeStatuses[nodeId] = status;
+            const statusEl = document.getElementById(`status-${nodeId}`);
+            if (statusEl) {
+                statusEl.textContent = status;
+                
+                // Barvno kodiranje
+                switch(status) {
+                    case "✅ Online": 
+                        statusEl.style.color = "#4CAF50"; 
+                        statusEl.style.background = "rgba(76, 175, 80, 0.15)";
+                        break;
+                    case "⚠️ Warning": 
+                        statusEl.style.color = "#FF9800"; 
+                        statusEl.style.background = "rgba(255, 152, 0, 0.15)";
+                        break;
+                    case "❌ Offline": 
+                        statusEl.style.color = "#F44336"; 
+                        statusEl.style.background = "rgba(244, 67, 54, 0.15)";
+                        break;
+                    case "🔄 Updating": 
+                        statusEl.style.color = "#2196F3"; 
+                        statusEl.style.background = "rgba(33, 150, 243, 0.15)";
+                        break;
+                }
+            }
+            
+            return status;
+        }
+
+        // Animacija dot-a po liniji
+        function animateFlow(lineObj) {
+            const status = nodeStatuses[lineObj.targetId];
+            
+            // FIXED: Proper SVG namespace with correct quotes
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("r", 8);
+            circle.setAttribute("class", "animated-dot");
+            
+            let color;
+            switch(status) {
+                case "✅ Online": color = "#4CAF50"; break;
+                case "⚠️ Warning": color = "#FF9800"; break;
+                case "❌ Offline": color = "#F44336"; break;
+                case "🔄 Updating": color = "#2196F3"; break;
+                default: color = "#9E9E9E";
+            }
+            
+            circle.setAttribute("fill", color);
+            circle.setAttribute("opacity", "0.9");
+            linksSVG.appendChild(circle);
+
+            const dotData = {
+                element: circle,
+                targetId: lineObj.targetId,
+                startTime: Date.now()
+            };
+            animatedDots.push(dotData);
+
+            let t = 0;
+            function step() {
+                t += 0.015; // Počasnejša animacija
+                if (t > 1) {
+                    // Odstrani dot
+                    if (circle.parentNode) {
+                        linksSVG.removeChild(circle);
+                    }
+                    animatedDots = animatedDots.filter(d => d.element !== circle);
+                    return;
+                }
+                
+                const l = lineObj.line;
+                const x1 = parseFloat(l.getAttribute("x1"));
+                const y1 = parseFloat(l.getAttribute("y1"));
+                const x2 = parseFloat(l.getAttribute("x2"));
+                const y2 = parseFloat(l.getAttribute("y2"));
+                
+                const x = x1 + (x2 - x1) * t;
+                const y = y1 + (y2 - y1) * t;
+                
+                circle.setAttribute("cx", x);
+                circle.setAttribute("cy", y);
+
+                requestAnimationFrame(step);
+            }
+            step();
+        }
+
+        // Posodobitev statistik
+        function updateStats() {
+            document.getElementById('module-count').textContent = nodes.length;
+            document.getElementById('connection-count').textContent = lines.length;
+            
+            const statusCounts = {
+                online: 0,
+                warning: 0,
+                offline: 0
+            };
+            
+            Object.values(nodeStatuses).forEach(status => {
+                if (status === "✅ Online") statusCounts.online++;
+                else if (status === "⚠️ Warning") statusCounts.warning++;
+                else if (status === "❌ Offline") statusCounts.offline++;
+            });
+            
+            document.getElementById('online-count').textContent = statusCounts.online;
+            document.getElementById('warning-count').textContent = statusCounts.warning;
+            document.getElementById('offline-count').textContent = statusCounts.offline;
+        }
+
+        // Dodaj osnovne module
+        function addPresetModules() {
+            const presets = [
+                {id: "finance", icon: "💰"},
+                {id: "healthcare", icon: "🏥"},
+                {id: "logistics", icon: "🚚"},
+                {id: "ai_assistant", icon: "🤖"},
+                {id: "security", icon: "🔒"}
+            ];
+            
+            presets.forEach((preset, index) => {
+                setTimeout(() => {
+                    createNode(preset.id, preset.icon);
+                }, index * 500);
+            });
+        }
+
+        // Dodaj napredne module
+        function addAdvancedModules() {
+            const advanced = [
+                {id: "tourism", icon: "🏖️"},
+                {id: "agriculture", icon: "🌾"},
+                {id: "industry", icon: "🏭"},
+                {id: "energy", icon: "⚡"},
+                {id: "communications", icon: "📡"},
+                {id: "analytics", icon: "📈"}
+            ];
+            
+            advanced.forEach((preset, index) => {
+                setTimeout(() => {
+                    createNode(preset.id, preset.icon);
+                }, index * 400);
+            });
+        }
+
+        // Počisti vse module
+        function clearAllModules() {
+            if (confirm("Ali ste prepričani, da želite odstraniti vse module? Ta akcija je nepovratna.")) {
+                const moduleNodes = nodes.filter(n => n.id !== "global");
+                moduleNodes.forEach((n, index) => {
+                    setTimeout(() => {
+                        removeNode(n.id);
+                    }, index * 200);
+                });
+            }
+        }
+
+        // Periodicne posodobitve in animacije
+        function updateAll() {
+            nodes.forEach(n => {
+                if (Math.random() < 0.3) { // 30% možnost posodobitve
+                    fetchStatus(n.id);
+                }
+            });
+            
+            // Animiraj tok podatkov
+            lines.forEach(l => {
+                if (Math.random() < 0.4) { // 40% možnost animacije
+                    animateFlow(l);
+                }
+            });
+            
+            updateStats();
+        }
+
+        // Event listeners
+        document.getElementById('add-node').onclick = () => {
+            const name = document.getElementById('new-node-name').value.trim();
+            const icon = document.getElementById('new-node-icon').value.trim();
+            
+            if (name && icon) {
+                const nodeId = name.toLowerCase().replace(/\s+/g, '_');
+                createNode(nodeId, icon);
+                document.getElementById('new-node-name').value = '';
+                document.getElementById('new-node-icon').value = '';
+            } else {
+                alert('Prosimo, vnesite ime in ikono modula!');
+            }
+        };
+
+        document.getElementById('remove-node').onclick = () => {
+            const name = document.getElementById('remove-node-name').value.trim();
+            if (name) {
+                const nodeId = name.toLowerCase().replace(/\s+/g, '_');
+                removeNode(nodeId);
+                document.getElementById('remove-node-name').value = '';
+            } else {
+                alert('Prosimo, vnesite ime modula za odstranitev!');
+            }
+        };
+
+        // Inicializacija
+        document.addEventListener('DOMContentLoaded', () => {
+            // Pripni click na Global Optimizer
+            attachNodeClick(document.getElementById('global'));
+            
+            // Zaženi periodicne posodobitve
+            setInterval(updateAll, 2000);
+            
+            // Posodobi začetne statistike
+            updateStats();
+            
+            // Inicializiraj Global Optimizer
+            setTimeout(() => {
+                nodeStatuses.global = "✅ Online";
+                document.getElementById('status-global').textContent = "✅ Online";
+                document.getElementById('status-global').style.color = "#4CAF50";
+                document.getElementById('status-global').style.background = "rgba(76, 175, 80, 0.15)";
+                updateStats();
+            }, 2000);
+        });
+
+        // Prepreči kontekstni meni
+        dashboard.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        // Posodobi povezave ob spremembi velikosti okna
+        window.addEventListener('resize', () => {
+            setTimeout(updateConnections, 100);
+        });
+    </script>
+</body>
+</html>

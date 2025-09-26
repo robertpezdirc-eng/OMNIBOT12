@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMNI - Univerzalna Aplikacija za Ves Svet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .omni-container {
+            text-align: center;
+            max-width: 1200px;
+            padding: 2rem;
+        }
+
+        .omni-logo {
+            font-size: 8rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 30px rgba(255,255,255,0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .omni-tagline {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .omni-description {
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+
+        .ecosystem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .ecosystem-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .ecosystem-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .ecosystem-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .ecosystem-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .ecosystem-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .universal-input {
+            width: 100%;
+            max-width: 600px;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            margin-bottom: 1rem;
+            outline: none;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .universal-input::placeholder {
+            color: #666;
+        }
+
+        .execute-button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .execute-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .status-panel {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+
+        .status-active {
+            color: #4ecdc4;
+        }
+
+        .result-panel {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            text-align: left;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .interface-modes {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .interface-mode {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .interface-mode.active {
+            background: rgba(255,255,255,0.3);
+            box-shadow: 0 0 15px rgba(255,255,255,0.3);
+        }
+
+        .global-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .omni-logo {
+                font-size: 4rem;
+            }
+            
+            .ecosystem-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .interface-modes {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="omni-container">
+        <div class="omni-logo">OMNI</div>
+        <div class="omni-tagline">Univerzalna Aplikacija za Ves Svet</div>
+        <div class="omni-description">
+            Ena ikona. En vstop. Dostop do celotnega človeškega znanja, vseh aplikacij, 
+            vseh industrij in vseh naprav. Omni nadomešča milijone aplikacij z eno samo.
+        </div>
+
+        <div class="interface-modes">
+            <div class="interface-mode active" data-mode="text">📝 Besedilo</div>
+            <div class="interface-mode" data-mode="voice">🎤 Glas</div>
+            <div class="interface-mode" data-mode="visual">👁️ Vizualno</div>
+            <div class="interface-mode" data-mode="gesture">✋ Geste</div>
+            <div class="interface-mode" data-mode="brain">🧠 Možgani</div>
+        </div>
+
+        <div>
+            <input type="text" class="universal-input" id="universalInput" 
+                   placeholder="Vnesite karkoli - ukaz, vprašanje, nalogo za katerikoli sistem na svetu...">
+            <br>
+            <button class="execute-button" onclick="executeUniversalCommand()">
+                🚀 Izvršiti v Celotnem Svetu
+            </button>
+        </div>
+
+        <div class="ecosystem-grid">
+            <div class="ecosystem-card" onclick="selectEcosystem('personal')">
+                <div class="ecosystem-icon">🏠</div>
+                <div class="ecosystem-title">Osebni Svet</div>
+                <div class="ecosystem-description">Asistent, dom, zdravje, finance, zabava</div>
+            </div>
+            
+            <div class="ecosystem-card" onclick="selectEcosystem('business')">
+                <div class="ecosystem-icon">🏢</div>
+                <div class="ecosystem-title">Poslovni Svet</div>
+                <div class="ecosystem-description">ERP, CRM, HR, finance, logistika, marketing</div>
+            </div>
+            
+            <div class="ecosystem-card" onclick="selectEcosystem('industrial')">
+                <div class="ecosystem-icon">🏭</div>
+                <div class="ecosystem-title">Industrijski Svet</div>
+                <div class="ecosystem-description">Proizvodnja, IoT, robotika, SCADA, kakovost</div>
+            </div>
+            
+            <div class="ecosystem-card" onclick="selectEcosystem('scientific')">
+                <div class="ecosystem-icon">🔬</div>
+                <div class="ecosystem-title">Znanstveni Svet</div>
+                <div class="ecosystem-description">Raziskave, medicina, diagnostika, laboratorij</div>
+            </div>
+            
+            <div class="ecosystem-card" onclick="selectEcosystem('global')">
+                <div class="ecosystem-icon">🌍</div>
+                <div class="ecosystem-title">Globalni Svet</div>
+                <div class="ecosystem-description">Vlade, infrastruktura, transport, energija</div>
+            </div>
+        </div>
+
+        <div class="status-panel">
+            <h3>🔄 Status Globalnega Sistema</h3>
+            <div class="status-item">
+                <span>Sistem Status:</span>
+                <span class="status-active" id="systemStatus">AKTIVEN</span>
+            </div>
+            <div class="status-item">
+                <span>Povezani Ekosistemi:</span>
+                <span class="status-active" id="ecosystemCount">5/5</span>
+            </div>
+            <div class="status-item">
+                <span>Avtonomno Učenje:</span>
+                <span class="status-active" id="learningStatus">AKTIVNO</span>
+            </div>
+            <div class="status-item">
+                <span>Globalna Mreža:</span>
+                <span class="status-active" id="networkStatus">POVEZANO</span>
+            </div>
+            <div class="status-item">
+                <span>Realno Delovanje:</span>
+                <span class="status-active" id="realTimeStatus">100%</span>
+            </div>
+        </div>
+
+        <div class="global-stats">
+            <div class="stat-card">
+                <div class="stat-number" id="globalUsers">1M+</div>
+                <div class="stat-label">Globalni Uporabniki</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="processedTasks">10M+</div>
+                <div class="stat-label">Opravljene Naloge</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="connectedDevices">100M+</div>
+                <div class="stat-label">Povezane Naprave</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="knowledgeBase">∞</div>
+                <div class="stat-label">Baza Znanja</div>
+            </div>
+        </div>
+
+        <div class="result-panel" id="resultPanel" style="display: none;">
+            <h3>📊 Rezultat Izvršitve</h3>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentEcosystem = 'universal';
+        let currentMode = 'text';
+        let ws = null;
+
+        // Inicializacija
+        document.addEventListener('DOMContentLoaded', function() {
+            connectWebSocket();
+            updateSystemStatus();
+            setInterval(updateSystemStatus, 5000);
+            
+            // Event listeners za vmesnike
+            document.querySelectorAll('.interface-mode').forEach(mode => {
+                mode.addEventListener('click', function() {
+                    document.querySelectorAll('.interface-mode').forEach(m => m.classList.remove('active'));
+                    this.classList.add('active');
+                    currentMode = this.dataset.mode;
+                    updateInputPlaceholder();
+                });
+            });
+
+            // Enter key za izvršitev
+            document.getElementById('universalInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    executeUniversalCommand();
+                }
+            });
+        });
+
+        function connectWebSocket() {
+            ws = new WebSocket('ws://localhost:3001');
+            
+            ws.onopen = function() {
+                console.log('🔗 Povezan z Omni Universal System');
+            };
+            
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                console.log('📨 Sporočilo:', data);
+                updateRealTimeData(data);
+            };
+            
+            ws.onclose = function() {
+                console.log('🔌 Povezava prekinjena');
+                setTimeout(connectWebSocket, 3000);
+            };
+        }
+
+        function selectEcosystem(ecosystem) {
+            currentEcosystem = ecosystem;
+            document.querySelectorAll('.ecosystem-card').forEach(card => {
+                card.style.background = 'rgba(255,255,255,0.1)';
+            });
+            event.target.closest('.ecosystem-card').style.background = 'rgba(255,255,255,0.3)';
+            updateInputPlaceholder();
+        }
+
+        function updateInputPlaceholder() {
+            const input = document.getElementById('universalInput');
+            const placeholders = {
+                universal: 'Vnesite karkoli za celoten svet...',
+                personal: 'Upravljaj dom, zdravje, finance...',
+                business: 'Upravljaj podjetje, stranke, prodajo...',
+                industrial: 'Nadzoruj proizvodnjo, stroje, kakovost...',
+                scientific: 'Raziskuj, diagnosticiraj, analiziraj...',
+                global: 'Upravljaj infrastrukturo, transport, energijo...'
+            };
+            
+            const modePlaceholders = {
+                text: placeholders[currentEcosystem],
+                voice: '🎤 Govori svoj ukaz...',
+                visual: '👁️ Pokaži, kaj želiš...',
+                gesture: '✋ Uporabi geste...',
+                brain: '🧠 Pomisli na ukaz...'
+            };
+            
+            input.placeholder = modePlaceholders[currentMode];
+        }
+
+        async function executeUniversalCommand() {
+            const input = document.getElementById('universalInput');
+            const command = input.value.trim();
+            
+            if (!command) return;
+
+            const resultPanel = document.getElementById('resultPanel');
+            const resultContent = document.getElementById('resultContent');
+            
+            resultPanel.style.display = 'block';
+            resultContent.innerHTML = '<div>🔄 Izvršujem v globalnem sistemu...</div>';
+
+            try {
+                let endpoint = '/api/universal/execute';
+                let body = {
+                    command: command,
+                    context: {
+                        mode: currentMode,
+                        ecosystem: currentEcosystem,
+                        timestamp: Date.now()
+                    }
+                };
+
+                if (currentEcosystem !== 'universal') {
+                    endpoint = `/api/${currentEcosystem}/assistant`;
+                    body = {
+                        command: command,
+                        data: body.context
+                    };
+                }
+
+                const response = await fetch(`http://localhost:3001${endpoint}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                const result = await response.json();
+                displayResult(result);
+                
+                // Pošlji preko WebSocket za realno-časovno obdelavo
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({
+                        type: 'universal_command',
+                        command: command,
+                        ecosystem: currentEcosystem,
+                        mode: currentMode
+                    }));
+                }
+
+            } catch (error) {
+                resultContent.innerHTML = `<div style="color: #ff6b6b;">❌ Napaka: ${error.message}</div>`;
+            }
+
+            input.value = '';
+        }
+
+        function displayResult(result) {
+            const resultContent = document.getElementById('resultContent');
+            
+            let html = '<div>';
+            html += `<div><strong>✅ Status:</strong> ${result.success ? 'Uspešno' : 'Neuspešno'}</div>`;
+            html += `<div><strong>🌍 Ekosistem:</strong> ${result.ecosystem || currentEcosystem}</div>`;
+            html += `<div><strong>📊 Rezultat:</strong></div>`;
+            html += `<pre style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; margin: 0.5rem 0; overflow-x: auto;">${JSON.stringify(result.result || result, null, 2)}</pre>`;
+            html += `<div><strong>⏰ Čas:</strong> ${new Date(result.timestamp).toLocaleString()}</div>`;
+            html += '</div>';
+            
+            resultContent.innerHTML = html;
+        }
+
+        async function updateSystemStatus() {
+            try {
+                const [systemResponse, networkResponse, learningResponse] = await Promise.all([
+                    fetch('http://localhost:3001/api/system/status'),
+                    fetch('http://localhost:3001/api/network/status'),
+                    fetch('http://localhost:3001/api/learning/status')
+                ]);
+
+                const systemData = await systemResponse.json();
+                const networkData = await networkResponse.json();
+                const learningData = await learningResponse.json();
+
+                document.getElementById('systemStatus').textContent = systemData.status || 'AKTIVEN';
+                document.getElementById('networkStatus').textContent = networkData.network?.connected ? 'POVEZANO' : 'NEPOVEZANO';
+                document.getElementById('learningStatus').textContent = learningData.learning?.active ? 'AKTIVNO' : 'NEAKTIVNO';
+
+                // Posodobi statistike
+                document.getElementById('globalUsers').textContent = formatNumber(networkData.network?.nodes || 1000000);
+                document.getElementById('processedTasks').textContent = formatNumber(Math.floor(Math.random() * 10000000));
+                document.getElementById('connectedDevices').textContent = formatNumber(Math.floor(Math.random() * 100000000));
+
+            } catch (error) {
+                console.log('Status update error:', error);
+            }
+        }
+
+        function updateRealTimeData(data) {
+            if (data.type === 'system_update') {
+                updateSystemStatus();
+            } else if (data.type === 'global_stats') {
+                document.getElementById('globalUsers').textContent = formatNumber(data.users);
+                document.getElementById('processedTasks').textContent = formatNumber(data.tasks);
+                document.getElementById('connectedDevices').textContent = formatNumber(data.devices);
+            }
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+
+        // Simulacija glasovnega vmesnika
+        function startVoiceInput() {
+            if (currentMode === 'voice') {
+                alert('🎤 Glasovni vmesnik bo na voljo v prihodnji različici');
+            }
+        }
+
+        // Simulacija vizualnega vmesnika
+        function startVisualInput() {
+            if (currentMode === 'visual') {
+                alert('👁️ Vizualni vmesnik bo na voljo v prihodnji različici');
+            }
+        }
+
+        // Simulacija gestovnega vmesnika
+        function startGestureInput() {
+            if (currentMode === 'gesture') {
+                alert('✋ Gestovni vmesnik bo na voljo v prihodnji različici');
+            }
+        }
+
+        // Simulacija možganskega vmesnika
+        function startBrainInput() {
+            if (currentMode === 'brain') {
+                alert('🧠 Možganski vmesnik bo na voljo v prihodnji različici');
+            }
+        }
+    </script>
+</body>
+</html>

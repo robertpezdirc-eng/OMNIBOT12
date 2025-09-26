@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌍 OMNI ULTRA - Univerzalni Sistem</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .omni-container {
+            text-align: center;
+            max-width: 1200px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .omni-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 20px rgba(255,255,255,0.2); }
+            to { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 30px rgba(255,255,255,0.4); }
+        }
+
+        .omni-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+        }
+
+        .omni-icon {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 2rem;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .omni-icon:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .omni-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 4s linear infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .sectors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 3rem 0;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .sectors-grid.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .sector-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .sector-card:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .sector-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .sector-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .sector-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+
+        .control-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .control-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 20px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .control-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .status-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .feature-list li:before {
+            content: '✅ ';
+            margin-right: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .omni-title {
+                font-size: 2.5rem;
+            }
+            
+            .omni-icon {
+                width: 150px;
+                height: 150px;
+                font-size: 4rem;
+            }
+            
+            .sectors-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="omni-container">
+        <h1 class="omni-title">🌍 OMNI ULTRA</h1>
+        <p class="omni-subtitle">Univerzalni sistem za vse človeške potrebe</p>
+        
+        <div class="omni-icon" onclick="activateOmni()">
+            🚀
+        </div>
+        
+        <div class="sectors-grid" id="sectorsGrid">
+            <!-- Osnovni sektorji -->
+            <div class="sector-card" onclick="openSector('finance')">
+                <div class="sector-icon">💰</div>
+                <div class="sector-title">Finance</div>
+                <div class="sector-description">Finančno upravljanje, investicije, optimizacija</div>
+            </div>
+            
+            <div class="sector-card" onclick="openSector('healthcare')">
+                <div class="sector-icon">🏥</div>
+                <div class="sector-title">Zdravstvo</div>
+                <div class="sector-description">Medicina, diagnostika, wellness</div>
+            </div>
+            
+            <div class="sector-card" onclick="openSector('logistics')">
+                <div class="sector-icon">🚚</div>
+                <div class="sector-title">Logistika</div>
+                <div class="sector-description">Transport, dobavne verige, optimizacija</div>
+            </div>
+            
+            <div class="sector-card" onclick="openSector('tourism')">
+                <div class="sector-icon">🌍</div>
+                <div class="sector-title">Turizem</div>
+                <div class="sector-description">Potovanja, gostinstvo, izkušnje</div>
+            </div>
+            
+            <div class="sector-card" onclick="openSector('agriculture')">
+                <div class="sector-icon">🌾</div>
+                <div class="sector-title">Kmetijstvo</div>
+                <div class="sector-description">Pridelava, živinoreja, trajnostnost</div>
+            </div>
+            
+            <div class="sector-card" onclick="openSector('energy')">
+                <div class="sector-icon">⚡</div>
+                <div class="sector-title">Energija</div>
+                <div class="sector-description">Obnovljivi viri, upravljanje, optimizacija</div>
+            </div>
+            
+            <!-- Napredni sektorji -->
+            <div class="sector-card" onclick="openSector('ai')">
+                <div class="sector-icon">🧠</div>
+                <div class="sector-title">Umetna Inteligenca</div>
+                <div class="sector-description">AI, strojno učenje, avtomatizacija</div>
+            </div>
+            
+            <div class="sector-card" onclick="openSector('robotics')">
+                <div class="sector-icon">🤖</div>
+                <div class="sector-title">Robotika</div>
+                <div class="sector-description">Roboti, avtomatizacija, interakcija</div>
+            </div>
+            
+            <div class="sector-card" onclick="openSector('space')">
+                <div class="sector-icon">🚀</div>
+                <div class="sector-title">Vesolje</div>
+                <div class="sector-description">Raziskave, sateliti, astronavtika</div>
+            </div>
+            
+            <div class="sector-card" onclick="openSector('military')">
+                <div class="sector-icon">🪖</div>
+                <div class="sector-title">Obramba</div>
+                <div class="sector-description">Vojaška logistika, strategija, varnost</div>
+            </div>
+            
+            <div class="sector-card" onclick="openSector('legal')">
+                <div class="sector-icon">⚖️</div>
+                <div class="sector-title">Pravo</div>
+                <div class="sector-description">Zakonodaja, compliance, svetovanje</div>
+            </div>
+            
+            <div class="sector-card" onclick="openSector('bioengineering')">
+                <div class="sector-icon">🧬</div>
+                <div class="sector-title">Bioinženiring</div>
+                <div class="sector-description">Genetika, biotehnologija, medicina</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="control-panel">
+        <button class="control-btn" onclick="showSystemStatus()">📊 Status</button>
+        <button class="control-btn" onclick="showAllFeatures()">🔧 Funkcije</button>
+        <button class="control-btn" onclick="optimizeSystem()">⚡ Optimiziraj</button>
+    </div>
+    
+    <div class="status-bar" id="statusBar">
+        🟢 Sistem aktiven | 🧠 AI učenje | 🔄 Avtonomno delovanje
+    </div>
+    
+    <!-- Modal za prikaz informacij -->
+    <div class="modal" id="infoModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Globalne spremenljivke
+        let systemActive = false;
+        let currentSector = null;
+        
+        // Aktiviraj OMNI sistem
+        function activateOmni() {
+            if (!systemActive) {
+                systemActive = true;
+                document.getElementById('sectorsGrid').classList.add('visible');
+                updateStatusBar('🚀 OMNI ULTRA aktiviran | Vsi sektorji dostopni');
+                
+                // Animacija aktivacije
+                const icon = document.querySelector('.omni-icon');
+                icon.style.animation = 'pulse 1s ease-in-out 3';
+                
+                // Zaženi avtonomne funkcije
+                startAutonomousFunctions();
+            } else {
+                // Če je že aktiven, prikaži glavno nadzorno ploščo
+                openGlobalDashboard();
+            }
+        }
+        
+        // Odpri sektor
+        function openSector(sectorName) {
+            if (!systemActive) {
+                activateOmni();
+                return;
+            }
+            
+            currentSector = sectorName;
+            
+            const sectorInfo = getSectorInfo(sectorName);
+            
+            const modalContent = `
+                <h2>${sectorInfo.icon} ${sectorInfo.title}</h2>
+                <p><strong>Opis:</strong> ${sectorInfo.description}</p>
+                <h3>🔧 Funkcionalnosti:</h3>
+                <ul class="feature-list">
+                    ${sectorInfo.features.map(feature => `<li>${feature}</li>`).join('')}
+                </ul>
+                <h3>🎯 Dostopne aplikacije:</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 15px;">
+                    ${sectorInfo.apps.map(app => `
+                        <button class="control-btn" onclick="launchApp('${app.id}')" style="border-radius: 10px; padding: 15px;">
+                            ${app.icon} ${app.name}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+            
+            showModal(modalContent);
+            updateStatusBar(`📍 Aktiven sektor: ${sectorInfo.title}`);
+        }
+        
+        // Pridobi informacije o sektorju
+        function getSectorInfo(sectorName) {
+            const sectors = {
+                finance: {
+                    title: 'Finance',
+                    icon: '💰',
+                    description: 'Celovito finančno upravljanje z AI optimizacijo',
+                    features: [
+                        'Portfeljska optimizacija',
+                        'Analiza tveganj',
+                        'Avtomatsko trgovanje',
+                        'Proračunsko načrtovanje',
+                        'Napovedovanje trgov'
+                    ],
+                    apps: [
+                        {id: 'portfolio', name: 'Portfolio Manager', icon: '📈'},
+                        {id: 'trading', name: 'AI Trading', icon: '🤖'},
+                        {id: 'budget', name: 'Budget Planner', icon: '💳'}
+                    ]
+                },
+                healthcare: {
+                    title: 'Zdravstvo',
+                    icon: '🏥',
+                    description: 'Napredna zdravstvena oskrba z AI diagnostiko',
+                    features: [
+                        'AI diagnostika',
+                        'Načrtovanje zdravljenja',
+                        'Spremljanje zdravja',
+                        'Preventivna medicina',
+                        'Telemedicina'
+                    ],
+                    apps: [
+                        {id: 'diagnosis', name: 'AI Diagnosis', icon: '🔬'},
+                        {id: 'health_monitor', name: 'Health Monitor', icon: '📱'},
+                        {id: 'telemedicine', name: 'Telemedicine', icon: '💻'}
+                    ]
+                },
+                ai: {
+                    title: 'Umetna Inteligenca',
+                    icon: '🧠',
+                    description: 'Napredni AI sistemi za vse panoge',
+                    features: [
+                        'Globoko učenje',
+                        'Naravni jezik',
+                        'Računalniški vid',
+                        'Prediktivna analitika',
+                        'Avtonomni sistemi'
+                    ],
+                    apps: [
+                        {id: 'ml_studio', name: 'ML Studio', icon: '🔬'},
+                        {id: 'nlp_engine', name: 'NLP Engine', icon: '💬'},
+                        {id: 'vision_ai', name: 'Vision AI', icon: '👁️'}
+                    ]
+                },
+                robotics: {
+                    title: 'Robotika',
+                    icon: '🤖',
+                    description: 'Napredni robotski sistemi in avtomatizacija',
+                    features: [
+                        'Robotsko upravljanje',
+                        'Načrtovanje poti',
+                        'Človeško-robotska interakcija',
+                        'Industrijska avtomatizacija',
+                        'Servisni roboti'
+                    ],
+                    apps: [
+                        {id: 'robot_control', name: 'Robot Control', icon: '🎮'},
+                        {id: 'automation', name: 'Automation Hub', icon: '⚙️'},
+                        {id: 'service_bots', name: 'Service Bots', icon: '🤝'}
+                    ]
+                },
+                space: {
+                    title: 'Vesolje',
+                    icon: '🚀',
+                    description: 'Raziskave vesolja in satelitske tehnologije',
+                    features: [
+                        'Načrtovanje misij',
+                        'Orbitalna mehanika',
+                        'Satelitske operacije',
+                        'Vremenske napovedi',
+                        'Raziskave planetov'
+                    ],
+                    apps: [
+                        {id: 'mission_planner', name: 'Mission Planner', icon: '🛰️'},
+                        {id: 'orbit_calc', name: 'Orbit Calculator', icon: '🌌'},
+                        {id: 'space_weather', name: 'Space Weather', icon: '☄️'}
+                    ]
+                },
+                military: {
+                    title: 'Obramba',
+                    icon: '🪖',
+                    description: 'Vojaška logistika in strateško načrtovanje',
+                    features: [
+                        'Strateško načrtovanje',
+                        'Logistična koordinacija',
+                        'Ocena groženj',
+                        'Razporejanje virov',
+                        'Komunikacijski sistemi'
+                    ],
+                    apps: [
+                        {id: 'strategy', name: 'Strategy Planner', icon: '🗺️'},
+                        {id: 'logistics', name: 'Military Logistics', icon: '📦'},
+                        {id: 'intel', name: 'Intelligence Hub', icon: '🔍'}
+                    ]
+                },
+                legal: {
+                    title: 'Pravo',
+                    icon: '⚖️',
+                    description: 'Pravno svetovanje in compliance management',
+                    features: [
+                        'Pravne raziskave',
+                        'Analiza pogodb',
+                        'Compliance monitoring',
+                        'Upravljanje primerov',
+                        'Pravna avtomatizacija'
+                    ],
+                    apps: [
+                        {id: 'legal_research', name: 'Legal Research', icon: '📚'},
+                        {id: 'contract_ai', name: 'Contract AI', icon: '📄'},
+                        {id: 'compliance', name: 'Compliance Hub', icon: '✅'}
+                    ]
+                },
+                bioengineering: {
+                    title: 'Bioinženiring',
+                    icon: '🧬',
+                    description: 'Biotehnologija in genetski inženiring',
+                    features: [
+                        'Genetska analiza',
+                        'Optimizacija bioprocesov',
+                        'Razvoj zdravil',
+                        'Sintetična biologija',
+                        'Bioinformatika'
+                    ],
+                    apps: [
+                        {id: 'gene_analyzer', name: 'Gene Analyzer', icon: '🔬'},
+                        {id: 'bioprocess', name: 'Bioprocess Optimizer', icon: '⚗️'},
+                        {id: 'drug_design', name: 'Drug Designer', icon: '💊'}
+                    ]
+                }
+            };
+            
+            // Dodaj privzete vrednosti za manjkajoče sektorje
+            const defaultSector = {
+                title: sectorName.charAt(0).toUpperCase() + sectorName.slice(1),
+                icon: '🔧',
+                description: `Napredne funkcionalnosti za ${sectorName}`,
+                features: ['Optimizacija', 'Analitika', 'Avtomatizacija', 'Monitoring'],
+                apps: [
+                    {id: 'main', name: 'Glavna aplikacija', icon: '🚀'},
+                    {id: 'analytics', name: 'Analitika', icon: '📊'},
+                    {id: 'settings', name: 'Nastavitve', icon: '⚙️'}
+                ]
+            };
+            
+            return sectors[sectorName] || defaultSector;
+        }
+        
+        // Zaženi aplikacijo
+        function launchApp(appId) {
+            updateStatusBar(`🚀 Zaganjam aplikacijo: ${appId}`);
+            
+            // Simuliraj zagon aplikacije
+            setTimeout(() => {
+                const urls = {
+                    portfolio: 'http://localhost:3000',
+                    trading: 'http://localhost:3001',
+                    diagnosis: 'http://localhost:8080/global_dashboard.html',
+                    ml_studio: 'http://localhost:8080',
+                    robot_control: 'http://localhost:5000'
+                };
+                
+                const url = urls[appId] || 'http://localhost:8080/global_dashboard.html';
+                
+                // Odpri v novem oknu
+                window.open(url, '_blank');
+                
+                updateStatusBar(`✅ Aplikacija ${appId} zagnana`);
+            }, 1000);
+        }
+        
+        // Prikaži status sistema
+        function showSystemStatus() {
+            const modalContent = `
+                <h2>📊 Status Sistema OMNI ULTRA</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0;">
+                    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
+                        <h3>🟢 Sistem</h3>
+                        <p>Status: Aktiven</p>
+                        <p>Uptime: ${getUptime()}</p>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
+                        <h3>🧠 AI Engine</h3>
+                        <p>Status: Učenje</p>
+                        <p>Modeli: 47 aktivnih</p>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
+                        <h3>🔄 Avtonomija</h3>
+                        <p>Status: Deluje</p>
+                        <p>Optimizacije: 1,247</p>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
+                        <h3>📡 Sektorji</h3>
+                        <p>Aktivni: 12/12</p>
+                        <p>Pokritost: 100%</p>
+                    </div>
+                </div>
+                <h3>🎯 Aktivni procesi:</h3>
+                <ul class="feature-list">
+                    <li>Globalna optimizacija</li>
+                    <li>Samodejno učenje</li>
+                    <li>Prediktivna analitika</li>
+                    <li>Avtonomno odločanje</li>
+                    <li>Kontinuirno izboljševanje</li>
+                </ul>
+            `;
+            
+            showModal(modalContent);
+        }
+        
+        // Prikaži vse funkcije
+        function showAllFeatures() {
+            const modalContent = `
+                <h2>🔧 Vse Funkcije OMNI ULTRA</h2>
+                <div style="columns: 2; column-gap: 20px;">
+                    <h3>🏢 Poslovne funkcije:</h3>
+                    <ul class="feature-list">
+                        <li>Finančna optimizacija</li>
+                        <li>Logistično upravljanje</li>
+                        <li>Upravljanje virov</li>
+                        <li>Strateško načrtovanje</li>
+                    </ul>
+                    
+                    <h3>🔬 Znanstvene funkcije:</h3>
+                    <ul class="feature-list">
+                        <li>Raziskave in razvoj</li>
+                        <li>Analiza podatkov</li>
+                        <li>Simulacije</li>
+                        <li>Modeliranje</li>
+                    </ul>
+                    
+                    <h3>🤖 AI funkcije:</h3>
+                    <ul class="feature-list">
+                        <li>Strojno učenje</li>
+                        <li>Naravni jezik</li>
+                        <li>Računalniški vid</li>
+                        <li>Avtonomno odločanje</li>
+                    </ul>
+                    
+                    <h3>🌍 Družbene funkcije:</h3>
+                    <ul class="feature-list">
+                        <li>Izobraževanje</li>
+                        <li>Zdravstvo</li>
+                        <li>Varnost</li>
+                        <li>Trajnostni razvoj</li>
+                    </ul>
+                </div>
+            `;
+            
+            showModal(modalContent);
+        }
+        
+        // Optimiziraj sistem
+        function optimizeSystem() {
+            updateStatusBar('⚡ Optimiziram sistem...');
+            
+            // Simuliraj optimizacijo
+            setTimeout(() => {
+                const improvements = [
+                    'Povečana hitrost za 23%',
+                    'Zmanjšana poraba energije za 15%',
+                    'Izboljšana natančnost za 8%',
+                    'Optimizirani algoritmi',
+                    'Posodobljeni modeli AI'
+                ];
+                
+                const modalContent = `
+                    <h2>⚡ Optimizacija Končana</h2>
+                    <p>Sistem je bil uspešno optimiziran!</p>
+                    <h3>🎯 Izboljšave:</h3>
+                    <ul class="feature-list">
+                        ${improvements.map(improvement => `<li>${improvement}</li>`).join('')}
+                    </ul>
+                    <p style="margin-top: 20px; padding: 15px; background: rgba(0,255,0,0.2); border-radius: 10px;">
+                        ✅ Vsi sektorji so optimizirani in pripravljeni za uporabo!
+                    </p>
+                `;
+                
+                showModal(modalContent);
+                updateStatusBar('✅ Sistem optimiziran | Vse funkcije izboljšane');
+            }, 3000);
+        }
+        
+        // Odpri globalno nadzorno ploščo
+        function openGlobalDashboard() {
+            window.open('http://localhost:8080/global_dashboard.html', '_blank');
+        }
+        
+        // Zaženi avtonomne funkcije
+        function startAutonomousFunctions() {
+            // Simuliraj avtonomne procese
+            setInterval(() => {
+                const processes = [
+                    'Optimiziram finance',
+                    'Analiziram zdravstvene podatke',
+                    'Načrtujem logistiko',
+                    'Učim se iz podatkov',
+                    'Napovedujem trende',
+                    'Optimiziram energijo'
+                ];
+                
+                const randomProcess = processes[Math.floor(Math.random() * processes.length)];
+                updateStatusBar(`🤖 ${randomProcess} | Avtonomno delovanje`);
+            }, 5000);
+        }
+        
+        // Pomožne funkcije
+        function showModal(content) {
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('infoModal').style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.getElementById('infoModal').style.display = 'none';
+        }
+        
+        function updateStatusBar(message) {
+            document.getElementById('statusBar').textContent = message;
+        }
+        
+        function getUptime() {
+            const start = new Date();
+            const now = new Date();
+            const diff = now - start;
+            const minutes = Math.floor(diff / 60000);
+            return `${minutes} min`;
+        }
+        
+        // Zapri modal s klikom izven
+        document.getElementById('infoModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+        
+        // Inicializacija
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStatusBar('🌍 OMNI ULTRA pripravljen | Kliknite ikono za aktivacijo');
+        });
+    </script>
+</body>
+</html>

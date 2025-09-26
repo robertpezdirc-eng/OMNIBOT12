@@ -1,0 +1,56 @@
+{
+  "timestamp": "2025-09-23T14:01:59.068Z",
+  "summary": {
+    "total": 9,
+    "passed": 3,
+    "failed": 6,
+    "successRate": "33.3%"
+  },
+  "results": [
+    {
+      "test": "Client Panel Availability",
+      "status": "PASSED",
+      "details": "Client Panel je dostopen"
+    },
+    {
+      "test": "License System Availability",
+      "status": "PASSED",
+      "details": "Licenčni sistem je dostopen in zdrav"
+    },
+    {
+      "test": "Client Panel License Status API",
+      "status": "FAILED",
+      "details": "License status API endpoint ne obstaja"
+    },
+    {
+      "test": "Client Panel License Modules API",
+      "status": "FAILED",
+      "details": "License modules API endpoint ne obstaja"
+    },
+    {
+      "test": "Client Panel Data Access",
+      "status": "FAILED",
+      "details": "Napaka pri dostopu do podatkov: Request failed with status code 404"
+    },
+    {
+      "test": "Client Panel Pricing Access",
+      "status": "FAILED",
+      "details": "Napaka pri dostopu do cenikov: Request failed with status code 404"
+    },
+    {
+      "test": "Client Panel Modules Access",
+      "status": "FAILED",
+      "details": "Napaka pri dostopu do modulov: Request failed with status code 404"
+    },
+    {
+      "test": "License Validation Flow",
+      "status": "FAILED",
+      "details": "Licenčna validacija endpoint ne obstaja"
+    },
+    {
+      "test": "Cross-Origin Requests (CORS)",
+      "status": "PASSED",
+      "details": "CORS je pravilno konfiguriran"
+    }
+  ]
+}

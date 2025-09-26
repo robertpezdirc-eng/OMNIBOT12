@@ -1,0 +1,19 @@
+{
+  "name": "traffic_predictor",
+  "version": "1.0.0",
+  "type": "prediction",
+  "horizon": "1h",
+  "accuracy": 0.78,
+  "trainingData": 10000,
+  "lastTrained": "2025-09-24T23:14:51.851Z",
+  "parameters": {
+    "algorithm": "lstm",
+    "sequence_length": 60,
+    "features": [
+      "volume",
+      "speed",
+      "density",
+      "weather"
+    ]
+  }
+}

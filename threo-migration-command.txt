@@ -1,0 +1,82 @@
+THREO UKAZ ZA MIGRACIJO OMNI V OBLAK
+=====================================
+
+Kopiraj in prilepi ta ukaz v Threo konzolo na tvojem oblačnem strežniku:
+
+---
+
+Naloga: Izvedi popolno migracijo Omni aplikacije v oblak z avtomatsko HTTPS konfiguracijo.
+
+KONFIGURACIJA:
+- Domena: moja-domena.com
+- Email: admin@moja-domena.com
+- Aplikacija: Omni Brain Platform
+- Port: 8080 (interno), 80/443 (javno)
+
+KORAKI MIGRACIJE:
+
+1. SISTEMSKA PRIPRAVA:
+   - Posodobi sistem (apt update && apt upgrade)
+   - Namesti odvisnosti: python3, pip, nginx, git, certbot, ufw
+   - Ustvari uporabnika 'omni' z domačim direktorijem
+   - Konfiguriraj firewall (UFW): omogoči SSH, HTTP, HTTPS
+
+2. OMNI APLIKACIJA:
+   - Kloniraj repozitorij: git clone https://github.com/your-repo/omniscient-ai-platform.git /opt/omni
+   - Namesti Python odvisnosti: pip install -r requirements.txt
+   - Ustvari virtualno okolje in aktiviraj
+   - Testiraj aplikacijo na portu 8080
+
+3. NGINX REVERSE PROXY:
+   - Konfiguriraj Nginx kot reverse proxy za port 8080
+   - Ustvari server block za moja-domena.com
+   - Omogoči gzip kompresijo in varnostne headerje
+   - Nastavi rate limiting in DDoS zaščito
+
+4. SSL CERTIFIKAT (Let's Encrypt):
+   - Pridobi SSL certifikat: certbot --nginx -d moja-domena.com
+   - Konfiguriraj avtomatsko podaljševanje (crontab)
+   - Nastavi HSTS in SSL optimizacije
+   - Preusmeri HTTP na HTTPS
+
+5. SYSTEMD STORITEV:
+   - Ustvari omni.service za avtomatski zagon
+   - Omogoči restart ob napakah
+   - Nastavi logiranje in monitoring
+   - Zaženi in omogoči ob zagonu sistema
+
+6. BACKUP IN MONITORING:
+   - Implementiraj dnevni backup sistem
+   - Nastavi SSL monitoring in opozorila
+   - Konfiguriraj log rotation
+   - Ustvari health check endpoint
+
+7. VARNOSTNE NASTAVITVE:
+   - Konfiguriraj fail2ban za SSH zaščito
+   - Nastavi varnostne headerje (HSTS, CSP, X-Frame-Options)
+   - Implementiraj rate limiting
+   - Zaščiti admin endpointe
+
+8. FINALNA VALIDACIJA:
+   - Testiraj HTTPS povezavo: https://moja-domena.com
+   - Preveri SSL certifikat (A+ rating)
+   - Testiraj avtomatsko podaljševanje certifikata
+   - Preveri delovanje aplikacije in API-jev
+
+REZULTAT:
+- Omni aplikacija dostopna na https://moja-domena.com
+- Avtomatski SSL certifikati z Let's Encrypt
+- 24/7 delovanje z avtomatskim restartom
+- Backup sistem in monitoring
+- Produkcijska varnostna konfiguracija
+
+Obvesti me, ko je migracija končana in aplikacija dostopna.
+
+---
+
+NAVODILA ZA UPORABO:
+1. Zamenjaj "moja-domena.com" s svojo dejansko domeno
+2. Zamenjaj "admin@moja-domena.com" s svojim emailom
+3. Prilepi ukaz v Threo konzolo
+4. Počakaj na dokončanje migracije
+5. Testiraj na https://tvoja-domena.com

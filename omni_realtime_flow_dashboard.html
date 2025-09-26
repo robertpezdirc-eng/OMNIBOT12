@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni-APP Real-time Flow Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .dashboard-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .control-panel {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            max-width: 320px;
+        }
+
+        .control-panel h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .control-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .control-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .control-group button {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: transform 0.2s;
+            margin-bottom: 5px;
+        }
+
+        .control-group button:hover {
+            transform: translateY(-2px);
+        }
+
+        .flow-controls {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .flow-controls h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .flow-toggle {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .flow-toggle input[type="checkbox"] {
+            margin-right: 8px;
+            transform: scale(1.2);
+        }
+
+        .flow-toggle label {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .stats-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            min-width: 250px;
+        }
+
+        .stats-panel h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+        }
+
+        .flow-stats {
+            background: rgba(76, 175, 80, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .flow-stats h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .flow-indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .flow-dot-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .flow-dot-indicator.active { background: #4CAF50; }
+        .flow-dot-indicator.warning { background: #FF9800; }
+        .flow-dot-indicator.error { background: #F44336; }
+        .flow-dot-indicator.inactive { background: #9E9E9E; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .node {
+            position: absolute;
+            width: 120px;
+            height: 80px;
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: move;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .node:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .node.selected {
+            border-color: #ff6b6b;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+        }
+
+        .node.global {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border-color: #f39c12;
+            width: 140px;
+            height: 100px;
+        }
+
+        .node.subnode {
+            width: 100px;
+            height: 60px;
+            background: linear-gradient(135deg, #e8f4fd, #d1ecf1);
+            border-color: #3498db;
+        }
+
+        .node.active-flow {
+            border-color: #4CAF50;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+        }
+
+        .node.warning-flow {
+            border-color: #FF9800;
+            box-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
+        }
+
+        .node.error-flow {
+            border-color: #F44336;
+            box-shadow: 0 0 20px rgba(244, 67, 54, 0.5);
+        }
+
+        .node-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .node-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+        }
+
+        .node-status {
+            font-size: 10px;
+            margin-top: 2px;
+        }
+
+        .node-flow-indicator {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid white;
+            animation: pulse 1.5s infinite;
+        }
+
+        .info-box {
+            position: fixed;
+            background: rgba(255, 255, 255, 0.98);
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            z-index: 2000;
+            max-width: 350px;
+            display: none;
+        }
+
+        .info-box h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .flow-info {
+            background: rgba(76, 175, 80, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .flow-info h5 {
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .links-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .connection-line {
+            stroke: #667eea;
+            stroke-width: 3;
+            stroke-dasharray: 5,5;
+            opacity: 0.7;
+        }
+
+        .connection-line.active-flow {
+            stroke: #4CAF50;
+            stroke-width: 4;
+            opacity: 1;
+            animation: flow-pulse 2s infinite;
+        }
+
+        .connection-line.warning-flow {
+            stroke: #FF9800;
+            stroke-width: 4;
+            opacity: 1;
+        }
+
+        .connection-line.error-flow {
+            stroke: #F44336;
+            stroke-width: 4;
+            opacity: 1;
+        }
+
+        @keyframes flow-pulse {
+            0% { stroke-dasharray: 5,5; stroke-dashoffset: 0; }
+            100% { stroke-dasharray: 5,5; stroke-dashoffset: 10; }
+        }
+
+        .flow-dot {
+            r: 6;
+            opacity: 0.9;
+        }
+
+        .flow-dot.active { fill: #4CAF50; }
+        .flow-dot.warning { fill: #FF9800; }
+        .flow-dot.error { fill: #F44336; }
+        .flow-dot.inactive { fill: #9E9E9E; }
+
+        .keyboard-shortcuts {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+
+        .keyboard-shortcuts h4 {
+            margin-bottom: 10px;
+        }
+
+        .shortcut {
+            margin-bottom: 5px;
+        }
+
+        .shortcut kbd {
+            background: #555;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .backend-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            min-width: 200px;
+        }
+
+        .backend-status h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .backend-indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .backend-indicator .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .backend-indicator .status-dot.online { background: #4CAF50; }
+        .backend-indicator .status-dot.offline { background: #F44336; }
+        .backend-indicator .status-dot.connecting { background: #FF9800; animation: pulse 1s infinite; }
+
+        @media (max-width: 768px) {
+            .control-panel, .stats-panel {
+                position: relative;
+                margin: 10px;
+                max-width: none;
+            }
+            
+            .node {
+                width: 100px;
+                height: 70px;
+            }
+            
+            .node.global {
+                width: 120px;
+                height: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <h3>🎛️ Upravljanje Modulov</h3>
+            
+            <div class="control-group">
+                <label>Dodaj Glavni Modul:</label>
+                <input type="text" id="new-node-name" placeholder="Ime modula">
+                <input type="text" id="new-node-icon" placeholder="Ikona (emoji)">
+                <button id="add-node">➕ Dodaj Modul</button>
+            </div>
+
+            <div class="control-group">
+                <label>Dodaj Podmodul:</label>
+                <input type="text" id="parent-node-name" placeholder="Starševski modul">
+                <input type="text" id="sub-node-name" placeholder="Ime podmodula">
+                <input type="text" id="sub-node-icon" placeholder="Ikona (emoji)">
+                <button id="add-subnode">➕ Dodaj Podmodul</button>
+            </div>
+
+            <div class="control-group">
+                <label>Odstrani Modul:</label>
+                <input type="text" id="remove-node-name" placeholder="Ime modula">
+                <button id="remove-node">🗑️ Odstrani</button>
+            </div>
+
+            <div class="control-group">
+                <button id="auto-layout">🎯 Auto Layout</button>
+                <button id="reset-dashboard">🔄 Reset</button>
+            </div>
+
+            <!-- Flow Controls -->
+            <div class="flow-controls">
+                <h4>🌊 Flow Animacije</h4>
+                <div class="flow-toggle">
+                    <input type="checkbox" id="enable-flows" checked>
+                    <label for="enable-flows">Omogoči Flow Animacije</label>
+                </div>
+                <div class="flow-toggle">
+                    <input type="checkbox" id="show-flow-paths" checked>
+                    <label for="show-flow-paths">Prikaži Flow Poti</label>
+                </div>
+                <div class="flow-toggle">
+                    <input type="checkbox" id="simulate-backend" checked>
+                    <label for="simulate-backend">Simuliraj Backend</label>
+                </div>
+                <button id="trigger-flow-burst">🚀 Sproži Flow Burst</button>
+            </div>
+        </div>
+
+        <!-- Stats Panel -->
+        <div class="stats-panel">
+            <h3>📊 Statistike</h3>
+            <div class="stat-item">
+                <span>Moduli:</span>
+                <span id="modules-count">0</span>
+            </div>
+            <div class="stat-item">
+                <span>Podmoduli:</span>
+                <span id="submodules-count">0</span>
+            </div>
+            <div class="stat-item">
+                <span>Povezave:</span>
+                <span id="connections-count">0</span>
+            </div>
+            <div class="stat-item">
+                <span>Aktivni Flows:</span>
+                <span id="active-flows-count">0</span>
+            </div>
+
+            <!-- Flow Statistics -->
+            <div class="flow-stats">
+                <h4>🌊 Flow Status</h4>
+                <div class="flow-indicator">
+                    <div class="flow-dot-indicator active"></div>
+                    <span>Aktivni: <span id="active-flows">0</span></span>
+                </div>
+                <div class="flow-indicator">
+                    <div class="flow-dot-indicator warning"></div>
+                    <span>Opozorila: <span id="warning-flows">0</span></span>
+                </div>
+                <div class="flow-indicator">
+                    <div class="flow-dot-indicator error"></div>
+                    <span>Napake: <span id="error-flows">0</span></span>
+                </div>
+                <div class="flow-indicator">
+                    <div class="flow-dot-indicator inactive"></div>
+                    <span>Neaktivni: <span id="inactive-flows">0</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Backend Status -->
+        <div class="backend-status">
+            <h4>🔗 Backend Status</h4>
+            <div class="backend-indicator">
+                <div class="status-dot connecting" id="backend-status-dot"></div>
+                <span id="backend-status-text">Povezovanje...</span>
+            </div>
+            <div style="font-size: 12px; color: #666; margin-top: 8px;">
+                <div>Zadnji update: <span id="last-update">-</span></div>
+                <div>Flow paketi: <span id="flow-packets">0</span></div>
+            </div>
+        </div>
+
+        <!-- SVG for connections -->
+        <svg class="links-svg" id="links-svg">
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                        refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#667eea" />
+                </marker>
+                <marker id="arrowhead-active" markerWidth="10" markerHeight="7" 
+                        refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#4CAF50" />
+                </marker>
+                <marker id="arrowhead-warning" markerWidth="10" markerHeight="7" 
+                        refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#FF9800" />
+                </marker>
+                <marker id="arrowhead-error" markerWidth="10" markerHeight="7" 
+                        refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#F44336" />
+                </marker>
+            </defs>
+        </svg>
+
+        <!-- Info Box -->
+        <div class="info-box" id="info-box">
+            <h4 id="info-title">Modul Info</h4>
+            <p id="info-content">Podrobnosti o modulu...</p>
+            <div class="flow-info" id="flow-info" style="display: none;">
+                <h5>🌊 Aktivni Flows</h5>
+                <div id="flow-details"></div>
+            </div>
+        </div>
+
+        <!-- Keyboard Shortcuts -->
+        <div class="keyboard-shortcuts">
+            <h4>⌨️ Bližnjice</h4>
+            <div class="shortcut"><kbd>A</kbd> - Auto Layout</div>
+            <div class="shortcut"><kbd>R</kbd> - Reset</div>
+            <div class="shortcut"><kbd>F</kbd> - Toggle Flows</div>
+            <div class="shortcut"><kbd>B</kbd> - Flow Burst</div>
+            <div class="shortcut"><kbd>Del</kbd> - Odstrani izbrani</div>
+            <div class="shortcut"><kbd>Esc</kbd> - Prekliči izbor</div>
+        </div>
+    </div>
+
+    <script>
+        // Globalne spremenljivke
+        let nodes = [];
+        let lines = [];
+        let flows = [];
+        let activeFlowAnimations = new Map();
+        let selectedNode = null;
+        let nodeStatuses = {};
+        let flowStatuses = {};
+        let dragOffset = { x: 0, y: 0 };
+        let isDragging = false;
+        let flowsEnabled = true;
+        let backendSimulation = true;
+        let flowPacketCount = 0;
+        
+        const linksSVG = document.getElementById("links-svg");
+        const infoBox = document.getElementById("info-box");
+
+        // Helper funkcije za varno delo z DOM elementi
+        function safeGetElement(id) {
+            const element = document.getElementById(id);
+            if (!element) {
+                console.warn(`Element z ID '${id}' ni najden`);
+                return null;
+            }
+            return element;
+        }
+
+        function safeUpdateText(id, text) {
+            const element = safeGetElement(id);
+            if (element) {
+                element.textContent = text;
+            }
+        }
+
+        // Ustvarjanje novega node-a
+        function createNode(id, icon = "📦", top = null, left = null, parent = null) {
+            if (nodes.find(n => n.id === id)) {
+                console.warn(`Node z ID '${id}' že obstaja`);
+                return;
+            }
+
+            const node = {
+                id: id,
+                icon: icon,
+                top: top || Math.random() * 400 + 100,
+                left: left || Math.random() * 600 + 200,
+                parent: parent,
+                flowActivity: 'inactive'
+            };
+
+            nodes.push(node);
+            nodeStatuses[id] = "🟢 Online";
+
+            const nodeEl = document.createElement("div");
+            nodeEl.className = `node ${parent ? 'subnode' : ''} ${id === 'global' ? 'global' : ''}`;
+            nodeEl.id = id;
+            nodeEl.style.top = node.top + "px";
+            nodeEl.style.left = node.left + "px";
+
+            nodeEl.innerHTML = `
+                <div class="node-icon">${icon}</div>
+                <div class="node-name">${id}</div>
+                <div class="node-status" id="status-${id}">🟢 Online</div>
+                <div class="node-flow-indicator" id="flow-indicator-${id}" style="display: none;"></div>
+            `;
+
+            document.body.appendChild(nodeEl);
+            
+            attachNodeClick(nodeEl, node);
+            makeDraggable(nodeEl, node);
+            updateConnections();
+            updateStats();
+
+            // Počisti input polja
+            const inputs = ['new-node-name', 'new-node-icon', 'sub-node-name', 'sub-node-icon'];
+            inputs.forEach(inputId => {
+                const input = safeGetElement(inputId);
+                if (input) input.value = '';
+            });
+        }
+
+        // Odstranjevanje node-a
+        function removeNode(id) {
+            const nodeIndex = nodes.findIndex(n => n.id === id);
+            if (nodeIndex === -1) {
+                console.warn(`Node z ID '${id}' ne obstaja`);
+                return;
+            }
+
+            // Odstrani podmodule
+            const childNodes = nodes.filter(n => n.parent === id);
+            childNodes.forEach(child => removeNode(child.id));
+
+            // Odstrani node iz arrays
+            nodes.splice(nodeIndex, 1);
+            delete nodeStatuses[id];
+            delete flowStatuses[id];
+
+            // Odstrani DOM element
+            const nodeEl = safeGetElement(id);
+            if (nodeEl) {
+                nodeEl.remove();
+            }
+
+            // Posodobi povezave in statistike
+            updateConnections();
+            updateStats();
+
+            // Počisti input polje
+            const removeInput = safeGetElement('remove-node-name');
+            if (removeInput) removeInput.value = '';
+        }
+
+        // Posodabljanje povezav med node-i
+        function updateConnections() {
+            // Počisti obstoječe povezave
+            const existingLines = linksSVG.querySelectorAll('.connection-line, .flow-dot');
+            existingLines.forEach(line => line.remove());
+            lines = [];
+
+            nodes.forEach(node => {
+                if (node.parent) {
+                    const parentNode = nodes.find(n => n.id === node.parent);
+                    if (parentNode) {
+                        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                        
+                        const x1 = parentNode.left + 60;
+                        const y1 = parentNode.top + 40;
+                        const x2 = node.left + 60;
+                        const y2 = node.top + 40;
+
+                        line.setAttribute("x1", x1);
+                        line.setAttribute("y1", y1);
+                        line.setAttribute("x2", x2);
+                        line.setAttribute("y2", y2);
+                        line.setAttribute("class", "connection-line");
+                        line.setAttribute("marker-end", "url(#arrowhead)");
+                        line.setAttribute("id", `line-${node.parent}-${node.id}`);
+
+                        linksSVG.appendChild(line);
+                        lines.push({
+                            line: line,
+                            source: node.parent,
+                            target: node.id,
+                            id: `${node.parent}-${node.id}`
+                        });
+                    }
+                }
+            });
+
+            // Posodobi statistike
+            safeUpdateText('connections-count', lines.length);
+        }
+
+        // Pripenjanje click event-a na node
+        function attachNodeClick(nodeEl, node) {
+            nodeEl.addEventListener('click', (e) => {
+                e.stopPropagation();
+                
+                // Odstrani prejšnji izbor
+                const prevSelected = document.querySelector('.node.selected');
+                if (prevSelected) {
+                    prevSelected.classList.remove('selected');
+                }
+
+                // Dodaj novi izbor
+                nodeEl.classList.add('selected');
+                selectedNode = node;
+
+                // Prikaži info box
+                showInfoBox(e, node);
+            });
+        }
+
+        // Prikaz info box-a z flow informacijami
+        function showInfoBox(event, node) {
+            const infoTitle = safeGetElement('info-title');
+            const infoContent = safeGetElement('info-content');
+            const flowInfo = safeGetElement('flow-info');
+            const flowDetails = safeGetElement('flow-details');
+            
+            if (infoTitle) infoTitle.textContent = `${node.icon} ${node.id}`;
+            if (infoContent) {
+                const childCount = nodes.filter(n => n.parent === node.id).length;
+                const status = nodeStatuses[node.id] || "🟢 Online";
+                const flowActivity = node.flowActivity || 'inactive';
+                
+                infoContent.innerHTML = `
+                    <strong>Status:</strong> ${status}<br>
+                    <strong>Tip:</strong> ${node.parent ? 'Podmodul' : 'Glavni modul'}<br>
+                    <strong>Podmoduli:</strong> ${childCount}<br>
+                    <strong>Flow Aktivnost:</strong> ${flowActivity}<br>
+                    <strong>Pozicija:</strong> (${Math.round(node.left)}, ${Math.round(node.top)})
+                `;
+            }
+
+            // Prikaži flow informacije
+            const nodeFlows = flows.filter(f => f.from === node.id || f.to === node.id);
+            if (nodeFlows.length > 0 && flowDetails) {
+                flowInfo.style.display = 'block';
+                flowDetails.innerHTML = nodeFlows.map(flow => 
+                    `<div style="margin-bottom: 5px;">
+                        <span style="color: ${getFlowColor(flow.status)};">●</span>
+                        ${flow.from} → ${flow.to} (${flow.status})
+                    </div>`
+                ).join('');
+            } else if (flowInfo) {
+                flowInfo.style.display = 'none';
+            }
+
+            infoBox.style.display = 'block';
+            infoBox.style.left = (event.pageX + 10) + 'px';
+            infoBox.style.top = (event.pageY + 10) + 'px';
+        }
+
+        // Skrij info box
+        function hideInfoBox() {
+            infoBox.style.display = 'none';
+        }
+
+        // Drag & Drop funkcionalnost
+        function makeDraggable(nodeEl, node) {
+            nodeEl.addEventListener('mousedown', (e) => {
+                if (e.button !== 0) return; // Samo levi klik
+                
+                isDragging = true;
+                dragOffset.x = e.clientX - node.left;
+                dragOffset.y = e.clientY - node.top;
+                
+                nodeEl.style.zIndex = '1000';
+                document.body.style.cursor = 'grabbing';
+                
+                e.preventDefault();
+            });
+        }
+
+        // Globalni mouse eventi za drag & drop
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging && selectedNode) {
+                selectedNode.left = e.clientX - dragOffset.x;
+                selectedNode.top = e.clientY - dragOffset.y;
+                
+                const nodeEl = safeGetElement(selectedNode.id);
+                if (nodeEl) {
+                    nodeEl.style.left = selectedNode.left + 'px';
+                    nodeEl.style.top = selectedNode.top + 'px';
+                }
+                
+                updateConnections();
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                document.body.style.cursor = 'default';
+                
+                if (selectedNode) {
+                    const nodeEl = safeGetElement(selectedNode.id);
+                    if (nodeEl) {
+                        nodeEl.style.zIndex = '10';
+                    }
+                }
+            }
+        });
+
+        // Klik na ozadje - odstrani izbor
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.node') && !e.target.closest('.info-box')) {
+                const prevSelected = document.querySelector('.node.selected');
+                if (prevSelected) {
+                    prevSelected.classList.remove('selected');
+                }
+                selectedNode = null;
+                hideInfoBox();
+            }
+        });
+
+        // Smart Auto-Layout funkcija
+        function autoLayout() {
+            const global = safeGetElement("global");
+            const marginX = 50, marginY = 150;
+            const topGlobal = 50, leftGlobal = 600;
+            
+            if (global) {
+                global.style.top = topGlobal + "px";
+                global.style.left = leftGlobal + "px";
+                
+                const globalNode = nodes.find(n => n.id === "global");
+                if (globalNode) {
+                    globalNode.top = topGlobal;
+                    globalNode.left = leftGlobal;
+                }
+            }
+
+            const mainModules = nodes.filter(n => n.parent === null && n.id !== "global");
+            const spacingX = 200;
+            const startX = leftGlobal - ((mainModules.length - 1) / 2) * spacingX;
+
+            mainModules.forEach((mod, i) => {
+                mod.top = topGlobal + marginY;
+                mod.left = startX + i * spacingX;
+                const el = safeGetElement(mod.id);
+                if (el) {
+                    el.style.top = mod.top + "px";
+                    el.style.left = mod.left + "px";
+                }
+
+                const subs = nodes.filter(n => n.parent === mod.id);
+                const subSpacingX = 120;
+                const startSubX = mod.left - ((subs.length - 1) / 2) * subSpacingX;
+                subs.forEach((sub, j) => {
+                    sub.top = mod.top + marginY;
+                    sub.left = startSubX + j * subSpacingX;
+                    const subEl = safeGetElement(sub.id);
+                    if (subEl) {
+                        subEl.style.top = sub.top + "px";
+                        subEl.style.left = sub.left + "px";
+                    }
+                });
+            });
+            updateConnections();
+        }
+
+        // Posodabljanje statistik
+        function updateStats() {
+            const mainModules = nodes.filter(n => n.parent === null).length;
+            const subModules = nodes.filter(n => n.parent !== null).length;
+            const activeFlows = flows.filter(f => f.active && f.status === 'active').length;
+            
+            safeUpdateText('modules-count', mainModules);
+            safeUpdateText('submodules-count', subModules);
+            safeUpdateText('connections-count', lines.length);
+            safeUpdateText('active-flows-count', activeFlows);
+
+            // Flow statistike
+            const flowStats = {
+                active: flows.filter(f => f.status === 'active').length,
+                warning: flows.filter(f => f.status === 'warning').length,
+                error: flows.filter(f => f.status === 'error').length,
+                inactive: flows.filter(f => f.status === 'inactive').length
+            };
+
+            safeUpdateText('active-flows', flowStats.active);
+            safeUpdateText('warning-flows', flowStats.warning);
+            safeUpdateText('error-flows', flowStats.error);
+            safeUpdateText('inactive-flows', flowStats.inactive);
+        }
+
+        // Pridobi barvo za flow status
+        function getFlowColor(status) {
+            switch(status) {
+                case 'active': return '#4CAF50';
+                case 'warning': return '#FF9800';
+                case 'error': return '#F44336';
+                default: return '#9E9E9E';
+            }
+        }
+
+        // REAL-TIME FLOW ANIMATION ENGINE
+        function animateFlowFromBackend(flow) {
+            if (!flowsEnabled) return;
+            
+            const sourceEl = safeGetElement(flow.from);
+            const targetEl = safeGetElement(flow.to);
+            if (!sourceEl || !targetEl) return;
+
+            const x1 = sourceEl.offsetLeft + sourceEl.offsetWidth / 2;
+            const y1 = sourceEl.offsetTop + sourceEl.offsetHeight / 2;
+            const x2 = targetEl.offsetLeft + targetEl.offsetWidth / 2;
+            const y2 = targetEl.offsetTop + targetEl.offsetHeight / 2;
+
+            // Ustvari animirani dot
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("r", flow.status === 'active' ? 8 : 6);
+            circle.setAttribute("class", `flow-dot ${flow.status}`);
+            circle.setAttribute("fill", getFlowColor(flow.status));
+            circle.setAttribute("opacity", "0.9");
+            
+            // Dodaj glow efekt za aktivne flow-e
+            if (flow.status === 'active') {
+                circle.setAttribute("filter", "drop-shadow(0 0 6px " + getFlowColor(flow.status) + ")");
+            }
+            
+            linksSVG.appendChild(circle);
+
+            // Posodobi line styling
+            const lineId = `line-${flow.from}-${flow.to}`;
+            const line = safeGetElement(lineId);
+            if (line) {
+                line.setAttribute("class", `connection-line ${flow.status}-flow`);
+                line.setAttribute("marker-end", `url(#arrowhead-${flow.status})`);
+            }
+
+            // Posodobi node styling
+            updateNodeFlowStatus(flow.from, flow.status);
+            updateNodeFlowStatus(flow.to, flow.status);
+
+            let t = 0;
+            const speed = flow.status === 'active' ? 0.025 : 
+                         flow.status === 'warning' ? 0.015 : 0.01;
+            
+            function step() {
+                t += speed;
+                if (t > 1) {
+                    circle.remove();
+                    
+                    // Reset node styling če ni več aktivnih flow-ov
+                    setTimeout(() => {
+                        const hasActiveFlows = flows.some(f => 
+                            (f.from === flow.from || f.to === flow.from || 
+                             f.from === flow.to || f.to === flow.to) && 
+                            f.active && f.status !== 'inactive'
+                        );
+                        if (!hasActiveFlows) {
+                            resetNodeFlowStatus(flow.from);
+                            resetNodeFlowStatus(flow.to);
+                        }
+                    }, 1000);
+                    
+                    return;
+                }
+                
+                const currentX = x1 + (x2 - x1) * t;
+                const currentY = y1 + (y2 - y1) * t;
+                
+                circle.setAttribute("cx", currentX);
+                circle.setAttribute("cy", currentY);
+                
+                // Dodaj trail efekt za aktivne flow-e
+                if (flow.status === 'active' && Math.random() < 0.3) {
+                    createTrailDot(currentX, currentY);
+                }
+                
+                requestAnimationFrame(step);
+            }
+            step();
+
+            // Shrani animacijo za tracking
+            const animationId = `${flow.from}-${flow.to}-${Date.now()}`;
+            activeFlowAnimations.set(animationId, {
+                flow: flow,
+                element: circle,
+                startTime: Date.now()
+            });
+        }
+
+        // Ustvari trail dot za aktivne flow-e
+        function createTrailDot(x, y) {
+            const trailDot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            trailDot.setAttribute("cx", x);
+            trailDot.setAttribute("cy", y);
+            trailDot.setAttribute("r", 3);
+            trailDot.setAttribute("fill", "#4CAF50");
+            trailDot.setAttribute("opacity", "0.5");
+            linksSVG.appendChild(trailDot);
+            
+            setTimeout(() => trailDot.remove(), 500);
+        }
+
+        // Posodobi node flow status
+        function updateNodeFlowStatus(nodeId, status) {
+            const nodeEl = safeGetElement(nodeId);
+            const flowIndicator = safeGetElement(`flow-indicator-${nodeId}`);
+            
+            if (nodeEl) {
+                nodeEl.classList.remove('active-flow', 'warning-flow', 'error-flow');
+                if (status !== 'inactive') {
+                    nodeEl.classList.add(`${status}-flow`);
+                }
+            }
+            
+            if (flowIndicator) {
+                flowIndicator.style.display = status !== 'inactive' ? 'block' : 'none';
+                flowIndicator.style.background = getFlowColor(status);
+            }
+            
+            // Posodobi node objekt
+            const node = nodes.find(n => n.id === nodeId);
+            if (node) {
+                node.flowActivity = status;
+            }
+        }
+
+        // Reset node flow status
+        function resetNodeFlowStatus(nodeId) {
+            const nodeEl = safeGetElement(nodeId);
+            const flowIndicator = safeGetElement(`flow-indicator-${nodeId}`);
+            
+            if (nodeEl) {
+                nodeEl.classList.remove('active-flow', 'warning-flow', 'error-flow');
+            }
+            
+            if (flowIndicator) {
+                flowIndicator.style.display = 'none';
+            }
+            
+            const node = nodes.find(n => n.id === nodeId);
+            if (node) {
+                node.flowActivity = 'inactive';
+            }
+        }
+
+        // WebSocket real-time integracija z flow handling
+        let ws = null;
+        let wsReconnectAttempts = 0;
+        const maxReconnectAttempts = 5;
+
+        function connectWebSocket() {
+            try {
+                const endpoints = [
+                    "wss://your-omni-app-backend/flows",
+                    "ws://localhost:8080/flows",
+                    "ws://localhost:3000/flows"
+                ];
+                
+                const endpoint = endpoints[wsReconnectAttempts % endpoints.length];
+                ws = new WebSocket(endpoint);
+                
+                ws.onopen = () => {
+                    console.log("✅ Povezano z Omni-APP backend flow sistemom");
+                    wsReconnectAttempts = 0;
+                    updateBackendStatus('online', 'Povezano z backend-om');
+                };
+                
+                ws.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        flowPacketCount++;
+                        safeUpdateText('flow-packets', flowPacketCount);
+                        safeUpdateText('last-update', new Date().toLocaleTimeString());
+                        
+                        // Posodobitev statusov modulov
+                        if (data.modules && Array.isArray(data.modules)) {
+                            data.modules.forEach(mod => {
+                                nodeStatuses[mod.id] = mod.status;
+                                const statusEl = safeGetElement(`status-${mod.id}`);
+                                if (statusEl) {
+                                    statusEl.textContent = mod.status;
+                                    statusEl.style.color = mod.status === "✅ Online" ? "green" : 
+                                                          mod.status === "⚠ Warning" ? "orange" : "red";
+                                }
+                            });
+                        }
+
+                        // Animacija flow-ov - KLJUČNA FUNKCIONALNOST
+                        if (data.flows && Array.isArray(data.flows)) {
+                            flows = data.flows;
+                            data.flows.forEach(flow => {
+                                if (flow.active) {
+                                    animateFlowFromBackend(flow);
+                                }
+                            });
+                            updateStats();
+                        }
+                        
+                    } catch (error) {
+                        console.warn("Napaka pri parsiranju WebSocket sporočila:", error);
+                    }
+                };
+                
+                ws.onerror = (error) => {
+                    console.warn("WebSocket napaka:", error);
+                    updateBackendStatus('connecting', 'Povezovanje...');
+                };
+                
+                ws.onclose = () => {
+                    console.log("WebSocket povezava zaprta");
+                    updateBackendStatus('offline', 'Offline');
+                    
+                    if (wsReconnectAttempts < maxReconnectAttempts) {
+                        wsReconnectAttempts++;
+                        setTimeout(connectWebSocket, 3000 * wsReconnectAttempts);
+                    }
+                };
+                
+            } catch (error) {
+                console.warn("Napaka pri vzpostavljanju WebSocket povezave:", error);
+                updateBackendStatus('offline', 'Offline');
+                
+                if (backendSimulation) {
+                    simulateBackendFlows();
+                }
+            }
+        }
+
+        // Posodobi backend status
+        function updateBackendStatus(status, text) {
+            const statusDot = safeGetElement('backend-status-dot');
+            const statusText = safeGetElement('backend-status-text');
+            
+            if (statusDot) {
+                statusDot.className = `status-dot ${status}`;
+            }
+            
+            if (statusText) {
+                statusText.textContent = text;
+            }
+        }
+
+        // Simulacija backend flow podatkov
+        function simulateBackendFlows() {
+            console.log("🔄 Zagon simulacije backend flow-ov");
+            updateBackendStatus('online', 'Simulacija aktivna');
+            
+            setInterval(() => {
+                if (!backendSimulation) return;
+                
+                // Generiraj naključne flow-e med obstoječimi node-i
+                const possibleFlows = [];
+                
+                // Global → Glavni moduli
+                const mainModules = nodes.filter(n => n.parent === null && n.id !== 'global');
+                mainModules.forEach(mod => {
+                    possibleFlows.push({
+                        from: 'global',
+                        to: mod.id,
+                        active: Math.random() > 0.3,
+                        status: Math.random() > 0.8 ? 'warning' : Math.random() > 0.9 ? 'error' : 'active'
+                    });
+                });
+                
+                // Glavni moduli → Podmoduli
+                mainModules.forEach(mod => {
+                    const subModules = nodes.filter(n => n.parent === mod.id);
+                    subModules.forEach(sub => {
+                        possibleFlows.push({
+                            from: mod.id,
+                            to: sub.id,
+                            active: Math.random() > 0.4,
+                            status: Math.random() > 0.7 ? 'warning' : Math.random() > 0.95 ? 'error' : 'active'
+                        });
+                    });
+                });
+                
+                flows = possibleFlows;
+                
+                // Animiraj aktivne flow-e
+                flows.forEach(flow => {
+                    if (flow.active && flowsEnabled) {
+                        animateFlowFromBackend(flow);
+                    }
+                });
+                
+                // Posodobi statistike
+                updateStats();
+                flowPacketCount++;
+                safeUpdateText('flow-packets', flowPacketCount);
+                safeUpdateText('last-update', new Date().toLocaleTimeString());
+                
+            }, 2000 + Math.random() * 3000); // Naključni interval 2-5 sekund
+        }
+
+        // Flow burst funkcija
+        function triggerFlowBurst() {
+            if (!flowsEnabled) return;
+            
+            console.log("🚀 Sproži Flow Burst!");
+            
+            // Ustvari intenzivne flow-e med vsemi povezavami
+            lines.forEach(line => {
+                const flow = {
+                    from: line.source,
+                    to: line.target,
+                    active: true,
+                    status: 'active'
+                };
+                
+                // Ustvari več zaporednih animacij
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        animateFlowFromBackend(flow);
+                    }, i * 200);
+                }
+            });
+        }
+
+        // Event listener-ji za kontrole
+        const addNodeBtn = safeGetElement("add-node");
+        if (addNodeBtn) {
+            addNodeBtn.onclick = () => {
+                const nameInput = safeGetElement("new-node-name");
+                const iconInput = safeGetElement("new-node-icon");
+                
+                const name = nameInput ? nameInput.value.trim() : '';
+                const icon = iconInput ? iconInput.value.trim() || "📦" : "📦";
+                
+                if (name && !nodes.find(n => n.id === name)) {
+                    createNode(name, icon);
+                }
+            };
+        }
+
+        const addSubnodeBtn = safeGetElement("add-subnode");
+        if (addSubnodeBtn) {
+            addSubnodeBtn.onclick = () => {
+                const parentInput = safeGetElement("parent-node-name");
+                const nameInput = safeGetElement("sub-node-name");
+                const iconInput = safeGetElement("sub-node-icon");
+                
+                const parent = parentInput ? parentInput.value.trim() : '';
+                const name = nameInput ? nameInput.value.trim() : '';
+                const icon = iconInput ? iconInput.value.trim() || "📦" : "📦";
+                
+                if (name && parent && nodes.find(n => n.id === parent) && !nodes.find(n => n.id === name)) {
+                    createNode(name, icon, null, null, parent);
+                }
+            };
+        }
+
+        const removeNodeBtn = safeGetElement("remove-node");
+        if (removeNodeBtn) {
+            removeNodeBtn.onclick = () => {
+                const nameInput = safeGetElement("remove-node-name");
+                const name = nameInput ? nameInput.value.trim() : '';
+                if (name) {
+                    removeNode(name);
+                }
+            };
+        }
+
+        const autoLayoutBtn = safeGetElement("auto-layout");
+        if (autoLayoutBtn) {
+            autoLayoutBtn.onclick = autoLayout;
+        }
+
+        const resetBtn = safeGetElement("reset-dashboard");
+        if (resetBtn) {
+            resetBtn.onclick = () => {
+                const nodesToRemove = nodes.filter(n => n.id !== 'global').map(n => n.id);
+                nodesToRemove.forEach(id => removeNode(id));
+                
+                const globalNode = nodes.find(n => n.id === 'global');
+                if (globalNode) {
+                    globalNode.top = 50;
+                    globalNode.left = 600;
+                    const globalEl = safeGetElement('global');
+                    if (globalEl) {
+                        globalEl.style.top = '50px';
+                        globalEl.style.left = '600px';
+                    }
+                }
+                
+                flows = [];
+                activeFlowAnimations.clear();
+                updateConnections();
+                updateStats();
+            };
+        }
+
+        // Flow kontrole
+        const enableFlowsCheckbox = safeGetElement("enable-flows");
+        if (enableFlowsCheckbox) {
+            enableFlowsCheckbox.onchange = (e) => {
+                flowsEnabled = e.target.checked;
+                if (!flowsEnabled) {
+                    // Počisti vse aktivne animacije
+                    const flowDots = linksSVG.querySelectorAll('.flow-dot');
+                    flowDots.forEach(dot => dot.remove());
+                    activeFlowAnimations.clear();
+                }
+            };
+        }
+
+        const simulateBackendCheckbox = safeGetElement("simulate-backend");
+        if (simulateBackendCheckbox) {
+            simulateBackendCheckbox.onchange = (e) => {
+                backendSimulation = e.target.checked;
+                if (backendSimulation && !ws) {
+                    simulateBackendFlows();
+                }
+            };
+        }
+
+        const flowBurstBtn = safeGetElement("trigger-flow-burst");
+        if (flowBurstBtn) {
+            flowBurstBtn.onclick = triggerFlowBurst;
+        }
+
+        // Tipkovnica shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT') return;
+            
+            switch(e.key.toLowerCase()) {
+                case 'a':
+                    autoLayout();
+                    break;
+                case 'r':
+                    if (resetBtn) resetBtn.click();
+                    break;
+                case 'f':
+                    if (enableFlowsCheckbox) {
+                        enableFlowsCheckbox.checked = !enableFlowsCheckbox.checked;
+                        enableFlowsCheckbox.onchange({target: enableFlowsCheckbox});
+                    }
+                    break;
+                case 'b':
+                    triggerFlowBurst();
+                    break;
+                case 'delete':
+                    if (selectedNode && selectedNode.id !== 'global') {
+                        removeNode(selectedNode.id);
+                    }
+                    break;
+                case 'escape':
+                    const prevSelected = document.querySelector('.node.selected');
+                    if (prevSelected) {
+                        prevSelected.classList.remove('selected');
+                    }
+                    selectedNode = null;
+                    hideInfoBox();
+                    break;
+            }
+        });
+
+        // Touch support za mobilne naprave
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            if (e.target.closest('.node')) {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            }
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (isDragging && selectedNode) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                selectedNode.left = touch.clientX - dragOffset.x;
+                selectedNode.top = touch.clientY - dragOffset.y;
+                
+                const nodeEl = safeGetElement(selectedNode.id);
+                if (nodeEl) {
+                    nodeEl.style.left = selectedNode.left + 'px';
+                    nodeEl.style.top = selectedNode.top + 'px';
+                }
+                
+                updateConnections();
+            }
+        });
+
+        // Inicializacija aplikacije
+        function initializeApp() {
+            console.log("🚀 Inicializacija Omni-APP Real-time Flow Dashboard...");
+            
+            // Ustvari global node
+            createNode("global", "🌐", 50, 600);
+            
+            // Ustvari nekaj začetnih modulov
+            createNode("AI", "🤖", 200, 400);
+            createNode("IoT", "📡", 200, 600);
+            createNode("Analytics", "📊", 200, 800);
+            createNode("Finance", "💰", 200, 1000);
+            
+            // Ustvari podmodule
+            createNode("NLP", "💬", 350, 350, "AI");
+            createNode("Vision", "👁️", 350, 450, "AI");
+            createNode("Sensors", "🌡️", 350, 550, "IoT");
+            createNode("Devices", "📱", 350, 650, "IoT");
+            createNode("Reports", "📈", 350, 750, "Analytics");
+            createNode("Banking", "🏦", 350, 950, "Finance");
+            
+            // Posodobi povezave in statistike
+            updateConnections();
+            updateStats();
+            
+            // Zaženi WebSocket povezavo
+            connectWebSocket();
+            
+            // Če WebSocket ne deluje, zaženi simulacijo
+            setTimeout(() => {
+                if (!ws || ws.readyState !== WebSocket.OPEN) {
+                    if (backendSimulation) {
+                        simulateBackendFlows();
+                    }
+                }
+            }, 2000);
+            
+            console.log("✅ Omni-APP Real-time Flow Dashboard uspešno inicializiran!");
+        }
+
+        // Zaženi aplikacijo ko je DOM pripravljen
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
+    </script>
+</body>
+</html>

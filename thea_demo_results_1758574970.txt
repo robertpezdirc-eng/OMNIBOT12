@@ -1,0 +1,82 @@
+🎯 THEA CONSOLIDATED RESULTS
+============================================================
+📅 Merged at: 2025-09-22 23:02:50
+📊 Total prompts merged: 5
+
+📝 RESULT #1
+----------------------------------------
+🔸 Prompt: Analiziraj prodajne podatke za Q4 2024
+🔸 Processed: 23:02:42
+🔸 Processing time: 0.45s
+🔸 Resources: 
+
+📋 RESULT:
+🤖 Thea AI Odgovor na: 'Analiziraj prodajne podatke za Q4 2024...'
+⏱️ Obdelano v 0.45s
+🔧 Uporabljeni viri: 
+
+============================================================
+
+📝 RESULT #2
+----------------------------------------
+🔸 Prompt: Pripravi finančno poročilo za management
+🔸 Processed: 23:02:43
+🔸 Processing time: 0.12s
+🔸 Resources: 
+
+📋 RESULT:
+🤖 Thea AI Odgovor na: 'Pripravi finančno poročilo za management...'
+⏱️ Obdelano v 0.12s
+🔧 Uporabljeni viri: 
+
+============================================================
+
+📝 RESULT #3
+----------------------------------------
+🔸 Prompt: Preveri IoT senzorje v skladišču A
+🔸 Processed: 23:02:43
+🔸 Processing time: 0.04s
+🔸 Resources: iot
+
+📋 RESULT:
+🤖 Thea AI Odgovor na: 'Preveri IoT senzorje v skladišču A...'
+🌡️ IoT: 156 naprav, 22.5°C
+⏱️ Obdelano v 0.04s
+🔧 Uporabljeni viri: iot
+
+============================================================
+
+📝 RESULT #4
+----------------------------------------
+🔸 Prompt: Optimiziraj turistične pakete za poletje
+🔸 Processed: 23:02:44
+🔸 Processing time: 0.29s
+🔸 Resources: 
+
+📋 RESULT:
+🤖 Thea AI Odgovor na: 'Optimiziraj turistične pakete za poletje...'
+⏱️ Obdelano v 0.29s
+🔧 Uporabljeni viri: 
+
+============================================================
+
+📝 RESULT #5
+----------------------------------------
+🔸 Prompt: Generiraj marketing kampanjo za novo storitev
+🔸 Processed: 23:02:44
+🔸 Processing time: 0.04s
+🔸 Resources: 
+
+📋 RESULT:
+🤖 Thea AI Odgovor na: 'Generiraj marketing kampanjo za novo storitev...'
+⏱️ Obdelano v 0.04s
+🔧 Uporabljeni viri: 
+
+============================================================
+
+📊 CONSOLIDATED STATISTICS
+----------------------------------------
+⏱️ Total processing time: 0.94s
+🔧 Resources used: iot
+📈 Average processing time: 0.19s
+🎯 Success rate: 100%

@@ -1,0 +1,69 @@
+{
+  "passed": 3,
+  "failed": 5,
+  "tests": [
+    {
+      "name": "Health Check",
+      "status": "FAILED",
+      "error": "Expected status 200, got 404"
+    },
+    {
+      "name": "License Validation",
+      "status": "PASSED",
+      "result": {
+        "error": "Not found",
+        "message": "Route POST /api/license/validate not found"
+      }
+    },
+    {
+      "name": "License Creation",
+      "status": "FAILED",
+      "error": "Expected status 201/200, got 404"
+    },
+    {
+      "name": "License Toggle",
+      "status": "FAILED",
+      "error": "Expected status 200, got 404"
+    },
+    {
+      "name": "License Extension",
+      "status": "FAILED",
+      "error": "Expected status 200, got 404"
+    },
+    {
+      "name": "WebSocket Connection",
+      "status": "FAILED",
+      "error": "socket hang up"
+    },
+    {
+      "name": "Rate Limiting",
+      "status": "PASSED",
+      "result": {
+        "totalRequests": 10,
+        "rateLimited": false,
+        "statusCodes": [
+          404,
+          404,
+          404,
+          404,
+          404,
+          404,
+          404,
+          404,
+          404,
+          404
+        ]
+      }
+    },
+    {
+      "name": "Security Headers",
+      "status": "PASSED",
+      "result": {
+        "x-frame-options": "SAMEORIGIN",
+        "x-content-type-options": "nosniff",
+        "x-xss-protection": "0",
+        "strict-transport-security": "max-age=15552000; includeSubDomains"
+      }
+    }
+  ]
+}

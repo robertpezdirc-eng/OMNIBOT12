@@ -1,0 +1,39 @@
+{
+  "name": "omni-ultimate-tests",
+  "version": "1.0.0",
+  "description": "Test suite for Omni Ultimate Turbo Flow System",
+  "main": "run-all-tests.js",
+  "scripts": {
+    "test": "node run-all-tests.js",
+    "test:api": "node api-tests.js",
+    "test:websocket": "node websocket-tests.js",
+    "test:client": "node client-tests.js",
+    "test:specific": "node run-all-tests.js",
+    "install-deps": "npm install"
+  },
+  "keywords": [
+    "omni",
+    "testing",
+    "api",
+    "websocket",
+    "client",
+    "license",
+    "automation"
+  ],
+  "author": "Omni Ultimate Team",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "colors": "^1.4.0",
+    "socket.io-client": "^4.7.0",
+    "puppeteer": "^21.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "mocha": "^10.2.0",
+    "chai": "^4.3.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

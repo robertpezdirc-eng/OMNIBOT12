@@ -1,0 +1,49 @@
+services:
+  - type: web
+    name: omni-threo-backend
+    env: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: API_URL
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: CORS_ORIGIN
+        value: "*"
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 900000
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: 100
+      - key: LOG_LEVEL
+        value: info
+    autoDeploy: true
+    branch: main
+    rootDir: ./
+    
+databases:
+  - name: omni-threo-redis
+    plan: starter
+    
+# Optional: Static site for documentation
+  - type: static
+    name: omni-threo-docs
+    buildCommand: echo "No build needed"
+    staticPublishPath: ./docs
+    pullRequestPreviewsEnabled: false

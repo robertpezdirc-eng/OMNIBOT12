@@ -1,0 +1,80 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="64" fill="url(#gradient)"/>
+  
+  <!-- Main Icon -->
+  <g transform="translate(96, 96)">
+    <!-- Central Hub -->
+    <circle cx="160" cy="160" r="48" fill="#ffffff" opacity="0.9"/>
+    <circle cx="160" cy="160" r="32" fill="#2563eb"/>
+    
+    <!-- Connection Lines -->
+    <line x1="160" y1="112" x2="160" y2="48" stroke="#ffffff" stroke-width="6" opacity="0.7"/>
+    <line x1="208" y1="160" x2="272" y2="160" stroke="#ffffff" stroke-width="6" opacity="0.7"/>
+    <line x1="160" y1="208" x2="160" y2="272" stroke="#ffffff" stroke-width="6" opacity="0.7"/>
+    <line x1="112" y1="160" x2="48" y2="160" stroke="#ffffff" stroke-width="6" opacity="0.7"/>
+    
+    <!-- Diagonal connections -->
+    <line x1="194" y1="126" x2="238" y2="82" stroke="#ffffff" stroke-width="4" opacity="0.5"/>
+    <line x1="194" y1="194" x2="238" y2="238" stroke="#ffffff" stroke-width="4" opacity="0.5"/>
+    <line x1="126" y1="194" x2="82" y2="238" stroke="#ffffff" stroke-width="4" opacity="0.5"/>
+    <line x1="126" y1="126" x2="82" y2="82" stroke="#ffffff" stroke-width="4" opacity="0.5"/>
+    
+    <!-- Secondary connections -->
+    <line x1="160" y1="80" x2="200" y2="40" stroke="#ffffff" stroke-width="3" opacity="0.3"/>
+    <line x1="240" y1="160" x2="280" y2="120" stroke="#ffffff" stroke-width="3" opacity="0.3"/>
+    <line x1="160" y1="240" x2="200" y2="280" stroke="#ffffff" stroke-width="3" opacity="0.3"/>
+    <line x1="80" y1="160" x2="40" y2="120" stroke="#ffffff" stroke-width="3" opacity="0.3"/>
+    
+    <!-- Device Nodes -->
+    <circle cx="160" cy="40" r="20" fill="#10b981"/>
+    <circle cx="280" cy="160" r="20" fill="#f59e0b"/>
+    <circle cx="160" cy="280" r="20" fill="#ef4444"/>
+    <circle cx="40" cy="160" r="20" fill="#8b5cf6"/>
+    
+    <!-- Corner Devices -->
+    <circle cx="240" cy="80" r="16" fill="#06b6d4"/>
+    <circle cx="240" cy="240" r="16" fill="#ec4899"/>
+    <circle cx="80" cy="240" r="16" fill="#84cc16"/>
+    <circle cx="80" cy="80" r="16" fill="#f97316"/>
+    
+    <!-- Extended Network Nodes -->
+    <circle cx="200" cy="40" r="12" fill="#14b8a6"/>
+    <circle cx="280" cy="120" r="12" fill="#f472b6"/>
+    <circle cx="200" cy="280" r="12" fill="#a3e635"/>
+    <circle cx="40" cy="120" r="12" fill="#fb7185"/>
+    
+    <!-- Data Flow Animation Dots -->
+    <circle cx="160" cy="76" r="4" fill="#ffffff" opacity="0.8">
+      <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="244" cy="160" r="4" fill="#ffffff" opacity="0.8">
+      <animate attributeName="opacity" values="0.2;0.8;0.2" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="160" cy="244" r="4" fill="#ffffff" opacity="0.8">
+      <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="76" cy="160" r="4" fill="#ffffff" opacity="0.8">
+      <animate attributeName="opacity" values="0.2;0.8;0.2" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Pulse Effect on Central Hub -->
+    <circle cx="160" cy="160" r="48" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.3">
+      <animate attributeName="r" values="48;60;48" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.3;0.1;0.3" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Text Label -->
+    <text x="160" y="320" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="24" font-weight="bold" opacity="0.8">OMNI IoT</text>
+  </g>
+  
+  <!-- Gradient Definition -->
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e40af;stop-opacity:1" />
+      <stop offset="25%" style="stop-color:#2563eb;stop-opacity:1" />
+      <stop offset="75%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#60a5fa;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>

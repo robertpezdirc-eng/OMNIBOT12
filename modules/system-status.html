@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status Sistema - Omni AI Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .overall-status {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .status-indicator {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .status-healthy {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+
+        .status-warning {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+        }
+
+        .status-error {
+            background: linear-gradient(135deg, #dc3545, #e83e8c);
+        }
+
+        .status-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .status-description {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .components-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .component-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .component-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .component-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .component-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            margin-right: 15px;
+        }
+
+        .component-title {
+            flex: 1;
+        }
+
+        .component-title h3 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .component-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .metric {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            margin: 50px 0;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .last-updated {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Status Sistema</h1>
+            <p>Pregled stanja vseh komponent Omni AI platforme</p>
+        </div>
+
+        <button class="refresh-btn" onclick="loadSystemStatus()">🔄 Osveži status</button>
+
+        <div id="loading" class="loading">
+            Nalagam status sistema...
+        </div>
+
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div id="status-container" style="display: none;">
+            <div id="overall-status" class="overall-status"></div>
+            <div id="components-container" class="components-grid"></div>
+            <div id="last-updated" class="last-updated"></div>
+        </div>
+    </div>
+
+    <script>
+        const componentIcons = {
+            'main_app': '🏠',
+            'angel_api': '🤖',
+            'unified_server': '🖥️',
+            'quantum_processing': '⚛️',
+            'backup_system': '💾',
+            'monitoring': '📊',
+            'systemd': '⚙️',
+            'logging': '📝'
+        };
+
+        const componentNames = {
+            'main_app': 'Glavna aplikacija',
+            'angel_api': 'Angel API',
+            'unified_server': 'Enotni strežnik',
+            'quantum_processing': 'Kvantno procesiranje',
+            'backup_system': 'Backup sistem',
+            'monitoring': 'Monitoring',
+            'systemd': 'Sistemske storitve',
+            'logging': 'Logiranje'
+        };
+
+        async function loadSystemStatus() {
+            const loadingEl = document.getElementById('loading');
+            const errorEl = document.getElementById('error');
+            const containerEl = document.getElementById('status-container');
+
+            loadingEl.style.display = 'block';
+            errorEl.style.display = 'none';
+            containerEl.style.display = 'none';
+
+            try {
+                // Naložimo osnovne podatke o zdravju
+                const healthResponse = await fetch('/api/health');
+                if (!healthResponse.ok) {
+                    throw new Error(`HTTP ${healthResponse.status}: ${healthResponse.statusText}`);
+                }
+                const healthData = await healthResponse.json();
+
+                // Naložimo statistike
+                const statsResponse = await fetch('/api/stats');
+                const statsData = statsResponse.ok ? await statsResponse.json() : {};
+
+                displaySystemStatus(healthData, statsData);
+
+                loadingEl.style.display = 'none';
+                containerEl.style.display = 'block';
+            } catch (error) {
+                console.error('Napaka pri nalaganju statusa sistema:', error);
+                loadingEl.style.display = 'none';
+                errorEl.style.display = 'block';
+                errorEl.textContent = `Napaka pri nalaganju podatkov: ${error.message}`;
+            }
+        }
+
+        function displaySystemStatus(healthData, statsData) {
+            displayOverallStatus(healthData);
+            displayComponents(healthData, statsData);
+            updateLastUpdated();
+        }
+
+        function displayOverallStatus(healthData) {
+            const container = document.getElementById('overall-status');
+            const status = healthData.status || 'unknown';
+            
+            let statusClass, statusIcon, statusText, statusDesc;
+            
+            if (status === 'healthy') {
+                statusClass = 'status-healthy';
+                statusIcon = '✓';
+                statusText = 'Sistem deluje normalno';
+                statusDesc = 'Vse komponente so aktivne in delujoče';
+            } else if (status === 'warning') {
+                statusClass = 'status-warning';
+                statusIcon = '⚠';
+                statusText = 'Opozorilo';
+                statusDesc = 'Nekatere komponente potrebujejo pozornost';
+            } else {
+                statusClass = 'status-error';
+                statusIcon = '✗';
+                statusText = 'Napaka sistema';
+                statusDesc = 'Ena ali več komponent ne deluje pravilno';
+            }
+
+            container.innerHTML = `
+                <div class="status-indicator ${statusClass}">${statusIcon}</div>
+                <div class="status-text">${statusText}</div>
+                <div class="status-description">${statusDesc}</div>
+            `;
+        }
+
+        function displayComponents(healthData, statsData) {
+            const container = document.getElementById('components-container');
+            container.innerHTML = '';
+
+            // Kombiniramo podatke iz health in stats
+            const components = {};
+            
+            // Dodamo komponente iz health podatkov
+            if (healthData.components) {
+                Object.keys(healthData.components).forEach(key => {
+                    components[key] = {
+                        status: healthData.components[key] ? 'active' : 'inactive',
+                        ...healthData.components[key]
+                    };
+                });
+            }
+
+            // Dodamo dodatne metrike iz stats
+            if (statsData) {
+                if (components.unified_server) {
+                    components.unified_server.uptime = statsData.uptime;
+                    components.unified_server.requests = statsData.requests;
+                    components.unified_server.response_time = statsData.response_time;
+                }
+            }
+
+            Object.keys(components).forEach(key => {
+                const component = components[key];
+                const card = createComponentCard(key, component);
+                container.appendChild(card);
+            });
+        }
+
+        function createComponentCard(key, component) {
+            const card = document.createElement('div');
+            card.className = 'component-card';
+
+            const icon = componentIcons[key] || '🔧';
+            const name = componentNames[key] || key;
+            const isActive = component.status === 'active' || component === true;
+            const statusClass = isActive ? 'status-active' : 'status-inactive';
+            const statusText = isActive ? 'Aktiven' : 'Neaktiven';
+            const iconBg = isActive ? 'linear-gradient(135deg, #28a745, #20c997)' : 'linear-gradient(135deg, #dc3545, #e83e8c)';
+
+            let metricsHtml = '';
+            if (component.uptime || component.requests || component.response_time) {
+                metricsHtml = `
+                    <div class="metrics-grid">
+                        ${component.uptime ? `
+                        <div class="metric">
+                            <div class="metric-value">${component.uptime}</div>
+                            <div class="metric-label">Delovanje</div>
+                        </div>
+                        ` : ''}
+                        ${component.requests ? `
+                        <div class="metric">
+                            <div class="metric-value">${component.requests}</div>
+                            <div class="metric-label">Zahteve</div>
+                        </div>
+                        ` : ''}
+                        ${component.response_time ? `
+                        <div class="metric">
+                            <div class="metric-value">${component.response_time}</div>
+                            <div class="metric-label">Odzivni čas</div>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            card.innerHTML = `
+                <div class="component-header">
+                    <div class="component-icon" style="background: ${iconBg}">${icon}</div>
+                    <div class="component-title">
+                        <h3>${name}</h3>
+                        <span class="component-status ${statusClass}">${statusText}</span>
+                    </div>
+                </div>
+                ${metricsHtml}
+            `;
+
+            return card;
+        }
+
+        function updateLastUpdated() {
+            const container = document.getElementById('last-updated');
+            const now = new Date();
+            container.textContent = `Zadnja posodobitev: ${now.toLocaleString('sl-SI')}`;
+        }
+
+        // Naloži podatke ob zagonu
+        document.addEventListener('DOMContentLoaded', loadSystemStatus);
+
+        // Osveži podatke vsakih 15 sekund
+        setInterval(loadSystemStatus, 15000);
+    </script>
+</body>
+</html>

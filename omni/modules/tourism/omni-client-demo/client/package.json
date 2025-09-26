@@ -1,0 +1,20 @@
+{
+  "name": "omni-client-demo-client",
+  "version": "1.0.0",
+  "description": "Client Panel demo za Omni sistem z JWT licenčno integracijo",
+  "main": "client.js",
+  "scripts": {
+    "start": "node client.js",
+    "demo": "node client.js",
+    "test-valid": "CLIENT_ID=DEMO001 node client.js",
+    "test-premium": "CLIENT_ID=DEMO003 node client.js",
+    "test-expired": "CLIENT_ID=EXPIRED001 node client.js"
+  },
+  "dependencies": {
+    "axios": "^1.5.0",
+    "colors": "^1.4.0"
+  },
+  "keywords": ["client", "demo", "license", "jwt", "omni"],
+  "author": "Omni AI Platform",
+  "license": "MIT"
+}

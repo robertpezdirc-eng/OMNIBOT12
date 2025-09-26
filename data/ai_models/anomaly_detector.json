@@ -1,0 +1,19 @@
+{
+  "name": "anomaly_detector",
+  "version": "1.0.0",
+  "type": "anomaly_detection",
+  "threshold": 0.7,
+  "sensitivity": "medium",
+  "trainingData": 5000,
+  "lastTrained": "2025-09-24T23:14:51.851Z",
+  "parameters": {
+    "algorithm": "isolation_forest",
+    "contamination": 0.1,
+    "features": [
+      "speed",
+      "direction",
+      "size",
+      "behavior"
+    ]
+  }
+}

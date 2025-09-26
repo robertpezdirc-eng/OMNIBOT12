@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni Admin GUI - Enhanced</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" 
+            onerror="console.error('Failed to load Socket.IO from CDN'); loadSocketIOFallback();"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Fallback for Socket.IO if CDN fails
+        function loadSocketIOFallback() {
+            console.log('Loading Socket.IO fallback...');
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js';
+            script.onerror = function() {
+                console.error('All Socket.IO sources failed. Creating mock io object.');
+                window.io = function() {
+                    return {
+                        on: function() { console.log('Mock Socket.IO: on'); },
+                        emit: function() { console.log('Mock Socket.IO: emit'); },
+                        connect: function() { console.log('Mock Socket.IO: connect'); },
+                        disconnect: function() { console.log('Mock Socket.IO: disconnect'); }
+                    };
+                };
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Check if io is available after page load
+        window.addEventListener('load', function() {
+            if (typeof io === 'undefined') {
+                console.error('Socket.IO not loaded, creating fallback');
+                loadSocketIOFallback();
+            }
+        });
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .role-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .role-super-admin { background: #e53e3e; color: white; }
+        .role-admin { background: #3182ce; color: white; }
+        .role-support { background: #38a169; color: white; }
+        .role-moderator { background: #d69e2e; color: white; }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stats-panel, .chart-panel {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .active { color: #38a169; }
+        .demo { color: #3182ce; }
+        .expired { color: #e53e3e; }
+        .total { color: #805ad5; }
+
+        .controls-panel {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        input, select, textarea {
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary { background: #667eea; color: white; }
+        .btn-success { background: #38a169; color: white; }
+        .btn-warning { background: #d69e2e; color: white; }
+        .btn-danger { background: #e53e3e; color: white; }
+
+        .search-filter {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .table-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: #4a5568;
+            position: sticky;
+            top: 0;
+        }
+
+        tr:hover {
+            background: #f7fafc;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-active { background: #c6f6d5; color: #22543d; }
+        .status-demo { background: #bee3f8; color: #2a4365; }
+        .status-expired { background: #fed7d7; color: #742a2a; }
+        .status-suspended { background: #fbb6ce; color: #702459; }
+
+        .modules-list {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .module-tag {
+            background: #edf2f7;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            color: #4a5568;
+        }
+
+        .notification-panel {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 12px;
+            z-index: 1000;
+        }
+
+        .connected { background: #c6f6d5; color: #22543d; }
+        .disconnected { background: #fed7d7; color: #742a2a; }
+
+        .log-panel {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin-top: 15px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 2px 0;
+        }
+
+        .log-timestamp {
+            color: #a0aec0;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-filter {
+                flex-direction: column;
+            }
+            
+            table {
+                font-size: 12px;
+            }
+            
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🚀 Omni Admin GUI - Enhanced</h1>
+            <div class="user-info">
+                <div>
+                    <span>Prijavljeni kot: <strong id="currentUser">Admin</strong></span>
+                    <span class="role-badge" id="userRole">super-admin</span>
+                </div>
+                <div>
+                    <span>Zadnja posodobitev: <span id="lastUpdate">-</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Connection Status -->
+        <div class="connection-status disconnected" id="connectionStatus">
+            🔴 Ni povezave
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Stats Panel -->
+            <div class="stats-panel">
+                <h3>📊 Statistike licenc</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number active" id="activeCount">0</div>
+                        <div class="stat-label">Aktivne</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number demo" id="demoCount">0</div>
+                        <div class="stat-label">Demo</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number expired" id="expiredCount">0</div>
+                        <div class="stat-label">Potekle</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number total" id="totalCount">0</div>
+                        <div class="stat-label">Skupaj</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Panel -->
+            <div class="chart-panel">
+                <h3>📈 Vizualizacija</h3>
+                <canvas id="licenseChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Controls Panel -->
+        <div class="controls-panel">
+            <h3>🎛️ Upravljanje licenc</h3>
+            <div class="controls-grid">
+                <div class="control-group">
+                    <label>Client ID</label>
+                    <input type="text" id="clientId" placeholder="npr. client_001">
+                </div>
+                <div class="control-group">
+                    <label>Plan</label>
+                    <select id="planSelect">
+                        <option value="basic">Basic</option>
+                        <option value="premium">Premium</option>
+                        <option value="enterprise">Enterprise</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Moduli</label>
+                    <input type="text" id="modules" placeholder="ai,analytics,automation">
+                </div>
+                <div class="control-group">
+                    <label>Dni podaljšanja</label>
+                    <input type="number" id="extendDays" placeholder="30" min="1">
+                </div>
+            </div>
+            
+            <div class="controls-grid">
+                <button class="btn btn-success" onclick="createLicense()" id="createBtn">
+                    ➕ Ustvari licenco
+                </button>
+                <button class="btn btn-warning" onclick="extendLicense()" id="extendBtn">
+                    ⏰ Podaljšaj licenco
+                </button>
+                <button class="btn btn-primary" onclick="toggleLicense()" id="toggleBtn">
+                    🔄 Preklopi status
+                </button>
+                <button class="btn btn-primary" onclick="refreshData()">
+                    🔄 Osveži podatke
+                </button>
+            </div>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="search-filter">
+            <input type="text" id="searchInput" placeholder="🔍 Išči po Client ID..." onkeyup="filterTable()">
+            <select id="statusFilter" onchange="filterTable()">
+                <option value="">Vsi statusi</option>
+                <option value="active">Aktivne</option>
+                <option value="demo">Demo</option>
+                <option value="expired">Potekle</option>
+                <option value="suspended">Suspendirane</option>
+            </select>
+            <select id="planFilter" onchange="filterTable()">
+                <option value="">Vsi plani</option>
+                <option value="basic">Basic</option>
+                <option value="premium">Premium</option>
+                <option value="enterprise">Enterprise</option>
+            </select>
+        </div>
+
+        <!-- License Table -->
+        <div class="table-container">
+            <table id="licenseTable">
+                <thead>
+                    <tr>
+                        <th>Client ID</th>
+                        <th>Plan</th>
+                        <th>Status</th>
+                        <th>Poteče</th>
+                        <th>Moduli</th>
+                        <th>Ustvarjeno</th>
+                        <th>Akcije</th>
+                    </tr>
+                </thead>
+                <tbody id="licenseTableBody">
+                    <!-- Dinamično generirano -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Notification Panel -->
+        <div class="notification-panel">
+            <h3>📢 Push obvestila</h3>
+            <div class="controls-grid">
+                <div class="control-group">
+                    <label>Sporočilo</label>
+                    <textarea id="notificationMessage" placeholder="Vnesite sporočilo..." rows="3"></textarea>
+                </div>
+                <div class="control-group">
+                    <label>Ciljni klienti (ločeno z vejico)</label>
+                    <input type="text" id="targetClients" placeholder="client_001,client_002">
+                </div>
+                <div class="control-group">
+                    <label>Skupina</label>
+                    <select id="targetGroup">
+                        <option value="">Vsi klienti</option>
+                        <option value="premium">Premium klienti</option>
+                        <option value="basic">Basic klienti</option>
+                        <option value="enterprise">Enterprise klienti</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <button class="btn btn-primary" onclick="sendNotification()">
+                        📤 Pošlji obvestilo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Activity Log -->
+            <div class="log-panel" id="activityLog">
+                <div class="log-entry">
+                    <span class="log-timestamp">[Sistem]</span> Admin GUI inicializiran
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let socket = null;
+        let licenses = [];
+        let currentUserRole = 'super-admin';
+        let licenseChart = null;
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeWebSocket();
+            initializeChart();
+            loadLicenses();
+            updateUserRole();
+        });
+
+        // WebSocket initialization
+        function initializeWebSocket() {
+            // Check if Socket.IO is available
+            if (typeof io === 'undefined') {
+                console.error('Socket.IO not available, using mock connection');
+                socket = {
+                    on: function(event, callback) { 
+                        console.log(`Mock Socket: listening for ${event}`);
+                        if (event === 'connect') {
+                            setTimeout(() => callback(), 1000);
+                        }
+                    },
+                    emit: function(event, data) { 
+                        console.log(`Mock Socket: emitting ${event}`, data);
+                    },
+                    connected: false
+                };
+                updateConnectionStatus(false);
+                logActivity('WebSocket nedostopen - uporabljam mock povezavo');
+                return;
+            }
+            
+            const SERVER_URL = 'http://localhost:3000';
+            socket = io(SERVER_URL);
+
+            socket.on('connect', function() {
+                updateConnectionStatus(true);
+                logActivity('WebSocket povezan');
+                
+                // Identify as admin
+                socket.emit('identify', {
+                    client_id: 'admin_dashboard',
+                    role: 'admin'
+                });
+            });
+
+            socket.on('disconnect', function() {
+                updateConnectionStatus(false);
+                logActivity('WebSocket prekinjen');
+            });
+
+            socket.on('license_update', function(data) {
+                logActivity(`Licenca posodobljena: ${data.type} - ${data.license.client_id}`);
+                loadLicenses(); // Refresh data
+            });
+
+            socket.on('system_message', function(data) {
+                logActivity(`Sistemsko sporočilo: ${data.message}`);
+            });
+
+            socket.on('admin_data', function(data) {
+                if (data.licenses) {
+                    licenses = data.licenses;
+                    updateTable();
+                    updateStats();
+                }
+                if (data.stats) {
+                    updateStatsDisplay(data.stats);
+                }
+            });
+
+            // Heartbeat
+            setInterval(() => {
+                if (socket && socket.connected) {
+                    socket.emit('ping');
+                }
+            }, 30000);
+        }
+
+        // Update connection status
+        function updateConnectionStatus(connected) {
+            const statusEl = document.getElementById('connectionStatus');
+            if (connected) {
+                statusEl.textContent = '🟢 Povezano';
+                statusEl.className = 'connection-status connected';
+            } else {
+                statusEl.textContent = '🔴 Ni povezave';
+                statusEl.className = 'connection-status disconnected';
+            }
+        }
+
+        // Initialize Chart.js
+        function initializeChart() {
+            const ctx = document.getElementById('licenseChart').getContext('2d');
+            licenseChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Aktivne', 'Demo', 'Potekle'],
+                    datasets: [{
+                        data: [0, 0, 0],
+                        backgroundColor: ['#38a169', '#3182ce', '#e53e3e'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Load licenses from API
+        async function loadLicenses() {
+            try {
+                const response = await fetch('http://localhost:3000/api/license/all');
+                const data = await response.json();
+                licenses = data.licenses || [];
+                updateTable();
+                updateStats();
+                logActivity(`Naloženih ${licenses.length} licenc`);
+            } catch (error) {
+                logActivity(`Napaka pri nalaganju licenc: ${error.message}`);
+            }
+        }
+
+        // Update license table
+        function updateTable() {
+            const tbody = document.getElementById('licenseTableBody');
+            tbody.innerHTML = '';
+
+            licenses.forEach(license => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${license.client_id}</strong></td>
+                    <td><span class="module-tag">${license.plan}</span></td>
+                    <td><span class="status-badge status-${license.status}">${license.status}</span></td>
+                    <td>${formatDate(license.expires_at)}</td>
+                    <td>
+                        <div class="modules-list">
+                            ${license.modules.map(m => `<span class="module-tag">${m}</span>`).join('')}
+                        </div>
+                    </td>
+                    <td>${formatDate(license.created_at)}</td>
+                    <td>
+                        <button class="btn btn-warning" onclick="quickExtend('${license.client_id}')">+30d</button>
+                        <button class="btn btn-primary" onclick="quickToggle('${license.client_id}')">Toggle</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Update statistics
+        function updateStats() {
+            const stats = {
+                active: licenses.filter(l => l.status === 'active').length,
+                demo: licenses.filter(l => l.status === 'demo').length,
+                expired: licenses.filter(l => l.status === 'expired').length,
+                total: licenses.length
+            };
+
+            updateStatsDisplay(stats);
+            updateChart(stats);
+        }
+
+        // Update stats display
+        function updateStatsDisplay(stats) {
+            document.getElementById('activeCount').textContent = stats.active;
+            document.getElementById('demoCount').textContent = stats.demo;
+            document.getElementById('expiredCount').textContent = stats.expired;
+            document.getElementById('totalCount').textContent = stats.total;
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+        }
+
+        // Update chart
+        function updateChart(stats) {
+            if (licenseChart) {
+                licenseChart.data.datasets[0].data = [stats.active, stats.demo, stats.expired];
+                licenseChart.update();
+            }
+        }
+
+        // License management functions
+        async function createLicense() {
+            const clientId = document.getElementById('clientId').value;
+            const plan = document.getElementById('planSelect').value;
+            const modulesStr = document.getElementById('modules').value;
+
+            if (!clientId) {
+                alert('Client ID je obvezen!');
+                return;
+            }
+
+            const modules = modulesStr ? modulesStr.split(',').map(m => m.trim()) : ['ai'];
+
+            try {
+                const response = await fetch('http://localhost:3000/api/license/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ client_id: clientId, plan, modules })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    logActivity(`Licenca ustvarjena: ${clientId}`);
+                    clearForm();
+                } else {
+                    logActivity(`Napaka pri ustvarjanju licence: ${result.error}`);
+                }
+            } catch (error) {
+                logActivity(`Napaka: ${error.message}`);
+            }
+        }
+
+        async function extendLicense() {
+            const clientId = document.getElementById('clientId').value;
+            const days = parseInt(document.getElementById('extendDays').value) || 30;
+
+            if (!clientId) {
+                alert('Client ID je obvezen!');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/api/license/extend', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ client_id: clientId, days })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    logActivity(`Licenca podaljšana: ${clientId} za ${days} dni`);
+                } else {
+                    logActivity(`Napaka pri podaljšanju: ${result.error}`);
+                }
+            } catch (error) {
+                logActivity(`Napaka: ${error.message}`);
+            }
+        }
+
+        async function toggleLicense() {
+            const clientId = document.getElementById('clientId').value;
+
+            if (!clientId) {
+                alert('Client ID je obvezen!');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/api/license/toggle', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ client_id: clientId })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    logActivity(`Status licence preklopljen: ${clientId}`);
+                } else {
+                    logActivity(`Napaka pri preklapljanju: ${result.error}`);
+                }
+            } catch (error) {
+                logActivity(`Napaka: ${error.message}`);
+            }
+        }
+
+        // Quick actions
+        async function quickExtend(clientId) {
+            try {
+                const response = await fetch('http://localhost:3000/api/license/extend', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ client_id: clientId, days: 30 })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    logActivity(`Licenca podaljšana: ${clientId} za 30 dni`);
+                }
+            } catch (error) {
+                logActivity(`Napaka: ${error.message}`);
+            }
+        }
+
+        async function quickToggle(clientId) {
+            try {
+                const response = await fetch('http://localhost:3000/api/license/toggle', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ client_id: clientId })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    logActivity(`Status preklopljen: ${clientId}`);
+                }
+            } catch (error) {
+                logActivity(`Napaka: ${error.message}`);
+            }
+        }
+
+        // Send notification
+        async function sendNotification() {
+            const message = document.getElementById('notificationMessage').value;
+            const targetClients = document.getElementById('targetClients').value;
+            const targetGroup = document.getElementById('targetGroup').value;
+
+            if (!message) {
+                alert('Sporočilo je obvezno!');
+                return;
+            }
+
+            const payload = { message };
+            
+            if (targetGroup) {
+                payload.group_id = targetGroup;
+            } else if (targetClients) {
+                payload.client_ids = targetClients.split(',').map(c => c.trim());
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/api/notify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    logActivity(`Obvestilo poslano: "${message}"`);
+                    document.getElementById('notificationMessage').value = '';
+                    document.getElementById('targetClients').value = '';
+                    document.getElementById('targetGroup').value = '';
+                }
+            } catch (error) {
+                logActivity(`Napaka pri pošiljanju: ${error.message}`);
+            }
+        }
+
+        // Filter table
+        function filterTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const planFilter = document.getElementById('planFilter').value;
+
+            const rows = document.querySelectorAll('#licenseTableBody tr');
+            
+            rows.forEach(row => {
+                const clientId = row.cells[0].textContent.toLowerCase();
+                const plan = row.cells[1].textContent.toLowerCase();
+                const status = row.cells[2].textContent.toLowerCase();
+
+                const matchesSearch = clientId.includes(searchTerm);
+                const matchesStatus = !statusFilter || status.includes(statusFilter);
+                const matchesPlan = !planFilter || plan.includes(planFilter);
+
+                row.style.display = matchesSearch && matchesStatus && matchesPlan ? '' : 'none';
+            });
+        }
+
+        // Utility functions
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('sl-SI') + ' ' + date.toLocaleTimeString('sl-SI', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+        }
+
+        function clearForm() {
+            document.getElementById('clientId').value = '';
+            document.getElementById('modules').value = '';
+            document.getElementById('extendDays').value = '';
+        }
+
+        function refreshData() {
+            loadLicenses();
+            logActivity('Podatki osveženi');
+        }
+
+        function updateUserRole() {
+            document.getElementById('userRole').className = `role-badge role-${currentUserRole}`;
+            
+            // Hide/show buttons based on role
+            const isAdmin = ['super-admin', 'admin'].includes(currentUserRole);
+            const buttons = ['createBtn', 'extendBtn', 'toggleBtn'];
+            
+            buttons.forEach(btnId => {
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    btn.style.display = isAdmin ? 'block' : 'none';
+                }
+            });
+        }
+
+        function logActivity(message) {
+            const logPanel = document.getElementById('activityLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `<span class="log-timestamp">[${timestamp}]</span> ${message}`;
+            
+            logPanel.insertBefore(logEntry, logPanel.firstChild);
+            
+            // Keep only last 50 entries
+            while (logPanel.children.length > 50) {
+                logPanel.removeChild(logPanel.lastChild);
+            }
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            if (socket && socket.connected) {
+                loadLicenses();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

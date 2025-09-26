@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni - Prijava</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            max-width: 900px;
+            width: 100%;
+            display: flex;
+            min-height: 500px;
+        }
+
+        .auth-left {
+            flex: 1;
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .auth-left h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .auth-left p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .auth-right {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .auth-tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .form-group input.error {
+            border-color: #e74c3c;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .success-message {
+            color: #27ae60;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .auth-button {
+            width: 100%;
+            padding: 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .auth-button:hover {
+            background: #2980b9;
+        }
+
+        .auth-button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+            color: #666;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e0e0e0;
+            z-index: 1;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .social-login {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .social-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .social-btn:hover {
+            border-color: #3498db;
+            background: #f8f9fa;
+        }
+
+        .user-info {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .user-info.show {
+            display: block;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #3498db;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0 auto 15px;
+        }
+
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        @media (max-width: 768px) {
+            .auth-container {
+                flex-direction: column;
+                max-width: 400px;
+            }
+            
+            .auth-left {
+                padding: 30px 20px;
+            }
+            
+            .auth-left h1 {
+                font-size: 2em;
+            }
+            
+            .auth-right {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-left">
+            <h1>🚀 Omni</h1>
+            <p>Dobrodošli v pametni IoT platformi prihodnosti. Upravljajte svoje naprave, analizirajte podatke in avtomatizirajte procese.</p>
+        </div>
+        
+        <div class="auth-right">
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchTab('login')">Prijava</div>
+                <div class="auth-tab" onclick="switchTab('register')">Registracija</div>
+            </div>
+
+            <!-- Prijava -->
+            <form class="auth-form active" id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">E-pošta</label>
+                    <input type="email" id="loginEmail" required>
+                    <div class="error-message" id="loginEmailError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginPassword">Geslo</label>
+                    <input type="password" id="loginPassword" required>
+                    <div class="error-message" id="loginPasswordError"></div>
+                </div>
+                
+                <button type="submit" class="auth-button">Prijavi se</button>
+                
+                <div class="divider">
+                    <span>ali</span>
+                </div>
+                
+                <div class="social-login">
+                    <button type="button" class="social-btn" onclick="socialLogin('google')">
+                        🔍 Google
+                    </button>
+                    <button type="button" class="social-btn" onclick="socialLogin('github')">
+                        🐙 GitHub
+                    </button>
+                </div>
+                
+                <div style="text-align: center; margin-top: 15px;">
+                    <a href="#" onclick="showForgotPassword()" style="color: #3498db; text-decoration: none;">Pozabljeno geslo?</a>
+                </div>
+            </form>
+
+            <!-- Registracija -->
+            <form class="auth-form" id="registerForm">
+                <div class="form-group">
+                    <label for="registerName">Ime in priimek</label>
+                    <input type="text" id="registerName" required>
+                    <div class="error-message" id="registerNameError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="registerEmail">E-pošta</label>
+                    <input type="email" id="registerEmail" required>
+                    <div class="error-message" id="registerEmailError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="registerPassword">Geslo</label>
+                    <input type="password" id="registerPassword" required>
+                    <div class="error-message" id="registerPasswordError"></div>
+                    <div class="success-message" id="passwordStrength"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="registerConfirmPassword">Potrdi geslo</label>
+                    <input type="password" id="registerConfirmPassword" required>
+                    <div class="error-message" id="registerConfirmPasswordError"></div>
+                </div>
+                
+                <button type="submit" class="auth-button">Registriraj se</button>
+                
+                <div style="text-align: center; margin-top: 15px; font-size: 14px; color: #666;">
+                    Z registracijo se strinjate z <a href="#" style="color: #3498db;">pogoji uporabe</a>
+                </div>
+            </form>
+
+            <!-- Uporabniške informacije -->
+            <div class="user-info" id="userInfo">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <div style="text-align: center;">
+                    <h3 id="userName">Uporabnik</h3>
+                    <p id="userEmail" style="color: #666; margin: 5px 0;"></p>
+                    <p id="userRole" style="color: #3498db; font-size: 14px;"></p>
+                    <button class="logout-btn" onclick="logout()">Odjavi se</button>
+                    <div style="margin-top: 15px;">
+                        <a href="/dashboard" class="auth-button" style="text-decoration: none; display: inline-block; text-align: center;">
+                            🏠 Pojdi na nadzorno ploščo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulacija uporabniške baze
+        let users = JSON.parse(localStorage.getItem('omni_users') || '[]');
+        let currentUser = JSON.parse(localStorage.getItem('omni_current_user') || 'null');
+
+        // Preveri, če je uporabnik že prijavljen
+        if (currentUser) {
+            showUserInfo(currentUser);
+        }
+
+        function switchTab(tab) {
+            // Posodobi zavihke
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+            
+            // Posodobi forme
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            document.getElementById(tab + 'Form').classList.add('active');
+            
+            // Skrij uporabniške informacije
+            document.getElementById('userInfo').classList.remove('show');
+        }
+
+        function validateEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function validatePassword(password) {
+            return {
+                length: password.length >= 8,
+                uppercase: /[A-Z]/.test(password),
+                lowercase: /[a-z]/.test(password),
+                number: /\d/.test(password),
+                special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+            };
+        }
+
+        function showPasswordStrength(password) {
+            const strength = validatePassword(password);
+            const strengthEl = document.getElementById('passwordStrength');
+            
+            let score = Object.values(strength).filter(Boolean).length;
+            let message = '';
+            let color = '';
+            
+            if (score < 3) {
+                message = 'Šibko geslo';
+                color = '#e74c3c';
+            } else if (score < 5) {
+                message = 'Srednje geslo';
+                color = '#f39c12';
+            } else {
+                message = 'Močno geslo';
+                color = '#27ae60';
+            }
+            
+            strengthEl.textContent = message;
+            strengthEl.style.color = color;
+            strengthEl.style.display = 'block';
+        }
+
+        // Event listeneri
+        document.getElementById('registerPassword').addEventListener('input', function() {
+            showPasswordStrength(this.value);
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Validacija
+            if (!validateEmail(email)) {
+                showError('loginEmailError', 'Vnesite veljavno e-pošto');
+                return;
+            }
+            
+            // Poišči uporabnika
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                // Uspešna prijava
+                currentUser = user;
+                localStorage.setItem('omni_current_user', JSON.stringify(user));
+                showUserInfo(user);
+                clearErrors();
+            } else {
+                showError('loginPasswordError', 'Napačna e-pošta ali geslo');
+            }
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            clearErrors();
+            
+            // Validacija
+            let hasErrors = false;
+            
+            if (name.length < 2) {
+                showError('registerNameError', 'Ime mora imeti vsaj 2 znaka');
+                hasErrors = true;
+            }
+            
+            if (!validateEmail(email)) {
+                showError('registerEmailError', 'Vnesite veljavno e-pošto');
+                hasErrors = true;
+            }
+            
+            if (users.find(u => u.email === email)) {
+                showError('registerEmailError', 'E-pošta je že registrirana');
+                hasErrors = true;
+            }
+            
+            const passwordValidation = validatePassword(password);
+            if (!passwordValidation.length) {
+                showError('registerPasswordError', 'Geslo mora imeti vsaj 8 znakov');
+                hasErrors = true;
+            }
+            
+            if (password !== confirmPassword) {
+                showError('registerConfirmPasswordError', 'Gesli se ne ujemata');
+                hasErrors = true;
+            }
+            
+            if (hasErrors) return;
+            
+            // Ustvari novega uporabnika
+            const newUser = {
+                id: Date.now(),
+                name: name,
+                email: email,
+                password: password,
+                role: 'user',
+                createdAt: new Date().toISOString()
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('omni_users', JSON.stringify(users));
+            
+            // Avtomatska prijava
+            currentUser = newUser;
+            localStorage.setItem('omni_current_user', JSON.stringify(newUser));
+            showUserInfo(newUser);
+        });
+
+        function showError(elementId, message) {
+            const errorEl = document.getElementById(elementId);
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            
+            const inputEl = errorEl.previousElementSibling;
+            inputEl.classList.add('error');
+        }
+
+        function clearErrors() {
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.style.display = 'none';
+                el.textContent = '';
+            });
+            
+            document.querySelectorAll('input').forEach(el => {
+                el.classList.remove('error');
+            });
+        }
+
+        function showUserInfo(user) {
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            
+            const userInfo = document.getElementById('userInfo');
+            const userAvatar = document.getElementById('userAvatar');
+            const userName = document.getElementById('userName');
+            const userEmail = document.getElementById('userEmail');
+            const userRole = document.getElementById('userRole');
+            
+            userAvatar.textContent = user.name.charAt(0).toUpperCase();
+            userName.textContent = user.name;
+            userEmail.textContent = user.email;
+            userRole.textContent = user.role === 'admin' ? 'Administrator' : 'Uporabnik';
+            
+            userInfo.classList.add('show');
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('omni_current_user');
+            
+            document.getElementById('userInfo').classList.remove('show');
+            switchTab('login');
+            
+            // Počisti forme
+            document.querySelectorAll('input').forEach(input => input.value = '');
+            clearErrors();
+        }
+
+        function socialLogin(provider) {
+            alert(`${provider} prijava bo implementirana v prihodnji različici.`);
+        }
+
+        function showForgotPassword() {
+            const email = prompt('Vnesite vašo e-pošto:');
+            if (email && validateEmail(email)) {
+                alert('Navodila za ponastavitev gesla so bila poslana na vašo e-pošto.');
+            }
+        }
+
+        // Demo uporabniki
+        if (users.length === 0) {
+            users = [
+                {
+                    id: 1,
+                    name: 'Admin Uporabnik',
+                    email: 'admin@omni.si',
+                    password: 'admin123',
+                    role: 'admin',
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: 2,
+                    name: 'Test Uporabnik',
+                    email: 'test@omni.si',
+                    password: 'test123',
+                    role: 'user',
+                    createdAt: new Date().toISOString()
+                }
+            ];
+            localStorage.setItem('omni_users', JSON.stringify(users));
+        }
+    </script>
+</body>
+</html>

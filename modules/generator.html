@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omnia Generator - Dokumenti v 1 Minuti</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            padding: 2rem 0;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .generator-container {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 2rem 0;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .generator-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-button:hover {
+            background: #f8f9fa;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .generate-button {
+            width: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+            margin: 2rem 0;
+        }
+
+        .generate-button:hover {
+            transform: scale(1.02);
+        }
+
+        .generate-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .result-container {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+            display: none;
+        }
+
+        .result-container.show {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .result-stats {
+            display: flex;
+            gap: 2rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .result-preview {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 1rem 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .download-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .download-btn {
+            flex: 1;
+            padding: 1rem;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .download-btn:hover {
+            background: #218838;
+        }
+
+        .template-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .template-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .template-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .template-card.selected {
+            border-color: #667eea;
+            background: #e7f3ff;
+        }
+
+        .template-icon {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .template-title {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .template-description {
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .back-button:hover {
+            background: white;
+        }
+
+        .feature-highlight {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .feature-highlight h3 {
+            margin-bottom: 1rem;
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            list-style: none;
+        }
+
+        .feature-list li {
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .generator-tabs {
+                flex-direction: column;
+            }
+            
+            .download-buttons {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/demo" class="back-button">← Nazaj na Demo</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>📄 Omnia Generator</h1>
+            <p>Ustvarite profesionalne dokumente, poročila in predstavitve v manj kot minuti</p>
+        </div>
+
+        <div class="feature-highlight">
+            <h3>🚀 Zakaj Omnia Generator?</h3>
+            <ul class="feature-list">
+                <li>⚡ Rezultat v 60 sekundah</li>
+                <li>🎨 Profesionalno oblikovanje</li>
+                <li>📊 Avtomatski grafi in tabele</li>
+                <li>🌐 Večjezična podpora</li>
+                <li>📱 Vse formate (PDF, Word, PPT)</li>
+                <li>🤖 AI optimizacija vsebine</li>
+            </ul>
+        </div>
+
+        <div class="generator-container">
+            <div class="generator-tabs">
+                <button class="tab-button active" onclick="switchTab('documents')">📄 Dokumenti</button>
+                <button class="tab-button" onclick="switchTab('reports')">📊 Poročila</button>
+                <button class="tab-button" onclick="switchTab('presentations')">🎯 Predstavitve</button>
+            </div>
+
+            <!-- Documents Tab -->
+            <div id="documents" class="tab-content active">
+                <h3>📄 Generiranje Dokumentov</h3>
+                <p>Ustvarite profesionalne dokumente z AI pomočjo</p>
+
+                <div class="template-gallery">
+                    <div class="template-card" onclick="selectTemplate('business-plan')">
+                        <div class="template-icon">💼</div>
+                        <div class="template-title">Poslovni načrt</div>
+                        <div class="template-description">Celovit poslovni načrt z analizo trga</div>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('contract')">
+                        <div class="template-icon">📋</div>
+                        <div class="template-title">Pogodba</div>
+                        <div class="template-description">Pravno veljavne pogodbe in sporazumi</div>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('proposal')">
+                        <div class="template-icon">💡</div>
+                        <div class="template-title">Predlog projekta</div>
+                        <div class="template-description">Strukturiran predlog z budgetom</div>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('manual')">
+                        <div class="template-icon">📖</div>
+                        <div class="template-title">Priročnik</div>
+                        <div class="template-description">Navodila in dokumentacija</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Naslov dokumenta</label>
+                    <input type="text" class="form-input" id="docTitle" placeholder="Npr: Poslovni načrt za startup">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Tip dokumenta</label>
+                        <select class="form-select" id="docType">
+                            <option value="business">Poslovni dokument</option>
+                            <option value="technical">Tehnična dokumentacija</option>
+                            <option value="legal">Pravni dokument</option>
+                            <option value="marketing">Marketing material</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Jezik</label>
+                        <select class="form-select" id="docLanguage">
+                            <option value="sl">Slovenščina</option>
+                            <option value="en">Angleščina</option>
+                            <option value="de">Nemščina</option>
+                            <option value="it">Italijanščina</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Ključne točke (ločene z vejico)</label>
+                    <textarea class="form-textarea" id="docPoints" placeholder="Npr: analiza trga, finančne projekcije, marketing strategija, operativni načrt"></textarea>
+                </div>
+
+                <button class="generate-button" onclick="generateDocument()">
+                    🚀 Generiraj Dokument
+                </button>
+            </div>
+
+            <!-- Reports Tab -->
+            <div id="reports" class="tab-content">
+                <h3>📊 Generiranje Poročil</h3>
+                <p>Ustvarite podatkovno podprta poročila z vizualizacijami</p>
+
+                <div class="template-gallery">
+                    <div class="template-card" onclick="selectTemplate('sales-report')">
+                        <div class="template-icon">📈</div>
+                        <div class="template-title">Prodajno poročilo</div>
+                        <div class="template-description">Analiza prodaje z grafi in trendi</div>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('financial-report')">
+                        <div class="template-icon">💰</div>
+                        <div class="template-title">Finančno poročilo</div>
+                        <div class="template-description">Bilance, izkazi in analize</div>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('performance-report')">
+                        <div class="template-icon">⚡</div>
+                        <div class="template-title">Poročilo o uspešnosti</div>
+                        <div class="template-description">KPI-ji in metrike uspešnosti</div>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('market-analysis')">
+                        <div class="template-icon">🎯</div>
+                        <div class="template-title">Analiza trga</div>
+                        <div class="template-description">Raziskava trga in konkurence</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Naslov poročila</label>
+                    <input type="text" class="form-input" id="reportTitle" placeholder="Npr: Mesečno prodajno poročilo - December 2024">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Obdobje</label>
+                        <select class="form-select" id="reportPeriod">
+                            <option value="monthly">Mesečno</option>
+                            <option value="quarterly">Četrtletno</option>
+                            <option value="yearly">Letno</option>
+                            <option value="custom">Po meri</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Format grafov</label>
+                        <select class="form-select" id="chartType">
+                            <option value="mixed">Mešano</option>
+                            <option value="bar">Stolpčni grafi</option>
+                            <option value="line">Črtni grafi</option>
+                            <option value="pie">Tortni grafi</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Podatkovni viri</label>
+                    <textarea class="form-textarea" id="dataSources" placeholder="Npr: CRM sistem, Google Analytics, prodajne baze, finančni sistem"></textarea>
+                </div>
+
+                <button class="generate-button" onclick="generateReport()">
+                    📊 Generiraj Poročilo
+                </button>
+            </div>
+
+            <!-- Presentations Tab -->
+            <div id="presentations" class="tab-content">
+                <h3>🎯 Generiranje Predstavitev</h3>
+                <p>Ustvarite privlačne PowerPoint predstavitve</p>
+
+                <div class="template-gallery">
+                    <div class="template-card" onclick="selectTemplate('pitch-deck')">
+                        <div class="template-icon">🚀</div>
+                        <div class="template-title">Pitch Deck</div>
+                        <div class="template-description">Predstavitev za investitorje</div>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('company-overview')">
+                        <div class="template-icon">🏢</div>
+                        <div class="template-title">Pregled podjetja</div>
+                        <div class="template-description">Predstavitev podjetja in storitev</div>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('training')">
+                        <div class="template-icon">🎓</div>
+                        <div class="template-title">Izobraževanje</div>
+                        <div class="template-description">Učni materiali in delavnice</div>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('results')">
+                        <div class="template-icon">📊</div>
+                        <div class="template-title">Rezultati</div>
+                        <div class="template-description">Predstavitev dosežkov</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Naslov predstavitve</label>
+                    <input type="text" class="form-input" id="presentationTitle" placeholder="Npr: Naša vizija za prihodnost">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Število prosojnic</label>
+                        <select class="form-select" id="slideCount">
+                            <option value="10">10 prosojnic</option>
+                            <option value="15">15 prosojnic</option>
+                            <option value="20">20 prosojnic</option>
+                            <option value="custom">Po meri</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Stil oblikovanja</label>
+                        <select class="form-select" id="designStyle">
+                            <option value="modern">Moderno</option>
+                            <option value="corporate">Korporativno</option>
+                            <option value="creative">Kreativno</option>
+                            <option value="minimal">Minimalistično</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Ključne teme</label>
+                    <textarea class="form-textarea" id="presentationTopics" placeholder="Npr: uvod v podjetje, naši produkti, tržne priložnosti, finančni rezultati, prihodnji načrti"></textarea>
+                </div>
+
+                <button class="generate-button" onclick="generatePresentation()">
+                    🎯 Generiraj Predstavitev
+                </button>
+            </div>
+
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="result-container" id="resultContainer">
+                <div class="result-header">
+                    <div class="result-title" id="resultTitle">Dokument pripravljen!</div>
+                    <div class="result-stats">
+                        <span id="generationTime">⏱️ 45s</span>
+                        <span id="wordCount">📝 2,847 besed</span>
+                        <span id="pageCount">📄 12 strani</span>
+                    </div>
+                </div>
+                
+                <div class="result-preview" id="resultPreview">
+                    <!-- Generated content preview will appear here -->
+                </div>
+
+                <div class="download-buttons">
+                    <button class="download-btn" onclick="downloadFile('pdf')">📄 Prenesi PDF</button>
+                    <button class="download-btn" onclick="downloadFile('docx')">📝 Prenesi Word</button>
+                    <button class="download-btn" onclick="downloadFile('pptx')">🎯 Prenesi PowerPoint</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedTemplate = null;
+        let currentTab = 'documents';
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            currentTab = tabName;
+            selectedTemplate = null;
+            
+            // Clear template selections
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+        }
+
+        function selectTemplate(templateId) {
+            // Clear previous selections
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Select current template
+            event.target.closest('.template-card').classList.add('selected');
+            selectedTemplate = templateId;
+        }
+
+        function generateDocument() {
+            const title = document.getElementById('docTitle').value;
+            const type = document.getElementById('docType').value;
+            const language = document.getElementById('docLanguage').value;
+            const points = document.getElementById('docPoints').value;
+            
+            if (!title.trim()) {
+                alert('Prosimo vnesite naslov dokumenta');
+                return;
+            }
+            
+            startGeneration('dokument', title, {
+                type: type,
+                language: language,
+                points: points,
+                template: selectedTemplate
+            });
+        }
+
+        function generateReport() {
+            const title = document.getElementById('reportTitle').value;
+            const period = document.getElementById('reportPeriod').value;
+            const chartType = document.getElementById('chartType').value;
+            const dataSources = document.getElementById('dataSources').value;
+            
+            if (!title.trim()) {
+                alert('Prosimo vnesite naslov poročila');
+                return;
+            }
+            
+            startGeneration('poročilo', title, {
+                period: period,
+                chartType: chartType,
+                dataSources: dataSources,
+                template: selectedTemplate
+            });
+        }
+
+        function generatePresentation() {
+            const title = document.getElementById('presentationTitle').value;
+            const slideCount = document.getElementById('slideCount').value;
+            const designStyle = document.getElementById('designStyle').value;
+            const topics = document.getElementById('presentationTopics').value;
+            
+            if (!title.trim()) {
+                alert('Prosimo vnesite naslov predstavitve');
+                return;
+            }
+            
+            startGeneration('predstavitev', title, {
+                slideCount: slideCount,
+                designStyle: designStyle,
+                topics: topics,
+                template: selectedTemplate
+            });
+        }
+
+        function startGeneration(type, title, options) {
+            // Show progress bar
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            const resultContainer = document.getElementById('resultContainer');
+            
+            progressBar.style.display = 'block';
+            resultContainer.classList.remove('show');
+            
+            // Disable generate button
+            const generateBtn = document.querySelector('.generate-button');
+            generateBtn.disabled = true;
+            generateBtn.textContent = '🔄 Pripravljam...';
+            
+            // Simulate progress
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 95) progress = 95;
+                progressFill.style.width = progress + '%';
+            }, 200);
+            
+            // Complete generation after delay
+            setTimeout(() => {
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
+                
+                setTimeout(() => {
+                    completeGeneration(type, title, options);
+                    progressBar.style.display = 'none';
+                    generateBtn.disabled = false;
+                    generateBtn.textContent = `🚀 Generiraj ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+                }, 500);
+            }, 3000 + Math.random() * 2000);
+        }
+
+        function completeGeneration(type, title, options) {
+            const resultContainer = document.getElementById('resultContainer');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultPreview = document.getElementById('resultPreview');
+            const generationTime = document.getElementById('generationTime');
+            const wordCount = document.getElementById('wordCount');
+            const pageCount = document.getElementById('pageCount');
+            
+            // Update result info
+            resultTitle.textContent = `${type.charAt(0).toUpperCase() + type.slice(1)} pripravljen!`;
+            generationTime.textContent = `⏱️ ${Math.floor(Math.random() * 30 + 30)}s`;
+            wordCount.textContent = `📝 ${Math.floor(Math.random() * 2000 + 1500)} besed`;
+            pageCount.textContent = `📄 ${Math.floor(Math.random() * 15 + 8)} strani`;
+            
+            // Generate preview content
+            let previewContent = '';
+            
+            if (type === 'dokument') {
+                previewContent = `
+                    <h2>${title}</h2>
+                    <h3>Povzetek</h3>
+                    <p>Ta dokument predstavlja celovit pregled ${title.toLowerCase()} z vsemi potrebnimi elementi za uspešno implementacijo.</p>
+                    
+                    <h3>Ključne točke</h3>
+                    <ul>
+                        ${options.points.split(',').map(point => `<li>${point.trim()}</li>`).join('')}
+                    </ul>
+                    
+                    <h3>Analiza in priporočila</h3>
+                    <p>Na podlagi analize podatkov priporočamo implementacijo v fazah z jasno definiranimi mejniki.</p>
+                    
+                    <h3>Zaključek</h3>
+                    <p>Predlagani pristop omogoča optimalno doseganje zastavljenih ciljev.</p>
+                `;
+            } else if (type === 'poročilo') {
+                previewContent = `
+                    <h2>${title}</h2>
+                    <h3>Izvršni povzetek</h3>
+                    <p>Poročilo prikazuje ključne metrike in trende za obdobje ${options.period}.</p>
+                    
+                    <h3>Ključni rezultati</h3>
+                    <div style="background: #f0f8ff; padding: 1rem; border-radius: 5px; margin: 1rem 0;">
+                        <p><strong>Rast:</strong> +15.3% glede na prejšnje obdobje</p>
+                        <p><strong>Prihodki:</strong> €127,450</p>
+                        <p><strong>Stroški:</strong> €89,320</p>
+                        <p><strong>Dobiček:</strong> €38,130</p>
+                    </div>
+                    
+                    <h3>Grafični prikazi</h3>
+                    <p>[Avtomatsko generirani ${options.chartType} grafi na podlagi podatkov iz ${options.dataSources}]</p>
+                    
+                    <h3>Priporočila</h3>
+                    <p>Predlagamo nadaljevanje trenutnih strategij z dodatnim fokusom na optimizacijo stroškov.</p>
+                `;
+            } else if (type === 'predstavitev') {
+                previewContent = `
+                    <h2>${title}</h2>
+                    <h3>Struktura predstavitve (${options.slideCount} prosojnic)</h3>
+                    <ol>
+                        <li><strong>Uvod</strong> - Predstavitev teme in ciljev</li>
+                        <li><strong>Pregled</strong> - Trenutno stanje in izzivi</li>
+                        <li><strong>Rešitve</strong> - Predlagani pristopi</li>
+                        <li><strong>Rezultati</strong> - Pričakovani izidi</li>
+                        <li><strong>Zaključek</strong> - Povzetek in naslednji koraki</li>
+                    </ol>
+                    
+                    <h3>Oblikovanje</h3>
+                    <p>Stil: ${options.designStyle} z uporabo profesionalnih predlog in konsistentno barvno shemo.</p>
+                    
+                    <h3>Vsebina</h3>
+                    <p>Predstavitev vključuje:</p>
+                    <ul>
+                        ${options.topics.split(',').map(topic => `<li>${topic.trim()}</li>`).join('')}
+                    </ul>
+                `;
+            }
+            
+            resultPreview.innerHTML = previewContent;
+            resultContainer.classList.add('show');
+        }
+
+        function downloadFile(format) {
+            // Simulate file download
+            const filename = `omnia-generated-${currentTab}-${Date.now()}.${format}`;
+            
+            // Create a temporary link for download simulation
+            const link = document.createElement('a');
+            link.href = '#';
+            link.download = filename;
+            
+            // Show download notification
+            alert(`Prenašanje datoteke: ${filename}\n\nV resničnem sistemu bi se datoteka prenesla avtomatsko.`);
+        }
+
+        // Add enter key support for all inputs
+        document.querySelectorAll('.form-input, .form-textarea').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    const generateBtn = document.querySelector('.generate-button');
+                    if (!generateBtn.disabled) {
+                        generateBtn.click();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 Omniscient IoT Nadzorna Plošča</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .online { background: #28a745; }
+        .warning { background: #ffc107; }
+        .offline { background: #dc3545; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+            color: #667eea;
+        }
+
+        .device-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .device-card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .device-card:hover {
+            background: rgba(255,255,255,0.12);
+            transform: scale(1.02);
+        }
+
+        .device-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #28a745;
+        }
+
+        .device-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .device-value {
+            font-size: 1.5rem;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .device-unit {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #ffc107, #fd7e14);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .alert {
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid #dc3545;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-icon {
+            color: #dc3545;
+            font-size: 1.2rem;
+        }
+
+        .log-container {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 15px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 2px 0;
+        }
+
+        .log-time {
+            color: #667eea;
+        }
+
+        .log-level-info { color: #28a745; }
+        .log-level-warning { color: #ffc107; }
+        .log-level-error { color: #dc3545; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #aaa;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .status-bar {
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="fas fa-robot"></i> Omniscient IoT Nadzorna Plošča</h1>
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-dot online"></div>
+                <span>Sistem Online</span>
+            </div>
+            <div class="status-item">
+                <div class="status-dot online"></div>
+                <span id="device-count">12 Naprav</span>
+            </div>
+            <div class="status-item">
+                <div class="status-dot warning"></div>
+                <span id="alert-count">2 Opozorila</span>
+            </div>
+            <div class="status-item">
+                <i class="fas fa-clock"></i>
+                <span id="current-time">--:--:--</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Senzorji in naprave -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-thermometer-half card-icon"></i>
+                    Senzorji
+                </div>
+                <div class="loading" id="sensors-loading"></div>
+            </div>
+            <div class="device-grid" id="sensors-grid">
+                <!-- Dinamično generirano -->
+            </div>
+        </div>
+
+        <!-- Temperatura graf -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-chart-line card-icon"></i>
+                    Temperatura Trend
+                </div>
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="changeTimeRange('1h')">1h</button>
+                    <button class="btn btn-primary" onclick="changeTimeRange('24h')">24h</button>
+                    <button class="btn btn-primary" onclick="changeTimeRange('7d')">7d</button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="temperatureChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Upravljanje naprav -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-cogs card-icon"></i>
+                    Upravljanje Naprav
+                </div>
+            </div>
+            <div class="controls">
+                <button class="btn btn-success" onclick="toggleDevice('lights')">
+                    <i class="fas fa-lightbulb"></i> Luči
+                </button>
+                <button class="btn btn-warning" onclick="toggleDevice('heating')">
+                    <i class="fas fa-fire"></i> Ogrevanje
+                </button>
+                <button class="btn btn-primary" onclick="toggleDevice('ventilation')">
+                    <i class="fas fa-fan"></i> Ventilacija
+                </button>
+            </div>
+            <div class="device-grid" id="controls-grid">
+                <!-- Dinamično generirano -->
+            </div>
+        </div>
+
+        <!-- Statistike -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-chart-bar card-icon"></i>
+                    Statistike Sistema
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="uptime">99.8%</div>
+                    <div class="stat-label">Dostopnost</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="energy-usage">2.4kW</div>
+                    <div class="stat-label">Poraba</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="data-points">1.2M</div>
+                    <div class="stat-label">Podatki</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="efficiency">94%</div>
+                    <div class="stat-label">Učinkovitost</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Opozorila -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-exclamation-triangle card-icon"></i>
+                    Opozorila
+                </div>
+            </div>
+            <div id="alerts-container">
+                <!-- Dinamično generirano -->
+            </div>
+        </div>
+
+        <!-- Dnevnik dogodkov -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-list card-icon"></i>
+                    Dnevnik Dogodkov
+                </div>
+                <button class="btn btn-primary" onclick="clearLogs()">
+                    <i class="fas fa-trash"></i> Počisti
+                </button>
+            </div>
+            <div class="log-container" id="log-container">
+                <!-- Dinamično generirano -->
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 Omniscient AI Platform - IoT Nadzorna Plošča v1.0</p>
+    </div>
+
+    <script>
+        // Globalne spremenljivke
+        let temperatureChart;
+        let socket;
+        let sensorData = {};
+        let deviceStates = {};
+        let logEntries = [];
+
+        // Inicializacija
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeWebSocket();
+            initializeCharts();
+            startDataSimulation();
+            updateTime();
+            setInterval(updateTime, 1000);
+        });
+
+        // WebSocket povezava
+        function initializeWebSocket() {
+            try {
+                socket = io('http://localhost:3000');
+                
+                socket.on('connect', function() {
+                    addLog('info', 'WebSocket povezava vzpostavljena');
+                });
+
+                socket.on('sensor_data', function(data) {
+                    updateSensorData(data);
+                });
+
+                socket.on('device_status', function(data) {
+                    updateDeviceStatus(data);
+                });
+
+                socket.on('alert', function(alert) {
+                    addAlert(alert);
+                });
+
+            } catch (error) {
+                addLog('error', 'Napaka pri WebSocket povezavi: ' + error.message);
+            }
+        }
+
+        // Inicializacija grafov
+        function initializeCharts() {
+            const ctx = document.getElementById('temperatureChart').getContext('2d');
+            temperatureChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Temperatura (°C)',
+                        data: [],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Simulacija podatkov
+        function startDataSimulation() {
+            // Simuliraj senzorske podatke
+            setInterval(() => {
+                const sensors = [
+                    { id: 'temp_01', name: 'Dnevna soba', type: 'temperature', icon: 'fas fa-thermometer-half' },
+                    { id: 'temp_02', name: 'Spalnica', type: 'temperature', icon: 'fas fa-thermometer-half' },
+                    { id: 'hum_01', name: 'Vlažnost', type: 'humidity', icon: 'fas fa-tint' },
+                    { id: 'light_01', name: 'Svetloba', type: 'light', icon: 'fas fa-sun' }
+                ];
+
+                sensors.forEach(sensor => {
+                    let value;
+                    let unit;
+                    
+                    switch(sensor.type) {
+                        case 'temperature':
+                            value = (20 + Math.random() * 10).toFixed(1);
+                            unit = '°C';
+                            break;
+                        case 'humidity':
+                            value = (40 + Math.random() * 40).toFixed(0);
+                            unit = '%';
+                            break;
+                        case 'light':
+                            value = (200 + Math.random() * 600).toFixed(0);
+                            unit = 'lux';
+                            break;
+                    }
+
+                    updateSensorData({
+                        id: sensor.id,
+                        name: sensor.name,
+                        value: value,
+                        unit: unit,
+                        icon: sensor.icon,
+                        timestamp: new Date()
+                    });
+                });
+
+                // Posodobi graf
+                updateTemperatureChart();
+            }, 2000);
+
+            // Simuliraj opozorila
+            setInterval(() => {
+                if (Math.random() < 0.1) { // 10% možnost opozorila
+                    const alerts = [
+                        { type: 'warning', message: 'Visoka temperatura v dnevni sobi', device: 'temp_01' },
+                        { type: 'error', message: 'Naprava ne odgovarja', device: 'sensor_03' },
+                        { type: 'info', message: 'Avtomatska optimizacija aktivirana', device: 'system' }
+                    ];
+                    
+                    const alert = alerts[Math.floor(Math.random() * alerts.length)];
+                    addAlert(alert);
+                }
+            }, 10000);
+        }
+
+        // Posodobi senzorske podatke
+        function updateSensorData(data) {
+            sensorData[data.id] = data;
+            renderSensors();
+            addLog('info', `${data.name}: ${data.value}${data.unit}`);
+        }
+
+        // Prikaži senzorje
+        function renderSensors() {
+            const container = document.getElementById('sensors-grid');
+            container.innerHTML = '';
+
+            Object.values(sensorData).forEach(sensor => {
+                const sensorCard = document.createElement('div');
+                sensorCard.className = 'device-card';
+                sensorCard.innerHTML = `
+                    <div class="device-icon">
+                        <i class="${sensor.icon}"></i>
+                    </div>
+                    <div class="device-name">${sensor.name}</div>
+                    <div class="device-value">${sensor.value}</div>
+                    <div class="device-unit">${sensor.unit}</div>
+                `;
+                container.appendChild(sensorCard);
+            });
+
+            document.getElementById('sensors-loading').style.display = 'none';
+        }
+
+        // Posodobi graf temperature
+        function updateTemperatureChart() {
+            const tempSensor = sensorData['temp_01'];
+            if (!tempSensor) return;
+
+            const now = new Date();
+            const timeLabel = now.toLocaleTimeString();
+
+            temperatureChart.data.labels.push(timeLabel);
+            temperatureChart.data.datasets[0].data.push(parseFloat(tempSensor.value));
+
+            // Obdrži samo zadnjih 20 točk
+            if (temperatureChart.data.labels.length > 20) {
+                temperatureChart.data.labels.shift();
+                temperatureChart.data.datasets[0].data.shift();
+            }
+
+            temperatureChart.update('none');
+        }
+
+        // Dodaj opozorilo
+        function addAlert(alert) {
+            const container = document.getElementById('alerts-container');
+            const alertElement = document.createElement('div');
+            alertElement.className = 'alert';
+            alertElement.innerHTML = `
+                <i class="fas fa-exclamation-triangle alert-icon"></i>
+                <div>
+                    <strong>${alert.type.toUpperCase()}:</strong> ${alert.message}
+                    <br><small>Naprava: ${alert.device}</small>
+                </div>
+            `;
+            
+            container.insertBefore(alertElement, container.firstChild);
+            
+            // Odstrani stara opozorila
+            if (container.children.length > 5) {
+                container.removeChild(container.lastChild);
+            }
+
+            addLog(alert.type, alert.message);
+        }
+
+        // Dodaj dnevniški vnos
+        function addLog(level, message) {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString();
+            
+            logEntries.unshift({
+                time: timeStr,
+                level: level,
+                message: message
+            });
+
+            // Obdrži samo zadnjih 50 vnosov
+            if (logEntries.length > 50) {
+                logEntries.pop();
+            }
+
+            renderLogs();
+        }
+
+        // Prikaži dnevnik
+        function renderLogs() {
+            const container = document.getElementById('log-container');
+            container.innerHTML = '';
+
+            logEntries.forEach(entry => {
+                const logElement = document.createElement('div');
+                logElement.className = 'log-entry';
+                logElement.innerHTML = `
+                    <span class="log-time">[${entry.time}]</span>
+                    <span class="log-level-${entry.level}">[${entry.level.toUpperCase()}]</span>
+                    ${entry.message}
+                `;
+                container.appendChild(logElement);
+            });
+
+            container.scrollTop = 0;
+        }
+
+        // Upravljanje naprav
+        function toggleDevice(deviceId) {
+            deviceStates[deviceId] = !deviceStates[deviceId];
+            const state = deviceStates[deviceId] ? 'VKLOPLJENO' : 'IZKLOPLJENO';
+            addLog('info', `Naprava ${deviceId}: ${state}`);
+            
+            // Simuliraj API klic
+            if (socket) {
+                socket.emit('device_control', { device: deviceId, state: deviceStates[deviceId] });
+            }
+        }
+
+        // Spremeni časovni razpon grafa
+        function changeTimeRange(range) {
+            addLog('info', `Časovni razpon spremenjen na: ${range}`);
+            // Implementiraj logiko za različne časovne razpone
+        }
+
+        // Počisti dnevnik
+        function clearLogs() {
+            logEntries = [];
+            renderLogs();
+            addLog('info', 'Dnevnik počiščen');
+        }
+
+        // Posodobi čas
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleTimeString();
+        }
+
+        // Posodobi statistike
+        setInterval(() => {
+            document.getElementById('uptime').textContent = (99.5 + Math.random() * 0.5).toFixed(1) + '%';
+            document.getElementById('energy-usage').textContent = (2.0 + Math.random() * 1.0).toFixed(1) + 'kW';
+            document.getElementById('efficiency').textContent = (90 + Math.random() * 10).toFixed(0) + '%';
+        }, 5000);
+
+        // Dodaj začetna opozorila
+        setTimeout(() => {
+            addAlert({ type: 'info', message: 'Sistem uspešno zagnan', device: 'system' });
+            addAlert({ type: 'warning', message: 'Visoka vlažnost zaznana', device: 'hum_01' });
+        }, 1000);
+    </script>
+</body>
+</html>

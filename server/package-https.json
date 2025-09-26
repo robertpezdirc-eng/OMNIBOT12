@@ -1,0 +1,55 @@
+{
+  "name": "omni-https-server",
+  "version": "1.0.0",
+  "description": "Omni HTTPS Server with WebSocket support and license management",
+  "main": "https-server.js",
+  "scripts": {
+    "start": "node https-server.js",
+    "dev": "nodemon https-server.js",
+    "test": "node test-https-server.js",
+    "test:watch": "nodemon test-https-server.js",
+    "install-deps": "npm install",
+    "setup": "npm run install-deps && npm run test",
+    "prod": "NODE_ENV=production node https-server.js"
+  },
+  "keywords": [
+    "https",
+    "websocket",
+    "license",
+    "ssl",
+    "mongodb",
+    "jwt",
+    "express",
+    "socket.io"
+  ],
+  "author": "Omni Platform",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.4",
+    "mongoose": "^8.0.3",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "selfsigned": "^2.4.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "socket.io-client": "^4.7.4"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/omni-platform/https-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/omni-platform/https-server/issues"
+  },
+  "homepage": "https://github.com/omni-platform/https-server#readme"
+}

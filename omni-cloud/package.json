@@ -1,0 +1,45 @@
+{
+  "name": "omni-cloud",
+  "version": "1.0.0",
+  "description": "🚀 Omni Cloud-Ready Push-Button Setup - Complete full-stack solution with Express, Socket.IO, React, and MongoDB",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "setup": "npm run install:all && echo '✅ Omni Cloud setup complete! Run npm run dev to start development.'",
+    "push-button": "npm run setup && npm run dev"
+  },
+  "keywords": [
+    "omni-cloud",
+    "express",
+    "socket.io",
+    "react",
+    "mongodb",
+    "jwt",
+    "admin-dashboard",
+    "real-time",
+    "push-button-setup"
+  ],
+  "author": "Omni AI Platform",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/omni-ai/omni-cloud.git"
+  },
+  "bugs": {
+    "url": "https://github.com/omni-ai/omni-cloud/issues"
+  },
+  "homepage": "https://github.com/omni-ai/omni-cloud#readme"
+}

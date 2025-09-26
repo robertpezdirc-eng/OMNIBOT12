@@ -1,0 +1,110 @@
+# Tourism Master Integration - Zahtevane knjižnice
+# Verzija: 1.0.0
+
+# Core dependencies
+flask==2.3.3
+flask-cors==4.0.0
+websockets==11.0.3
+numpy==1.24.3
+pandas==2.0.3
+sqlite3  # Built-in Python module
+
+# AI and Machine Learning
+scikit-learn==1.3.0
+tensorflow==2.13.0
+transformers==4.33.2
+torch==2.0.1
+nltk==3.8.1
+
+# Data Processing
+requests==2.31.0
+beautifulsoup4==4.12.2
+lxml==4.9.3
+openpyxl==3.1.2
+xlsxwriter==3.1.1
+
+# Email and Communication
+smtplib  # Built-in Python module
+email-validator==2.0.0
+twilio==8.5.0
+
+# Date and Time
+python-dateutil==2.8.2
+pytz==2023.3
+
+# Async and Threading
+asyncio  # Built-in Python module
+threading  # Built-in Python module
+concurrent.futures  # Built-in Python module
+
+# Logging and Monitoring
+logging  # Built-in Python module
+psutil==5.9.5
+
+# Image and Media Processing
+pillow==10.0.0
+opencv-python==4.8.0.76
+
+# API Integration
+fastapi==0.103.1
+uvicorn==0.23.2
+httpx==0.24.1
+
+# Database
+sqlalchemy==2.0.20
+alembic==1.12.0
+
+# Visualization
+matplotlib==3.7.2
+seaborn==0.12.2
+plotly==5.16.1
+
+# Security
+cryptography==41.0.4
+bcrypt==4.0.1
+pyjwt==2.8.0
+
+# Configuration
+python-dotenv==1.0.0
+pyyaml==6.0.1
+
+# Testing
+pytest==7.4.2
+pytest-asyncio==0.21.1
+
+# Development
+black==23.7.0
+flake8==6.0.0
+mypy==1.5.1
+
+# Optional Premium Features
+# VR/AR Support
+opencv-contrib-python==4.8.0.76
+
+# IoT Integration
+paho-mqtt==1.6.1
+pyserial==3.5
+
+# Advanced Analytics
+scipy==1.11.2
+statsmodels==0.14.0
+
+# Social Media APIs
+tweepy==4.14.0
+facebook-sdk==3.1.0
+instagram-basic-display==1.0.0
+
+# Payment Processing
+stripe==6.6.0
+paypal-checkout-serversdk==1.0.1
+
+# Cloud Services
+boto3==1.28.57  # AWS
+google-cloud-storage==2.10.0  # Google Cloud
+azure-storage-blob==12.17.0  # Azure
+
+# Additional Utilities
+qrcode==7.4.2
+barcode==1.0.1
+reportlab==4.0.4
+weasyprint==59.0

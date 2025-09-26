@@ -1,0 +1,154 @@
+[
+  {
+    "id": "mem_0_1758526314.515507",
+    "content": "Registriran nov modul: finance",
+    "timestamp": "2025-09-22T09:31:54.515980",
+    "category": "system",
+    "importance": 0.8,
+    "metadata": {
+      "module": "finance",
+      "functions": [
+        "add_investment",
+        "add_transaction",
+        "create_budget",
+        "generate_monthly_report",
+        "get_budget_status",
+        "get_financial_insights",
+        "get_portfolio_summary",
+        "get_transactions",
+        "init_database",
+        "update_budget_spending"
+      ]
+    }
+  },
+  {
+    "id": "mem_1_1758526314.519644",
+    "content": "Registriran nov modul: tourism",
+    "timestamp": "2025-09-22T09:31:54.519660",
+    "category": "system",
+    "importance": 0.8,
+    "metadata": {
+      "module": "tourism",
+      "functions": [
+        "add_accommodation",
+        "add_activity",
+        "calculate_occupancy_rate",
+        "check_availability",
+        "create_booking",
+        "create_itinerary",
+        "generate_itinerary_suggestions",
+        "get_bookings",
+        "get_tourism_analytics",
+        "init_database",
+        "search_accommodations",
+        "search_activities"
+      ]
+    }
+  },
+  {
+    "id": "mem_2_1758526314.523443",
+    "content": "Registriran nov modul: devops",
+    "timestamp": "2025-09-22T09:31:54.523455",
+    "category": "system",
+    "importance": 0.8,
+    "metadata": {
+      "module": "devops",
+      "functions": [
+        "add_project",
+        "collect_system_metrics",
+        "create_deployment",
+        "create_issue",
+        "get_github_repo_info",
+        "get_project",
+        "get_project_issues",
+        "get_system_health_report",
+        "init_database",
+        "run_ci_cd_pipeline",
+        "sync_project_from_github",
+        "update_deployment_status",
+        "update_project_sync_time"
+      ]
+    }
+  },
+  {
+    "id": "mem_3_1758526322.317786",
+    "content": "Uporabnikov vnos: clear",
+    "timestamp": "2025-09-22T09:32:02.317802",
+    "category": "interaction",
+    "importance": 0.6,
+    "metadata": {
+      "context": {}
+    }
+  },
+  {
+    "id": "mem_4_1758526340.079587",
+    "content": "Registriran nov modul: finance",
+    "timestamp": "2025-09-22T09:32:20.079613",
+    "category": "system",
+    "importance": 0.8,
+    "metadata": {
+      "module": "finance",
+      "functions": [
+        "add_investment",
+        "add_transaction",
+        "create_budget",
+        "generate_monthly_report",
+        "get_budget_status",
+        "get_financial_insights",
+        "get_portfolio_summary",
+        "get_transactions",
+        "init_database",
+        "update_budget_spending"
+      ]
+    }
+  },
+  {
+    "id": "mem_5_1758526340.086616",
+    "content": "Registriran nov modul: tourism",
+    "timestamp": "2025-09-22T09:32:20.086629",
+    "category": "system",
+    "importance": 0.8,
+    "metadata": {
+      "module": "tourism",
+      "functions": [
+        "add_accommodation",
+        "add_activity",
+        "calculate_occupancy_rate",
+        "check_availability",
+        "create_booking",
+        "create_itinerary",
+        "generate_itinerary_suggestions",
+        "get_bookings",
+        "get_tourism_analytics",
+        "init_database",
+        "search_accommodations",
+        "search_activities"
+      ]
+    }
+  },
+  {
+    "id": "mem_6_1758526340.093947",
+    "content": "Registriran nov modul: devops",
+    "timestamp": "2025-09-22T09:32:20.093959",
+    "category": "system",
+    "importance": 0.8,
+    "metadata": {
+      "module": "devops",
+      "functions": [
+        "add_project",
+        "collect_system_metrics",
+        "create_deployment",
+        "create_issue",
+        "get_github_repo_info",
+        "get_project",
+        "get_project_issues",
+        "get_system_health_report",
+        "init_database",
+        "run_ci_cd_pipeline",
+        "sync_project_from_github",
+        "update_deployment_status",
+        "update_project_sync_time"
+      ]
+    }
+  }
+]

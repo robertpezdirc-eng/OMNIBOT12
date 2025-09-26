@@ -1,0 +1,149 @@
+{
+  "pattern_0": {
+    "timestamp": "2025-09-22T09:34:44.662091",
+    "data": {
+      "input": "Analiziraj podjetje in predlagaj optimizacijo vseh oddelkov.",
+      "ai_response": "❌ OpenAI client ni na voljo",
+      "modules": {
+        "finance": "finance modul pripravljen",
+        "tourism": "tourism modul pripravljen",
+        "devops": "devops modul pripravljen"
+      },
+      "memory_length": 4,
+      "execution_time": 0.0
+    },
+    "learned": true
+  },
+  "pattern_1": {
+    "timestamp": "2025-09-22T09:35:19.234874",
+    "data": {
+      "input": "Analiziraj podjetje in predlagaj optimizacijo vseh oddelkov.",
+      "ai_response": "❌ OpenAI client ni na voljo",
+      "modules": {
+        "finance": "finance modul pripravljen",
+        "tourism": "tourism modul pripravljen",
+        "devops": "devops modul pripravljen"
+      },
+      "memory_length": 8,
+      "execution_time": 0.0
+    },
+    "learned": true
+  },
+  "pattern_2": {
+    "timestamp": "2025-09-22T09:36:47.128046",
+    "data": {
+      "input": "Analiziraj podjetje in predlagaj optimizacijo vseh oddelkov.",
+      "ai_response": "{\n  \"analysis\": \"Analiziral sem prompt: 'Analiziraj podjetje in predlagaj optimizacijo vseh...'\",\n  \"recommendations\": [\n    \"Optimiziraj finance modul za boljše upravljanje stroškov\",\n    \"Izboljšaj tourism modul z novimi destinacijami\",\n    \"Nadgradi devops modul z avtomatizacijo\"\n  ],\n  \"priority_tasks\": [\n    {\n      \"module\": \"finance\",\n      \"task\": \"Analiza ROI\"\n    },\n    {\n      \"module\": \"tourism\",\n      \"task\": \"Sezonski načrti\"\n    },\n    {\n      \"module\": \"devops\",\n      \"task\": \"CI/CD optimizacija\"\n    }\n  ],\n  \"json_structure\": {\n    \"input\": \"Analiziraj podjetje in predlagaj optimizacijo vseh oddelkov.\",\n    \"ai_response\": \"Mock AI analiza uspešno izvedena\",\n    \"modules\": [\n      \"finance\",\n      \"tourism\",\n      \"devops\"\n    ],\n    \"memory_length\": 12,\n    \"execution_time\": \"simuliran\"\n  }\n}",
+      "modules": {
+        "finance": "finance modul pripravljen",
+        "tourism": "tourism modul pripravljen",
+        "devops": "devops modul pripravljen"
+      },
+      "memory_length": 12,
+      "execution_time": 0.01
+    },
+    "learned": true
+  },
+  "pattern_3": {
+    "timestamp": "2025-09-22T09:38:45.707785",
+    "data": {
+      "input": "Kakšne so aktualne cene nepremičnin v Ljubljani?",
+      "ai_response": "❌ OpenAI client ni na voljo",
+      "modules": {
+        "finance": "finance modul pripravljen",
+        "tourism": "tourism modul pripravljen",
+        "devops": "devops modul pripravljen"
+      },
+      "memory_length": 17,
+      "execution_time": 0.0
+    },
+    "learned": true
+  },
+  "pattern_4": {
+    "timestamp": "2025-09-22T09:38:45.717609",
+    "data": {
+      "input": "Kako optimizirati finance podjetja?",
+      "ai_response": "❌ OpenAI client ni na voljo",
+      "modules": {
+        "finance": "finance modul pripravljen",
+        "tourism": "tourism modul pripravljen",
+        "devops": "devops modul pripravljen"
+      },
+      "memory_length": 18,
+      "execution_time": 0.0
+    },
+    "learned": true
+  },
+  "pattern_5": {
+    "timestamp": "2025-09-22T09:53:27.049996",
+    "data": {
+      "input": "Prižgi pametno TV in preveri stanje",
+      "ai_response": "❌ OpenAI client ni na voljo",
+      "modules": {
+        "iot": "iot modul pripravljen"
+      },
+      "search_results": [
+        {
+          "info": "Bing Search integracija ni registrirana"
+        }
+      ],
+      "memory_length": 20,
+      "execution_time": 0.0
+    },
+    "learned": true
+  },
+  "pattern_6": {
+    "timestamp": "2025-09-22T09:53:27.565063",
+    "data": {
+      "input": "IoT nadzor: ugasni vse naprave",
+      "ai_response": "❌ OpenAI client ni na voljo",
+      "modules": {
+        "iot": "iot modul pripravljen"
+      },
+      "search_results": [
+        {
+          "info": "Bing Search integracija ni registrirana"
+        }
+      ],
+      "memory_length": 21,
+      "execution_time": 0.0
+    },
+    "learned": true
+  },
+  "pattern_7": {
+    "timestamp": "2025-09-22T09:53:28.090075",
+    "data": {
+      "input": "Seznam IoT naprav",
+      "ai_response": "❌ OpenAI client ni na voljo",
+      "modules": {
+        "iot": "iot modul pripravljen"
+      },
+      "search_results": [
+        {
+          "info": "Bing Search integracija ni registrirana"
+        }
+      ],
+      "memory_length": 22,
+      "execution_time": 0.01
+    },
+    "learned": true
+  },
+  "pattern_8": {
+    "timestamp": "2025-09-22T09:53:28.601447",
+    "data": {
+      "input": "Restart stroj 1 in klimatsko napravo",
+      "ai_response": "❌ OpenAI client ni na voljo",
+      "modules": {
+        "iot": "iot modul pripravljen"
+      },
+      "search_results": [
+        {
+          "info": "Bing Search integracija ni registrirana"
+        }
+      ],
+      "memory_length": 23,
+      "execution_time": 0.01
+    },
+    "learned": true
+  }
+}

@@ -1,0 +1,166 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="30%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#06b6d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#10b981;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#ffffff;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.3" />
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background circle with gradient -->
+  <circle cx="256" cy="256" r="240" fill="url(#gradient1)" stroke="#ffffff" stroke-width="8"/>
+  
+  <!-- Inner glow circle -->
+  <circle cx="256" cy="256" r="200" fill="none" stroke="url(#centerGlow)" stroke-width="2" opacity="0.5"/>
+  
+  <!-- Central AI brain network -->
+  <g transform="translate(256,256)">
+    <!-- Outer neural network ring -->
+    <g opacity="0.9">
+      <!-- Main nodes -->
+      <circle cx="-80" cy="-50" r="12" fill="#ffffff" filter="url(#glow)"/>
+      <circle cx="80" cy="-50" r="12" fill="#ffffff" filter="url(#glow)"/>
+      <circle cx="-80" cy="50" r="12" fill="#ffffff" filter="url(#glow)"/>
+      <circle cx="80" cy="50" r="12" fill="#ffffff" filter="url(#glow)"/>
+      <circle cx="0" cy="-90" r="12" fill="#ffffff" filter="url(#glow)"/>
+      <circle cx="0" cy="90" r="12" fill="#ffffff" filter="url(#glow)"/>
+      <circle cx="-110" cy="0" r="12" fill="#ffffff" filter="url(#glow)"/>
+      <circle cx="110" cy="0" r="12" fill="#ffffff" filter="url(#glow)"/>
+      
+      <!-- Secondary nodes -->
+      <circle cx="-60" cy="-70" r="8" fill="#ffffff" opacity="0.8"/>
+      <circle cx="60" cy="-70" r="8" fill="#ffffff" opacity="0.8"/>
+      <circle cx="-60" cy="70" r="8" fill="#ffffff" opacity="0.8"/>
+      <circle cx="60" cy="70" r="8" fill="#ffffff" opacity="0.8"/>
+      <circle cx="-90" cy="-25" r="8" fill="#ffffff" opacity="0.8"/>
+      <circle cx="90" cy="-25" r="8" fill="#ffffff" opacity="0.8"/>
+      <circle cx="-90" cy="25" r="8" fill="#ffffff" opacity="0.8"/>
+      <circle cx="90" cy="25" r="8" fill="#ffffff" opacity="0.8"/>
+    </g>
+    
+    <!-- Central processing core -->
+    <circle cx="0" cy="0" r="30" fill="url(#centerGlow)" filter="url(#glow)"/>
+    <circle cx="0" cy="0" r="20" fill="#ffffff" opacity="0.95"/>
+    
+    <!-- Neural connections -->
+    <g stroke="#ffffff" stroke-width="3" opacity="0.7">
+      <line x1="-80" y1="-50" x2="0" y2="0"/>
+      <line x1="80" y1="-50" x2="0" y2="0"/>
+      <line x1="-80" y1="50" x2="0" y2="0"/>
+      <line x1="80" y1="50" x2="0" y2="0"/>
+      <line x1="0" y1="-90" x2="0" y2="0"/>
+      <line x1="0" y1="90" x2="0" y2="0"/>
+      <line x1="-110" y1="0" x2="0" y2="0"/>
+      <line x1="110" y1="0" x2="0" y2="0"/>
+    </g>
+    
+    <!-- Secondary connections -->
+    <g stroke="#ffffff" stroke-width="2" opacity="0.5">
+      <line x1="-60" y1="-70" x2="-80" y2="-50"/>
+      <line x1="60" y1="-70" x2="80" y2="-50"/>
+      <line x1="-60" y1="70" x2="-80" y2="50"/>
+      <line x1="60" y1="70" x2="80" y2="50"/>
+      <line x1="-90" y1="-25" x2="-80" y2="-50"/>
+      <line x1="90" y1="-25" x2="80" y2="-50"/>
+      <line x1="-90" y1="25" x2="-80" y2="50"/>
+      <line x1="90" y1="25" x2="80" y2="50"/>
+    </g>
+    
+    <!-- Animated data flow particles -->
+    <g fill="url(#gradient2)">
+      <circle cx="-40" cy="-25" r="4" opacity="0.8">
+        <animate attributeName="opacity" values="0.3;1;0.3" dur="3s" repeatCount="indefinite"/>
+        <animateTransform attributeName="transform" type="translate" values="0,0; 40,25; 0,0" dur="3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="40" cy="-25" r="4" opacity="0.8">
+        <animate attributeName="opacity" values="0.3;1;0.3" dur="3s" repeatCount="indefinite" begin="0.75s"/>
+        <animateTransform attributeName="transform" type="translate" values="0,0; -40,25; 0,0" dur="3s" repeatCount="indefinite" begin="0.75s"/>
+      </circle>
+      <circle cx="-40" cy="25" r="4" opacity="0.8">
+        <animate attributeName="opacity" values="0.3;1;0.3" dur="3s" repeatCount="indefinite" begin="1.5s"/>
+        <animateTransform attributeName="transform" type="translate" values="0,0; 40,-25; 0,0" dur="3s" repeatCount="indefinite" begin="1.5s"/>
+      </circle>
+      <circle cx="40" cy="25" r="4" opacity="0.8">
+        <animate attributeName="opacity" values="0.3;1;0.3" dur="3s" repeatCount="indefinite" begin="2.25s"/>
+        <animateTransform attributeName="transform" type="translate" values="0,0; -40,-25; 0,0" dur="3s" repeatCount="indefinite" begin="2.25s"/>
+      </circle>
+    </g>
+  </g>
+  
+  <!-- Corner module indicators -->
+  <!-- IoT Devices (top-left) -->
+  <g transform="translate(100,100)">
+    <rect x="-20" y="-20" width="40" height="40" rx="8" fill="#ffffff" opacity="0.9" filter="url(#glow)"/>
+    <circle cx="0" cy="0" r="8" fill="url(#gradient1)"/>
+    <circle cx="-8" cy="-8" r="3" fill="#ffffff" opacity="0.8"/>
+    <circle cx="8" cy="-8" r="3" fill="#ffffff" opacity="0.8"/>
+    <circle cx="-8" cy="8" r="3" fill="#ffffff" opacity="0.8"/>
+    <circle cx="8" cy="8" r="3" fill="#ffffff" opacity="0.8"/>
+  </g>
+  
+  <!-- Analytics (top-right) -->
+  <g transform="translate(412,100)">
+    <rect x="-20" y="-20" width="40" height="40" rx="8" fill="#ffffff" opacity="0.9" filter="url(#glow)"/>
+    <rect x="-15" y="-10" width="8" height="20" fill="url(#gradient1)"/>
+    <rect x="-3" y="-15" width="8" height="30" fill="url(#gradient1)"/>
+    <rect x="9" y="-5" width="8" height="10" fill="url(#gradient1)"/>
+  </g>
+  
+  <!-- Automation (bottom-left) -->
+  <g transform="translate(100,412)">
+    <rect x="-20" y="-20" width="40" height="40" rx="8" fill="#ffffff" opacity="0.9" filter="url(#glow)"/>
+    <path d="M-12,-12 L12,-12 L12,12 L-12,12 Z" fill="none" stroke="url(#gradient1)" stroke-width="3"/>
+    <circle cx="0" cy="0" r="6" fill="url(#gradient1)"/>
+    <path d="M-8,0 L-4,-4 L-4,4 Z" fill="url(#gradient1)"/>
+    <path d="M8,0 L4,-4 L4,4 Z" fill="url(#gradient1)"/>
+  </g>
+  
+  <!-- Settings (bottom-right) -->
+  <g transform="translate(412,412)">
+    <rect x="-20" y="-20" width="40" height="40" rx="8" fill="#ffffff" opacity="0.9" filter="url(#glow)"/>
+    <circle cx="0" cy="0" r="12" fill="none" stroke="url(#gradient1)" stroke-width="3"/>
+    <circle cx="0" cy="0" r="6" fill="url(#gradient1)"/>
+    <line x1="0" y1="-12" x2="0" y2="-18" stroke="url(#gradient1)" stroke-width="3"/>
+    <line x1="0" y1="12" x2="0" y2="18" stroke="url(#gradient1)" stroke-width="3"/>
+    <line x1="12" y1="0" x2="18" y2="0" stroke="url(#gradient1)" stroke-width="3"/>
+    <line x1="-12" y1="0" x2="-18" y2="0" stroke="url(#gradient1)" stroke-width="3"/>
+  </g>
+  
+  <!-- Brand text -->
+  <text x="256" y="450" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="36" font-weight="bold" opacity="0.95" filter="url(#glow)">OMNISCIENT AI</text>
+  <text x="256" y="480" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="18" font-weight="normal" opacity="0.8">PLATFORM</text>
+  
+  <!-- Decorative elements -->
+  <g opacity="0.3">
+    <circle cx="80" cy="256" r="2" fill="#ffffff">
+      <animate attributeName="opacity" values="0.1;0.8;0.1" dur="4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="432" cy="256" r="2" fill="#ffffff">
+      <animate attributeName="opacity" values="0.1;0.8;0.1" dur="4s" repeatCount="indefinite" begin="1s"/>
+    </circle>
+    <circle cx="256" cy="80" r="2" fill="#ffffff">
+      <animate attributeName="opacity" values="0.1;0.8;0.1" dur="4s" repeatCount="indefinite" begin="2s"/>
+    </circle>
+    <circle cx="256" cy="432" r="2" fill="#ffffff">
+      <animate attributeName="opacity" values="0.1;0.8;0.1" dur="4s" repeatCount="indefinite" begin="3s"/>
+    </circle>
+  </g>
+</svg>

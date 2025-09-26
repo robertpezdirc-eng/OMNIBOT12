@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turizem & Gostinstvo - Odkrijte Slovenijo</title>
+    
+    <!-- 🎨 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
+    <link href="public.css" rel="stylesheet">
+    
+    <!-- 📱 Meta tags -->
+    <meta name="description" content="Odkrijte najboljše turistične objekte v Sloveniji - hoteli, restavracije, kampi, wellness centri in več.">
+    <meta name="keywords" content="turizem, slovenija, hoteli, restavracije, kampi, wellness, spa, apartmaji">
+    <meta property="og:title" content="Turizem & Gostinstvo - Odkrijte Slovenijo">
+    <meta property="og:description" content="Odkrijte najboljše turistične objekte v Sloveniji">
+    <meta property="og:type" content="website">
+</head>
+<body>
+    <!-- 🔄 Loading -->
+    <div id="loading" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>Nalagam...</p>
+    </div>
+
+    <!-- 🎯 HEADER -->
+    <header class="main-header">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand" href="#home">
+                    <i class="fas fa-mountain"></i>
+                    <span>Turizem & Gostinstvo</span>
+                </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#home" onclick="showSection('home')">
+                                <i class="fas fa-home"></i> Domov
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#search" onclick="showSection('search')">
+                                <i class="fas fa-search"></i> Iskanje
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#map" onclick="showSection('map')">
+                                <i class="fas fa-map"></i> Zemljevid
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#featured" onclick="showSection('featured')">
+                                <i class="fas fa-star"></i> Izpostavljeno
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <div class="navbar-nav">
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-globe"></i> Slovenščina
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-flag"></i> Slovenščina</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-flag"></i> English</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-flag"></i> Deutsch</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- 🏠 HOME SECTION -->
+    <section id="home-section" class="content-section active">
+        <!-- 🎨 Hero Banner -->
+        <div class="hero-banner">
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <div class="container">
+                    <div class="row justify-content-center text-center">
+                        <div class="col-lg-8">
+                            <h1 class="hero-title">Odkrijte čudovito Slovenijo</h1>
+                            <p class="hero-subtitle">Najdite najboljše hotele, restavracije, kampe in turistične atrakcije</p>
+                            
+                            <!-- 🔍 Quick Search -->
+                            <div class="hero-search">
+                                <div class="search-form">
+                                    <div class="row g-2">
+                                        <div class="col-md-4">
+                                            <input type="text" class="form-control" id="hero-search" placeholder="Kaj iščete?">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select class="form-select" id="hero-type">
+                                                <option value="">Vse kategorije</option>
+                                                <option value="hotel">Hoteli</option>
+                                                <option value="restavracija">Restavracije</option>
+                                                <option value="kamp">Kampi</option>
+                                                <option value="wellness_center">Wellness</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select class="form-select" id="hero-region">
+                                                <option value="">Vse regije</option>
+                                                <option value="Gorenjska">Gorenjska</option>
+                                                <option value="Goriška">Goriška</option>
+                                                <option value="Jugovzhodna Slovenija">Jugovzhodna Slovenija</option>
+                                                <option value="Koroška">Koroška</option>
+                                                <option value="Obalno-kraška">Obalno-kraška</option>
+                                                <option value="Osrednjeslovenska">Osrednjeslovenska</option>
+                                                <option value="Podravska">Podravska</option>
+                                                <option value="Pomurska">Pomurska</option>
+                                                <option value="Posavska">Posavska</option>
+                                                <option value="Primorsko-notranjska">Primorsko-notranjska</option>
+                                                <option value="Savinjska">Savinjska</option>
+                                                <option value="Zasavska">Zasavska</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button class="btn btn-primary w-100" onclick="performHeroSearch()">
+                                                <i class="fas fa-search"></i> Išči
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📊 Statistics -->
+        <div class="stats-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3 col-6">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-hotel"></i>
+                            </div>
+                            <div class="stat-number" id="total-objects">0</div>
+                            <div class="stat-label">Turističnih objektov</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="stat-number" id="total-reviews">0</div>
+                            <div class="stat-label">Ocen gostov</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Regij</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-certificate"></i>
+                            </div>
+                            <div class="stat-number" id="certified-objects">0</div>
+                            <div class="stat-label">Certificiranih objektov</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🌟 Featured Objects -->
+        <div class="featured-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Izpostavljeni objekti</h2>
+                    <p>Odkrijte naše najboljše turistične objekte</p>
+                </div>
+                
+                <div class="row" id="featured-objects">
+                    <!-- Featured objects will be loaded here -->
+                </div>
+                
+                <div class="text-center mt-4">
+                    <button class="btn btn-outline-primary" onclick="showSection('featured')">
+                        Prikaži vse izpostavljene objekte
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🏷️ Categories -->
+        <div class="categories-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Kategorije</h2>
+                    <p>Izberite tip objekta, ki vas zanima</p>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-3 col-md-4 col-6">
+                        <div class="category-card" onclick="searchByCategory('hotel')">
+                            <div class="category-icon">
+                                <i class="fas fa-hotel"></i>
+                            </div>
+                            <h5>Hoteli</h5>
+                            <p>Luksuzni in butični hoteli</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-6">
+                        <div class="category-card" onclick="searchByCategory('restavracija')">
+                            <div class="category-icon">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                            <h5>Restavracije</h5>
+                            <p>Okusna kulinarika</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-6">
+                        <div class="category-card" onclick="searchByCategory('kamp')">
+                            <div class="category-icon">
+                                <i class="fas fa-campground"></i>
+                            </div>
+                            <h5>Kampi</h5>
+                            <p>Naravni kampi in glamping</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-6">
+                        <div class="category-card" onclick="searchByCategory('wellness_center')">
+                            <div class="category-icon">
+                                <i class="fas fa-spa"></i>
+                            </div>
+                            <h5>Wellness</h5>
+                            <p>Sprostitev in zdravje</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 🔍 SEARCH SECTION -->
+    <section id="search-section" class="content-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Napredno iskanje</h2>
+                <p>Najdite popoln objekt za vaše potrebe</p>
+            </div>
+
+            <!-- 🔍 Advanced Search Form -->
+            <div class="search-form-container">
+                <form id="advanced-search-form">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Iskalni niz</label>
+                            <input type="text" class="form-control" id="search-query" placeholder="Vnesite ime objekta, mesto...">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Tip objekta</label>
+                            <select class="form-select" id="search-type">
+                                <option value="">Vse kategorije</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Regija</label>
+                            <select class="form-select" id="search-region">
+                                <option value="">Vse regije</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Minimalna ocena</label>
+                            <select class="form-select" id="search-rating">
+                                <option value="">Vse ocene</option>
+                                <option value="4.5">4.5+ ⭐⭐⭐⭐⭐</option>
+                                <option value="4.0">4.0+ ⭐⭐⭐⭐</option>
+                                <option value="3.5">3.5+ ⭐⭐⭐</option>
+                                <option value="3.0">3.0+ ⭐⭐</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="search-status">
+                                <option value="">Vsi statusi</option>
+                                <option value="aktivno">Aktivno</option>
+                                <option value="sezonsko">Sezonsko</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Certifikati</label>
+                            <select class="form-select" id="search-certificates">
+                                <option value="">Vsi certifikati</option>
+                                <option value="družinam_prijazno">Družinam prijazno</option>
+                                <option value="hišni_ljubljenčki_dovoljeni">Hišni ljubljenčki</option>
+                                <option value="dostop_za_invalide">Dostop za invalide</option>
+                                <option value="ekološko_certificirano">Ekološko certificirano</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Razvrsti po</label>
+                            <select class="form-select" id="search-sort">
+                                <option value="rating">Oceni (najvišja)</option>
+                                <option value="name">Imenu (A-Z)</option>
+                                <option value="reviews">Številu ocen</option>
+                                <option value="distance">Razdalji</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="search-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Išči
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="clearSearchForm()">
+                            <i class="fas fa-times"></i> Počisti
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 📋 Search Results -->
+            <div id="search-results" class="search-results">
+                <div class="results-header">
+                    <h4 id="results-count">Rezultati iskanja</h4>
+                    <div class="results-controls">
+                        <div class="view-toggle">
+                            <button class="btn btn-sm btn-outline-primary active" onclick="setViewMode('grid')" id="grid-view">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="setViewMode('list')" id="list-view">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="results-container" class="results-grid">
+                    <!-- Search results will be loaded here -->
+                </div>
+                
+                <!-- 📄 Pagination -->
+                <nav id="pagination-container" class="pagination-container">
+                    <!-- Pagination will be loaded here -->
+                </nav>
+            </div>
+        </div>
+    </section>
+
+    <!-- 🗺️ MAP SECTION -->
+    <section id="map-section" class="content-section">
+        <div class="container-fluid">
+            <div class="section-header">
+                <h2>Zemljevid objektov</h2>
+                <p>Odkrijte turistične objekte na interaktivnem zemljevidu</p>
+            </div>
+            
+            <div class="map-container">
+                <div id="tourism-map"></div>
+                
+                <!-- 🎛️ Map Controls -->
+                <div class="map-controls">
+                    <div class="map-filters">
+                        <select class="form-select form-select-sm" id="map-filter-type">
+                            <option value="">Vse kategorije</option>
+                        </select>
+                        <select class="form-select form-select-sm" id="map-filter-region">
+                            <option value="">Vse regije</option>
+                        </select>
+                        <button class="btn btn-sm btn-primary" onclick="filterMapObjects()">
+                            <i class="fas fa-filter"></i> Filtriraj
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ⭐ FEATURED SECTION -->
+    <section id="featured-section" class="content-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Izpostavljeni objekti</h2>
+                <p>Naši najboljši in najbolj priljubljeni turistični objekti</p>
+            </div>
+            
+            <div class="featured-filters">
+                <div class="btn-group" role="group">
+                    <button class="btn btn-outline-primary active" onclick="loadFeaturedObjects('all')">Vsi</button>
+                    <button class="btn btn-outline-primary" onclick="loadFeaturedObjects('hotel')">Hoteli</button>
+                    <button class="btn btn-outline-primary" onclick="loadFeaturedObjects('restavracija')">Restavracije</button>
+                    <button class="btn btn-outline-primary" onclick="loadFeaturedObjects('kamp')">Kampi</button>
+                    <button class="btn btn-outline-primary" onclick="loadFeaturedObjects('wellness_center')">Wellness</button>
+                </div>
+            </div>
+            
+            <div id="featured-objects-container" class="row">
+                <!-- Featured objects will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 🏨 OBJECT DETAIL MODAL -->
+    <div class="modal fade" id="objectDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="object-detail-title">Podrobnosti objekta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="object-detail-content">
+                    <!-- Object details will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📱 FOOTER -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>Turizem & Gostinstvo</h5>
+                    <p>Odkrijte najboljše turistične objekte v Sloveniji. Vaš vodnik po hotelih, restavracijah, kampih in wellness centrih.</p>
+                </div>
+                <div class="col-md-2">
+                    <h6>Kategorije</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#" onclick="searchByCategory('hotel')">Hoteli</a></li>
+                        <li><a href="#" onclick="searchByCategory('restavracija')">Restavracije</a></li>
+                        <li><a href="#" onclick="searchByCategory('kamp')">Kampi</a></li>
+                        <li><a href="#" onclick="searchByCategory('wellness_center')">Wellness</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2">
+                    <h6>Regije</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#" onclick="searchByRegion('Gorenjska')">Gorenjska</a></li>
+                        <li><a href="#" onclick="searchByRegion('Obalno-kraška')">Obalno-kraška</a></li>
+                        <li><a href="#" onclick="searchByRegion('Osrednjeslovenska')">Osrednjeslovenska</a></li>
+                        <li><a href="#" onclick="searchByRegion('Podravska')">Podravska</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2">
+                    <h6>Povezave</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#home" onclick="showSection('home')">Domov</a></li>
+                        <li><a href="#search" onclick="showSection('search')">Iskanje</a></li>
+                        <li><a href="#map" onclick="showSection('map')">Zemljevid</a></li>
+                        <li><a href="#featured" onclick="showSection('featured')">Izpostavljeno</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2">
+                    <h6>Kontakt</h6>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-envelope"></i> info@turizem.si</li>
+                        <li><i class="fas fa-phone"></i> +386 1 234 5678</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Ljubljana, Slovenija</li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-6">
+                    <p>&copy; 2024 Turizem & Gostinstvo. Vse pravice pridržane.</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 📱 JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="public.js"></script>
+</body>
+</html>

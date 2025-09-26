@@ -1,0 +1,12 @@
+{
+  "workspace": {
+    "recommended_path": "C:\\Users\\admin\\Downloads\\copy-of-copy-of-omniscient-ai-platform",
+    "performance_score": 99.5,
+    "total_files": 381,
+    "estimated_lsp_startup": 3.18,
+    "ignore_patterns": ['coverage', '.next', 'logs', '.git', 'cache', 'node_modules', 'venv', '__pycache__', '.venv', 'tmp', 'dist', '.cache', 'env', 'build', 'temp', '.nuxt']
+  },
+  "pyrightconfig": {
+    "exclude": ['coverage', '.next', 'logs', '.git', 'cache', 'node_modules', 'venv', '__pycache__', '.venv', 'tmp', 'dist', '.cache', 'env', 'build', 'temp', '.nuxt']
+  }
+}

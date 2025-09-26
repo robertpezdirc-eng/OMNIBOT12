@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omnia AI Platform - Aplikacija</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 Omnia AI Platform - Aplikacija</h1>
+            <p>Vnesite prompt in dobite takojšnji AI odgovor z integrirano bazo znanja in spletnim iskanjem</p>
+            <div class="status-indicator">
+                <span id="connectionStatus" class="status-dot offline"></span>
+                <span id="statusText">Connecting...</span>
+            </div>
+        </header>
+        
+        <nav class="navigation">
+            <div class="nav-section">
+                <h3>🎯 Quick Actions</h3>
+                <div class="quick-actions">
+                    <button class="nav-btn" onclick="showSection('main')">🏠 Main Chat</button>
+                    <button class="nav-btn" onclick="showSection('knowledge')">📚 Knowledge Base</button>
+                    <button class="nav-btn" onclick="showSection('pages')">🌐 Demo Pages</button>
+                    <button class="nav-btn" onclick="showSection('testing')">🧪 Testing Tools</button>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Main Chat Section -->
+        <main id="main-section" class="section active">
+            <div class="input-section">
+                <label for="prompt">Vaš prompt:</label>
+                <textarea 
+                    id="prompt" 
+                    placeholder="Vnesite vaš prompt tukaj... (npr. 'Napiši kratko zgodbo o robotih' ali 'Tell me about JavaScript')"
+                    rows="4"
+                ></textarea>
+                
+                <div class="controls">
+                    <button id="generateBtn" class="generate-btn">
+                        <span class="btn-text">🚀 Generiraj</span>
+                        <span class="loading" style="display: none;">⏳ Generiram...</span>
+                    </button>
+                    <button id="clearBtn" class="clear-btn">🗑️ Počisti</button>
+                    <button id="randomPromptBtn" class="random-btn">🎲 Random Prompt</button>
+                </div>
+            </div>
+            
+            <div class="output-section">
+                <label for="output">AI Odgovor:</label>
+                <pre id="output" class="output-box">Tukaj se bo prikazal AI odgovor...</pre>
+            </div>
+        </main>
+
+        <!-- Knowledge Base Section -->
+        <section id="knowledge-section" class="section">
+            <h2>📚 Knowledge Base Explorer</h2>
+            <div class="knowledge-controls">
+                <input type="text" id="searchInput" placeholder="Search knowledge base..." />
+                <button id="searchBtn" class="search-btn">🔍 Search</button>
+            </div>
+            
+            <div id="knowledgeCategories" class="categories-grid">
+                <!-- Categories will be loaded here -->
+            </div>
+            
+            <div id="knowledgeResults" class="knowledge-results">
+                <!-- Search results or category content will be displayed here -->
+            </div>
+        </section>
+
+        <!-- Demo Pages Section -->
+        <section id="pages-section" class="section">
+            <h2>🌐 Demo Pages</h2>
+            <div class="pages-grid">
+                <div class="page-card">
+                    <h3>🎭 Multimodal AI</h3>
+                    <p>Advanced AI capabilities with multiple input types</p>
+                    <a href="multimodal.html" target="_blank" class="page-link">Open Page</a>
+                </div>
+                <div class="page-card">
+                    <h3>👤 Personalization</h3>
+                    <p>Personalized AI experience tailored to your needs</p>
+                    <a href="personalization.html" target="_blank" class="page-link">Open Page</a>
+                </div>
+                <div class="page-card">
+                    <h3>🌍 Global AI</h3>
+                    <p>Global AI capabilities and international features</p>
+                    <a href="global.html" target="_blank" class="page-link">Open Page</a>
+                </div>
+                <div class="page-card">
+                    <h3>🔧 Versatility</h3>
+                    <p>Versatile AI tools for various use cases</p>
+                    <a href="versatility.html" target="_blank" class="page-link">Open Page</a>
+                </div>
+                <div class="page-card">
+                    <h3>✨ Simplicity</h3>
+                    <p>Simple and intuitive AI interface</p>
+                    <a href="simplicity.html" target="_blank" class="page-link">Open Page</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testing Tools Section -->
+        <section id="testing-section" class="section">
+            <h2>🧪 Testing Tools</h2>
+            <div class="testing-grid">
+                <div class="test-card">
+                    <h3>🔗 API Status</h3>
+                    <button id="testApiBtn" class="test-btn">Test API Connection</button>
+                    <div id="apiTestResult" class="test-result"></div>
+                </div>
+                <div class="test-card">
+                    <h3>📊 Knowledge Base Status</h3>
+                    <button id="testKnowledgeBtn" class="test-btn">Test Knowledge Base</button>
+                    <div id="knowledgeTestResult" class="test-result"></div>
+                </div>
+                <div class="test-card">
+                    <h3>🌐 Network Info</h3>
+                    <div id="networkInfo" class="network-info">
+                        <p>Local: <span id="localUrl">http://localhost:3001</span></p>
+                        <p>LAN Access: Available on your network</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <p>Powered by Omnia AI Platform | v2.0 | Polna integracija z spletnim iskanjem</p>
+        </footer>
+    </div>
+
+    <script>
+        let currentConversation = [];
+        let isGenerating = false;
+        let userConfig = null;
+
+        // Load user configuration from onboarding
+        function loadUserConfig() {
+            const config = localStorage.getItem('omniaConfig');
+            if (config) {
+                userConfig = JSON.parse(config);
+                updateUIForConfig();
+            }
+        }
+
+        function updateUIForConfig() {
+            if (userConfig) {
+                const industryEmojis = {
+                    turizem: '🏖️',
+                    gostinstvo: '🍽️',
+                    kmetijstvo: '🚜',
+                    zdravstvo: '🏥',
+                    it: '💻',
+                    marketing: '📈',
+                    izobrazevanje: '🎓',
+                    finance: '💰'
+                };
+                
+                const welcomeMessage = `${industryEmojis[userConfig.industry] || '🚀'} Dobrodošli! Vaša Omnia je konfigurirana za ${userConfig.industry}. Workflow: ${userConfig.workflow}`;
+                addMessage(welcomeMessage, false);
+            }
+        }
+
+        // Check if user needs onboarding
+        function checkOnboarding() {
+            if (!localStorage.getItem('omniaConfig')) {
+                if (confirm('Dobrodošli v Omnia App! Želite hitro nastavitev v 3 korakih?')) {
+                    window.location.href = 'onboarding.html';
+                }
+            } else {
+                loadUserConfig();
+            }
+        }
+
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    ${content}
+                </div>
+            `;
+            
+            const chatContainer = document.getElementById('output');
+            if (chatContainer) {
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }
+
+        // Initialize onboarding check when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(checkOnboarding, 1000); // Delay to ensure UI is ready
+        });
+    </script>
+    <script src="app.js"></script>
+</body>
+</html>

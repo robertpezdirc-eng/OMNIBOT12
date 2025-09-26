@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌐 Omni Dashboard</title>
+  <link rel="stylesheet" href="omni-dashboard.css">
+  <!-- Google Custom Search Engine -->
+  <script async src="https://cse.google.com/cse.js?cx=9130a294afdde4375"></script>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>🤖 Omni – Univerzalni Pomočnik</h1>
+      <p>Realni AI z OpenAI integracijo in spominom</p>
+    </header>
+    
+    <div class="input-section">
+      <input id="userInput" type="text" placeholder="Vnesi vprašanje ali ukaz..." />
+      <div class="upload-section">
+        <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="handleImageUpload(event)" />
+        <button class="upload-btn" onclick="document.getElementById('imageUpload').click()">🖼️ Naloži sliko</button>
+        <div id="imagePreview" class="image-preview"></div>
+      </div>
+      <div class="button-group">
+        <button onclick="sendToOmni()" class="send-btn">🚀 Pošlji</button>
+        <button onclick="startListening()" class="voice-btn" id="micBtn">🎤 Govori</button>
+        <button onclick="speakOutput()" class="voice-btn">🔊 Predvajaj</button>
+      </div>
+    </div>
+    
+    <!-- Google Search Widget -->
+    <div class="google-search-section">
+      <h3>🔍 Google Search</h3>
+      <div class="gcse-search"></div>
+    </div>
+    
+    <div class="output-section">
+      <div id="output" class="output-content">
+        <div class="welcome-message">
+          <h3>👋 Dobrodošel v Omni sistemu!</h3>
+          <p>Vpiši vprašanje zgoraj in pritisni "Pošlji" ali Enter.</p>
+          <p><strong>Primeri:</strong></p>
+          <ul>
+            <li>"Povej mi nekaj o reki Kolpi"</li>
+            <li>"Kako naredim torto?"</li>
+            <li>"Kaj je umetna inteligenca?"</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <div class="status-bar">
+      <div class="status-item">
+        <span class="status-label">🧠 AI Status:</span>
+        <span class="status-value" id="aiStatus">Pripravljen</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">🌐 Povezava:</span>
+        <span class="status-value" id="connectionStatus">Aktivna</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">📝 Spomin:</span>
+        <span class="status-value" id="memoryCount">0 vnosov</span>
+      </div>
+    </div>
+  </div>
+  
+  <script src="omni-frontend-app.js"></script>
+</body>
+</html>

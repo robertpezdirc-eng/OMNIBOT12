@@ -1,0 +1,57 @@
+{
+  "ITEM001": {
+    "id": "ITEM001",
+    "name": "Elektronika A",
+    "category": "electronics",
+    "current_stock": 150,
+    "min_stock": 50,
+    "max_stock": 500,
+    "unit_cost": 25.0,
+    "supplier": "SUP001",
+    "lead_time_days": 7
+  },
+  "ITEM002": {
+    "id": "ITEM002",
+    "name": "Oblačila B",
+    "category": "clothing",
+    "current_stock": 300,
+    "min_stock": 100,
+    "max_stock": 1000,
+    "unit_cost": 15.0,
+    "supplier": "SUP002",
+    "lead_time_days": 14
+  },
+  "ITEM003": {
+    "id": "ITEM003",
+    "name": "Hrana C",
+    "category": "food",
+    "current_stock": 80,
+    "min_stock": 20,
+    "max_stock": 200,
+    "unit_cost": 5.0,
+    "supplier": "SUP003",
+    "lead_time_days": 3
+  },
+  "ITEM004": {
+    "id": "ITEM004",
+    "name": "Orodje D",
+    "category": "tools",
+    "current_stock": 45,
+    "min_stock": 10,
+    "max_stock": 100,
+    "unit_cost": 35.0,
+    "supplier": "SUP004",
+    "lead_time_days": 10
+  },
+  "ITEM005": {
+    "id": "ITEM005",
+    "name": "Kozmetika E",
+    "category": "cosmetics",
+    "current_stock": 200,
+    "min_stock": 75,
+    "max_stock": 400,
+    "unit_cost": 12.0,
+    "supplier": "SUP005",
+    "lead_time_days": 5
+  }
+}

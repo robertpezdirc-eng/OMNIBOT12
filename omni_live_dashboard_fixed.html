@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni-APP Live Dashboard - Fixed Version</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        #links {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .link {
+            stroke: #ffffff;
+            stroke-width: 2;
+            stroke-dasharray: 10,5;
+            animation: dash 2s linear infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -15;
+            }
+        }
+
+        #dashboard {
+            position: relative;
+            z-index: 2;
+            padding: 20px;
+            min-width: 1300px;
+            min-height: 700px;
+        }
+
+        .node {
+            position: absolute;
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            border: 2px solid #ddd;
+            border-radius: 15px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            min-width: 200px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .node:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            border-color: #4CAF50;
+        }
+
+        .node#global {
+            background: linear-gradient(145deg, #FFD700, #FFA500);
+            border-color: #FF8C00;
+            font-size: 16px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .status {
+            display: block;
+            margin-top: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 5px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.8);
+        }
+
+        #info-box {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.95);
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            max-width: 300px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            font-size: 14px;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .control-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+
+        .control-btn:hover {
+            background: #45a049;
+        }
+
+        .control-btn.pause {
+            background: #ff9800;
+        }
+
+        .control-btn.restart {
+            background: #f44336;
+        }
+
+        /* Responsive design */
+        @media (max-width: 1400px) {
+            #dashboard {
+                transform: scale(0.8);
+                transform-origin: top left;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            #dashboard {
+                transform: scale(0.7);
+            }
+        }
+    </style>
+</head>
+<body>
+    <svg id="links" width="100%" height="800">
+        <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                    refX="9" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#ffffff" opacity="0.7"/>
+            </marker>
+        </defs>
+    </svg>
+
+    <div class="control-panel">
+        <h4>Live Control Panel</h4>
+        <button class="control-btn" onclick="toggleUpdates()">⏸️ Pause</button>
+        <button class="control-btn restart" onclick="restartAll()">🔄 Restart</button>
+        <button class="control-btn" onclick="exportData()">📊 Export</button>
+    </div>
+
+    <div id="dashboard">
+        <div class="node" id="global" style="top: 50px; left: 600px;">
+            🌐 Global Optimizer
+            <span class="status" id="status-global">⏳ Loading...</span>
+        </div>
+
+        <div class="node" id="finance" style="top: 200px; left: 100px;">
+            💰 Finance
+            <span class="status" id="status-finance">⏳ Loading...</span>
+        </div>
+        <div class="node" id="logistics" style="top: 200px; left: 350px;">
+            🚚 Logistics
+            <span class="status" id="status-logistics">⏳ Loading...</span>
+        </div>
+        <div class="node" id="healthcare" style="top: 200px; left: 600px;">
+            🏥 Healthcare
+            <span class="status" id="status-healthcare">⏳ Loading...</span>
+        </div>
+        <div class="node" id="tourism" style="top: 200px; left: 850px;">
+            🌴 Tourism
+            <span class="status" id="status-tourism">⏳ Loading...</span>
+        </div>
+        <div class="node" id="agriculture" style="top: 200px; left: 1100px;">
+            🚜 Agriculture
+            <span class="status" id="status-agriculture">⏳ Loading...</span>
+        </div>
+
+        <div class="node" id="industry" style="top: 400px; left: 100px;">
+            🏭 Industry
+            <span class="status" id="status-industry">⏳ Loading...</span>
+        </div>
+        <div class="node" id="energy" style="top: 400px; left: 350px;">
+            ⚡ Energy
+            <span class="status" id="status-energy">⏳ Loading...</span>
+        </div>
+        <div class="node" id="smart_home" style="top: 400px; left: 600px;">
+            🏠 Smart Home
+            <span class="status" id="status-smart_home">⏳ Loading...</span>
+        </div>
+        <div class="node" id="vehicles" style="top: 400px; left: 850px;">
+            🚗 Autonomous Vehicles
+            <span class="status" id="status-vehicles">⏳ Loading...</span>
+        </div>
+        <div class="node" id="robotics" style="top: 400px; left: 1100px;">
+            🤖 Robotics
+            <span class="status" id="status-robotics">⏳ Loading...</span>
+        </div>
+
+        <div class="node" id="science" style="top: 600px; left: 300px;">
+            🔬 Science
+            <span class="status" id="status-science">⏳ Loading...</span>
+        </div>
+        <div class="node" id="communications" style="top: 600px; left: 900px;">
+            📡 Communications
+            <span class="status" id="status-communications">⏳ Loading...</span>
+        </div>
+    </div>
+
+    <div id="info-box">Klikni na modul za več informacij</div>
+
+    <script>
+        const linksSVG = document.getElementById("links");
+        let updateInterval;
+        let isUpdating = true;
+
+        const nodes = [
+            "finance", "logistics", "healthcare", "tourism", "agriculture",
+            "industry", "energy", "smart_home", "vehicles", "robotics",
+            "science", "communications"
+        ];
+
+        const moduleDescriptions = {
+            global: "Centralni optimizator, ki koordinira vse module in zagotavlja sinhronizirano delovanje sistema.",
+            finance: "Upravljanje finančnih procesov, analiza stroškov, napovedovanje prihodkov in optimizacija proračuna.",
+            logistics: "Optimizacija transportnih poti, upravljanje zalog, sledenje pošiljkam in logistična analitika.",
+            healthcare: "Zdravstveno spremljanje, analiza vitalnih znakov, upravljanje zdravil in preventivna diagnostika.",
+            tourism: "Turistični itinerarji, rezervacije, lokalne aktivnosti in personalizirane priporočila.",
+            agriculture: "Pametno kmetijstvo, spremljanje pridelkov, vremenska analiza in optimizacija pridelave.",
+            industry: "Industrijska avtomatizacija, nadzor proizvodnje, kakovost in optimizacija procesov.",
+            energy: "Upravljanje energije, obnovljivi viri, optimizacija porabe in pametne mreže.",
+            smart_home: "Pametni dom, IoT naprave, avtomatizacija, varnost in energetska učinkovitost.",
+            vehicles: "Avtonomna vozila, navigacija, varnost, optimizacija poti in vzdrževanje.",
+            robotics: "Robotska avtomatizacija, AI algoritmi, senzorji in avtonomno delovanje.",
+            science: "Znanstvene raziskave, analiza podatkov, simulacije in eksperimentiranje.",
+            communications: "Komunikacijske mreže, 5G/6G tehnologije, IoT povezljivost in protokoli."
+        };
+
+        // Funkcija za povezovanje modulov z Global Optimizer
+        function connectNodes(sourceId, targetId) {
+            const source = document.getElementById(sourceId);
+            const target = document.getElementById(targetId);
+            
+            const x1 = source.offsetLeft + source.offsetWidth / 2;
+            const y1 = source.offsetTop + source.offsetHeight / 2;
+            const x2 = target.offsetLeft + target.offsetWidth / 2;
+            const y2 = target.offsetTop + target.offsetHeight / 2;
+
+            // FIXED: Proper SVG namespace without backticks
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", x1);
+            line.setAttribute("y1", y1);
+            line.setAttribute("x2", x2);
+            line.setAttribute("y2", y2);
+            line.setAttribute("class", "link");
+            line.setAttribute("marker-end", "url(#arrowhead)");
+
+            linksSVG.appendChild(line);
+            return line;
+        }
+
+        // Povežemo Global Optimizer z vsemi moduli
+        const lines = nodes.map(node => connectNodes("global", node));
+
+        // Info box
+        const infoBox = document.getElementById("info-box");
+
+        // Funkcija za posodobitev statusa
+        function updateStatus(nodeId, status, description) {
+            const statusEl = document.getElementById(`status-${nodeId}`);
+            statusEl.textContent = status;
+            
+            switch(status) {
+                case "✅ Online": 
+                    statusEl.style.color = "green"; 
+                    statusEl.style.background = "rgba(76, 175, 80, 0.1)";
+                    break;
+                case "⚠️ Warning": 
+                    statusEl.style.color = "orange"; 
+                    statusEl.style.background = "rgba(255, 152, 0, 0.1)";
+                    break;
+                case "❌ Offline": 
+                    statusEl.style.color = "red"; 
+                    statusEl.style.background = "rgba(244, 67, 54, 0.1)";
+                    break;
+                case "🔄 Updating": 
+                    statusEl.style.color = "blue"; 
+                    statusEl.style.background = "rgba(33, 150, 243, 0.1)";
+                    break;
+                default: 
+                    statusEl.style.color = "black";
+                    statusEl.style.background = "rgba(255,255,255,0.8)";
+            }
+            
+            document.getElementById(nodeId).onclick = () => {
+                infoBox.innerHTML = `
+                    <strong>${nodeId.toUpperCase()}</strong><br>
+                    <strong>Status:</strong> ${status}<br>
+                    <strong>Opis:</strong> ${description || moduleDescriptions[nodeId] || 'Ni opisa na voljo'}<br>
+                    <small>Zadnja posodobitev: ${new Date().toLocaleTimeString()}</small>
+                `;
+            };
+        }
+
+        // Simulacija backend fetch – demo z realističnimi podatki
+        async function fetchStatus(nodeId) {
+            try {
+                // Poskusi pravi API klic
+                const response = await fetch(`http://localhost:5000/api/status/${nodeId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.status;
+                }
+            } catch (error) {
+                // Fallback na demo mode
+                console.log(`Demo mode for ${nodeId}`);
+            }
+            
+            // Demo mode - simulacija različnih statusov
+            const statuses = ["✅ Online", "⚠️ Warning", "❌ Offline", "🔄 Updating"];
+            const weights = [0.6, 0.2, 0.1, 0.1]; // Večja verjetnost za Online
+            
+            let random = Math.random();
+            for (let i = 0; i < statuses.length; i++) {
+                if (random < weights[i]) {
+                    return statuses[i];
+                }
+                random -= weights[i];
+            }
+            return statuses[0];
+        }
+
+        // Animacija dot-ov po linijah - FIXED SVG namespace
+        function animateFlow(line, status) {
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("r", 4);
+            
+            let color;
+            switch(status) {
+                case "✅ Online": color = "#4CAF50"; break;
+                case "⚠️ Warning": color = "#FF9800"; break;
+                case "❌ Offline": color = "#F44336"; break;
+                case "🔄 Updating": color = "#2196F3"; break;
+                default: color = "#9E9E9E";
+            }
+            
+            circle.setAttribute("fill", color);
+            circle.setAttribute("opacity", "0.8");
+            linksSVG.appendChild(circle);
+
+            let t = 0;
+            function step() {
+                if (!isUpdating) return;
+                
+                t += 0.015;
+                if (t > 1) {
+                    linksSVG.removeChild(circle);
+                    return;
+                }
+                
+                const x1 = parseFloat(line.getAttribute("x1"));
+                const y1 = parseFloat(line.getAttribute("y1"));
+                const x2 = parseFloat(line.getAttribute("x2"));
+                const y2 = parseFloat(line.getAttribute("y2"));
+                
+                const x = x1 + (x2 - x1) * t;
+                const y = y1 + (y2 - y1) * t;
+                
+                circle.setAttribute("cx", x);
+                circle.setAttribute("cy", y);
+
+                requestAnimationFrame(step);
+            }
+            step();
+        }
+
+        // Periodic update in animacija
+        async function updateAllStatuses() {
+            if (!isUpdating) return;
+            
+            // Posodobi Global Optimizer
+            const globalStatus = await fetchStatus("global");
+            updateStatus("global", globalStatus, moduleDescriptions.global);
+            
+            // Posodobi vse module
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                const node = nodes[i];
+                const status = await fetchStatus(node);
+                updateStatus(node, status, moduleDescriptions[node]);
+                animateFlow(line, status);
+                
+                // Majhna zakasnitev med moduli za boljši vizualni efekt
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+        }
+
+        // Control Panel funkcije
+        function toggleUpdates() {
+            isUpdating = !isUpdating;
+            const btn = document.querySelector('.control-btn');
+            
+            if (isUpdating) {
+                btn.textContent = '⏸️ Pause';
+                btn.className = 'control-btn';
+                startUpdates();
+            } else {
+                btn.textContent = '▶️ Resume';
+                btn.className = 'control-btn pause';
+                clearInterval(updateInterval);
+            }
+        }
+
+        function restartAll() {
+            // Počisti vse animacije
+            const circles = linksSVG.querySelectorAll('circle');
+            circles.forEach(circle => {
+                if (circle.parentNode) {
+                    circle.parentNode.removeChild(circle);
+                }
+            });
+            
+            // Resetiraj vse statuse
+            [...nodes, 'global'].forEach(node => {
+                updateStatus(node, '🔄 Restarting...', 'Sistem se ponovno zaganja...');
+            });
+            
+            // Ponovno zaženi posodabljanje
+            setTimeout(() => {
+                updateAllStatuses();
+            }, 1000);
+        }
+
+        function exportData() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                modules: {}
+            };
+            
+            [...nodes, 'global'].forEach(node => {
+                const statusEl = document.getElementById(`status-${node}`);
+                data.modules[node] = {
+                    status: statusEl.textContent,
+                    description: moduleDescriptions[node]
+                };
+            });
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `omni-dashboard-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function startUpdates() {
+            updateInterval = setInterval(updateAllStatuses, 3000);
+        }
+
+        // Inicializacija
+        document.addEventListener('DOMContentLoaded', () => {
+            // Začetni update
+            updateAllStatuses();
+            
+            // Zaženi periodične posodobitve
+            startUpdates();
+            
+            // Dodaj info za Global Optimizer
+            updateStatus("global", "🔄 Initializing...", moduleDescriptions.global);
+        });
+    </script>
+</body>
+</html>

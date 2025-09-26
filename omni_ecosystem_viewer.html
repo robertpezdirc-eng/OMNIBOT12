@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni Ekosistem - Vizualna Shema</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .schema-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            max-width: 1400px;
+            width: 100%;
+        }
+
+        .svg-container {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .svg-container svg {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .info-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        .info-card h3 {
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-card li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .info-card li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: rgba(255,255,255,0.8);
+            font-weight: bold;
+        }
+
+        .architecture-card {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .benefits-card {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .tech-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .btn.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .module-details {
+            background: rgba(255,255,255,0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+            border-left: 5px solid #667eea;
+        }
+
+        .module-details.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .schema-container {
+                padding: 20px;
+            }
+            
+            .info-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧠 OMNI EKOSISTEM</h1>
+        <p>Integracijska arhitektura za pametno upravljanje modulov</p>
+    </div>
+
+    <div class="schema-container">
+        <div class="controls">
+            <button class="btn active" onclick="showView('overview')">📊 Pregled</button>
+            <button class="btn" onclick="showView('architecture')">🏗️ Arhitektura</button>
+            <button class="btn" onclick="showView('modules')">🔧 Moduli</button>
+            <button class="btn" onclick="showView('dataflow')">🔄 Pretok podatkov</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number">10+</div>
+                <div class="stat-label">Aktivnih modulov</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">1</div>
+                <div class="stat-label">Centralni CORE</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">∞</div>
+                <div class="stat-label">Možnosti razširitve</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Modularna zasnova</div>
+            </div>
+        </div>
+
+        <div class="svg-container">
+            <object data="omni_ecosystem_schema.svg" type="image/svg+xml" width="100%" height="600">
+                <img src="omni_ecosystem_schema.svg" alt="Omni Ekosistem Shema" style="max-width: 100%; height: auto;">
+            </object>
+        </div>
+
+        <div class="info-panel">
+            <div class="info-card architecture-card">
+                <h3>🏗️ Arhitektura</h3>
+                <ul>
+                    <li>Centralizirani integracijski sloj (CORE)</li>
+                    <li>Meta-agent za pametno usmerjanje</li>
+                    <li>Modularna zasnova z jasnimi vmesniki</li>
+                    <li>Plugin ogrodje za razširljivost</li>
+                    <li>Standardizirani API-ji za komunikacijo</li>
+                </ul>
+            </div>
+
+            <div class="info-card benefits-card">
+                <h3>✨ Prednosti</h3>
+                <ul>
+                    <li>Brez podvajanja podatkov</li>
+                    <li>Pametno povezovanje modulov</li>
+                    <li>Enostavno dodajanje novih funkcij</li>
+                    <li>Centralizirano upravljanje</li>
+                    <li>Skalabilnost in fleksibilnost</li>
+                </ul>
+            </div>
+
+            <div class="info-card tech-card">
+                <h3>⚙️ Tehnologije</h3>
+                <ul>
+                    <li>Python backend z FastAPI</li>
+                    <li>JavaScript frontend</li>
+                    <li>SVG vizualizacije</li>
+                    <li>WebSocket real-time komunikacija</li>
+                    <li>Modularna plugin arhitektura</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="module-details" class="module-details">
+            <h3>📋 Podrobnosti modulov</h3>
+            <div id="module-content">
+                <p>Izberite modul za prikaz podrobnosti...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const moduleData = {
+            'task': {
+                name: 'Task Manager',
+                icon: '📋',
+                description: 'Upravljanje nalog, projektov in delovnih tokov',
+                features: ['Ustvarjanje nalog', 'Sledenje napredku', 'Prioritizacija', 'Časovni načrti', 'Timsko sodelovanje'],
+                apis: ['POST /tasks', 'GET /tasks/{id}', 'PUT /tasks/{id}', 'DELETE /tasks/{id}']
+            },
+            'calendar': {
+                name: 'Koledar & Eventi',
+                icon: '📅',
+                description: 'Časovno načrtovanje in upravljanje dogodkov',
+                features: ['Ustvarjanje dogodkov', 'Opomniki', 'Ponavljajoči dogodki', 'Integracija z drugimi moduli', 'Izvoz v različne formate'],
+                apis: ['POST /events', 'GET /events', 'PUT /events/{id}', 'GET /calendar/view']
+            },
+            'analytics': {
+                name: 'Analiza podatkov',
+                icon: '📊',
+                description: 'Pametne analize in poročila',
+                features: ['Vizualizacija podatkov', 'Statistične analize', 'Napovedovanje trendov', 'Avtomatska poročila', 'Dashboard metriki'],
+                apis: ['POST /analytics/query', 'GET /reports', 'GET /metrics', 'POST /predictions']
+            },
+            'finance': {
+                name: 'Finance & Proračun',
+                icon: '💰',
+                description: 'Finančno upravljanje in proračuniranje',
+                features: ['Sledenje stroškov', 'Proračuniranje', 'Finančna poročila', 'Investicijske analize', 'Davčne kalkulacije'],
+                apis: ['POST /transactions', 'GET /budget', 'GET /financial-reports', 'POST /investments']
+            },
+            'tourism': {
+                name: 'Turizem & Potovanja',
+                icon: '🏖️',
+                description: 'Turistične storitve in načrtovanje potovanj',
+                features: ['Itinerarji', 'Rezervacije', 'Lokalne aktivnosti', 'Vremenske napovedi', 'Kulturne informacije'],
+                apis: ['POST /itineraries', 'GET /destinations', 'POST /bookings', 'GET /activities']
+            }
+        };
+
+        function showView(view) {
+            // Update button states
+            document.querySelectorAll('.btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Show relevant content based on view
+            const moduleDetails = document.getElementById('module-details');
+            const moduleContent = document.getElementById('module-content');
+
+            switch(view) {
+                case 'overview':
+                    moduleDetails.classList.remove('active');
+                    break;
+                case 'architecture':
+                    moduleContent.innerHTML = `
+                        <h4>🏗️ Arhitekturni principi</h4>
+                        <p><strong>Centralizirani pristop:</strong> Vse komunikacije potekajo preko CORE integracijskega sloja.</p>
+                        <p><strong>Meta-agent:</strong> Pametno odločanje o tem, katere module uporabiti za določeno nalogo.</p>
+                        <p><strong>Plugin sistem:</strong> Enostavno dodajanje novih modulov brez spreminjanja obstoječe kode.</p>
+                        <p><strong>API standardizacija:</strong> Vsi moduli sledijo enotnim API konvencijam.</p>
+                    `;
+                    moduleDetails.classList.add('active');
+                    break;
+                case 'modules':
+                    let modulesHtml = '<h4>🔧 Pregled modulov</h4>';
+                    Object.keys(moduleData).forEach(key => {
+                        const module = moduleData[key];
+                        modulesHtml += `
+                            <div style="margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #667eea;">
+                                <h5>${module.icon} ${module.name}</h5>
+                                <p>${module.description}</p>
+                                <strong>Ključne funkcionalnosti:</strong>
+                                <ul style="margin: 10px 0;">
+                                    ${module.features.map(feature => `<li>${feature}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    });
+                    moduleContent.innerHTML = modulesHtml;
+                    moduleDetails.classList.add('active');
+                    break;
+                case 'dataflow':
+                    moduleContent.innerHTML = `
+                        <h4>🔄 Pretok podatkov</h4>
+                        <p><strong>1. Uporabniška zahteva</strong> → Uporabnik pošlje zahtevo preko vmesnika</p>
+                        <p><strong>2. CORE analiza</strong> → Meta-agent analizira zahtevo in določi potrebne module</p>
+                        <p><strong>3. Modularna obdelava</strong> → Aktivirajo se ustrezni moduli za obdelavo</p>
+                        <p><strong>4. Podatkovni tok</strong> → Moduli si izmenjujejo podatke preko CORE</p>
+                        <p><strong>5. Rezultat</strong> → Končni rezultat se vrne uporabniku</p>
+                        <div style="margin-top: 20px; padding: 15px; background: #e8f5e8; border-radius: 10px;">
+                            <strong>🔒 Varnost:</strong> Vsi podatki so šifrirani, dostop je kontroliran preko CORE
+                        </div>
+                    `;
+                    moduleDetails.classList.add('active');
+                    break;
+            }
+        }
+
+        // Initialize with overview
+        document.addEventListener('DOMContentLoaded', function() {
+            showView('overview');
+        });
+
+        // Add click handlers for SVG elements (if needed)
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.svg-container')) {
+                console.log('SVG clicked - možnost za interaktivnost');
+            }
+        });
+    </script>
+</body>
+</html>

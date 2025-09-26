@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniCore Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-item {
+            text-align: center;
+            color: white;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--status-color);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .module-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+            --status-color: #28a745;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            --status-color: #dc3545;
+        }
+
+        .status-standby {
+            background: #fff3cd;
+            color: #856404;
+            --status-color: #ffc107;
+        }
+
+        .card-body {
+            color: #666;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .detail-label {
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #333;
+        }
+
+        .last-update {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 30px;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            margin-top: 50px;
+        }
+
+        .error-message {
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            color: #dc3545;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .updating {
+            animation: pulse 1s infinite;
+        }
+
+        /* KPI sekcija stili */
+        .kpi-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .kpi-card.finance::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #28a745;
+        }
+
+        .kpi-card.logistics::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #007bff;
+        }
+
+        .kpi-card.tourism::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #fd7e14;
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .kpi-header h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+
+        .kpi-status {
+            font-size: 1.5rem;
+            color: #28a745;
+        }
+
+        .kpi-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+
+        .metric-value {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌐 OmniCore Monitoring Dashboard</h1>
+        <div class="subtitle">Real-time sistem za spremljanje modulov</div>
+    </div>
+
+    <div class="container">
+        <!-- KPI sekcija za realne podatke -->
+        <div class="kpi-section">
+            <h2 class="section-title">📊 Realni KPI Podatki</h2>
+            <div class="kpi-grid">
+                <div class="kpi-card finance">
+                    <div class="kpi-header">
+                        <h3>💰 Finance</h3>
+                        <div class="kpi-status" id="finance-status">●</div>
+                    </div>
+                    <div class="kpi-metrics">
+                        <div class="metric">
+                            <span class="metric-value" id="total-revenue">€0</span>
+                            <span class="metric-label">Skupni prihodki</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value" id="profit">€0</span>
+                            <span class="metric-label">Dobiček</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value" id="profit-margin">0%</span>
+                            <span class="metric-label">Marža</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="kpi-card logistics">
+                    <div class="kpi-header">
+                        <h3>🚚 Logistika</h3>
+                        <div class="kpi-status" id="logistics-status">●</div>
+                    </div>
+                    <div class="kpi-metrics">
+                        <div class="metric">
+                            <span class="metric-value" id="completion-rate">0%</span>
+                            <span class="metric-label">Uspešnost dostav</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value" id="efficiency-score">0</span>
+                            <span class="metric-label">Učinkovitost</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value" id="total-deliveries">0</span>
+                            <span class="metric-label">Skupaj dostav</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="kpi-card tourism">
+                    <div class="kpi-header">
+                        <h3>🏨 Turizem</h3>
+                        <div class="kpi-status" id="tourism-status">●</div>
+                    </div>
+                    <div class="kpi-metrics">
+                        <div class="metric">
+                            <span class="metric-value" id="total-bookings">0</span>
+                            <span class="metric-label">Rezervacije</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value" id="tourism-revenue">€0</span>
+                            <span class="metric-label">Prihodki</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value" id="occupancy-rate">0%</span>
+                            <span class="metric-label">Zasedenost</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-number" id="total-modules">-</span>
+                <div class="stat-label">Skupaj modulov</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="active-modules">-</span>
+                <div class="stat-label">Aktivni</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="error-modules">-</span>
+                <div class="stat-label">Napake</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="standby-modules">-</span>
+                <div class="stat-label">V pripravljenosti</div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            Nalagam podatke o modulih...
+        </div>
+
+        <div class="error-message" id="error-message" style="display: none;">
+            Napaka pri nalaganju podatkov. Preverjam povezavo...
+        </div>
+
+        <div class="grid" id="modules"></div>
+
+        <div class="last-update">
+            Zadnja posodobitev: <span id="last-update-time">-</span>
+        </div>
+    </div>
+
+    <script>
+        let updateInterval;
+        let isUpdating = false;
+
+        async function fetchStatus() {
+            if (isUpdating) return;
+            isUpdating = true;
+
+            try {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('error-message').style.display = 'none';
+                
+                // Pridobi status modulov
+                const response = await fetch('/status');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                // Pridobi KPI podatke
+                await fetchKPIData();
+                
+                document.getElementById('loading').style.display = 'none';
+                renderModules(data);
+                updateStats(data);
+                updateLastUpdateTime();
+                
+            } catch (error) {
+                console.error('Napaka pri pridobivanju podatkov:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('error-message').textContent = 
+                    `Napaka pri nalaganju podatkov: ${error.message}`;
+            } finally {
+                isUpdating = false;
+            }
+        }
+
+        async function fetchKPIData() {
+            try {
+                const response = await fetch('/real-data/kpi');
+                
+                if (response.ok) {
+                    const kpiData = await response.json();
+                    updateKPIDisplay(kpiData);
+                } else {
+                    console.warn('KPI podatki niso na voljo');
+                    setKPIError();
+                }
+            } catch (error) {
+                console.error('Napaka pri pridobivanju KPI:', error);
+                setKPIError();
+            }
+        }
+
+        function updateKPIDisplay(kpiData) {
+            // Finance KPI
+            if (kpiData.finance) {
+                document.getElementById('total-revenue').textContent = 
+                    `€${kpiData.finance.total_revenue.toLocaleString('sl-SI')}`;
+                document.getElementById('profit').textContent = 
+                    `€${kpiData.finance.profit.toLocaleString('sl-SI')}`;
+                document.getElementById('profit-margin').textContent = 
+                    `${kpiData.finance.profit_margin.toFixed(1)}%`;
+                document.getElementById('finance-status').style.color = '#28a745';
+            }
+
+            // Logistics KPI
+            if (kpiData.logistics) {
+                document.getElementById('completion-rate').textContent = 
+                    `${kpiData.logistics.completion_rate.toFixed(1)}%`;
+                document.getElementById('efficiency-score').textContent = 
+                    kpiData.logistics.efficiency_score.toFixed(1);
+                document.getElementById('total-deliveries').textContent = 
+                    kpiData.logistics.total_deliveries.toLocaleString('sl-SI');
+                document.getElementById('logistics-status').style.color = '#007bff';
+            }
+
+            // Tourism KPI
+            if (kpiData.tourism) {
+                document.getElementById('total-bookings').textContent = 
+                    kpiData.tourism.total_bookings.toLocaleString('sl-SI');
+                document.getElementById('tourism-revenue').textContent = 
+                    `€${kpiData.tourism.total_revenue.toLocaleString('sl-SI')}`;
+                document.getElementById('occupancy-rate').textContent = 
+                    `${kpiData.tourism.occupancy_rate.toFixed(1)}%`;
+                document.getElementById('tourism-status').style.color = '#fd7e14';
+            }
+        }
+
+        function setKPIError() {
+            // Nastavi napako za KPI indikatorje
+            document.getElementById('finance-status').style.color = '#dc3545';
+            document.getElementById('logistics-status').style.color = '#dc3545';
+            document.getElementById('tourism-status').style.color = '#dc3545';
+        }
+
+        function renderModules(data) {
+            const container = document.getElementById('modules');
+            container.innerHTML = '';
+
+            if (Object.keys(data).length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: white; grid-column: 1/-1;">Ni podatkov o modulih</div>';
+                return;
+            }
+
+            Object.entries(data).forEach(([name, info]) => {
+                const card = document.createElement('div');
+                card.className = `card status-${info.status}`;
+                card.style.setProperty('--status-color', getStatusColor(info.status));
+
+                const lastCheck = info.last_check ? 
+                    new Date(info.last_check).toLocaleString('sl-SI') : 
+                    'Neznano';
+
+                let detailsHtml = '';
+                if (info.details) {
+                    Object.entries(info.details).forEach(([key, value]) => {
+                        detailsHtml += `
+                            <div class="detail-row">
+                                <span class="detail-label">${key}:</span>
+                                <span class="detail-value">${value}</span>
+                            </div>
+                        `;
+                    });
+                }
+
+                if (info.uptime) {
+                    const uptimeHours = (info.uptime / 3600).toFixed(1);
+                    detailsHtml += `
+                        <div class="detail-row">
+                            <span class="detail-label">Uptime:</span>
+                            <span class="detail-value">${uptimeHours}h</span>
+                        </div>
+                    `;
+                }
+
+                if (info.error) {
+                    detailsHtml += `
+                        <div class="detail-row">
+                            <span class="detail-label">Napaka:</span>
+                            <span class="detail-value" style="color: #dc3545;">${info.error}</span>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="module-name">${name}</div>
+                        <div class="status-badge status-${info.status}">
+                            ${getStatusText(info.status)}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="detail-row">
+                            <span class="detail-label">Zadnja preveritev:</span>
+                            <span class="detail-value">${lastCheck}</span>
+                        </div>
+                        ${detailsHtml}
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function updateStats(data) {
+            const total = Object.keys(data).length;
+            let active = 0, error = 0, standby = 0;
+
+            Object.values(data).forEach(info => {
+                switch (info.status) {
+                    case 'active': active++; break;
+                    case 'error': error++; break;
+                    case 'standby': standby++; break;
+                }
+            });
+
+            document.getElementById('total-modules').textContent = total;
+            document.getElementById('active-modules').textContent = active;
+            document.getElementById('error-modules').textContent = error;
+            document.getElementById('standby-modules').textContent = standby;
+        }
+
+        function updateLastUpdateTime() {
+            document.getElementById('last-update-time').textContent = 
+                new Date().toLocaleString('sl-SI');
+        }
+
+        function getStatusColor(status) {
+            switch (status) {
+                case 'active': return '#28a745';
+                case 'error': return '#dc3545';
+                case 'standby': return '#ffc107';
+                default: return '#6c757d';
+            }
+        }
+
+        function getStatusText(status) {
+            switch (status) {
+                case 'active': return 'Aktiven';
+                case 'error': return 'Napaka';
+                case 'standby': return 'Pripravljenost';
+                default: return 'Neznano';
+            }
+        }
+
+        function startAutoUpdate() {
+            // Osvežujemo vsakih 3 sekunde
+            updateInterval = setInterval(fetchStatus, 3000);
+        }
+
+        function stopAutoUpdate() {
+            if (updateInterval) {
+                clearInterval(updateInterval);
+            }
+        }
+
+        // Inicializacija
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchStatus();
+            startAutoUpdate();
+        });
+
+        // Ustavimo posodabljanje, ko uporabnik zapusti stran
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                stopAutoUpdate();
+            } else {
+                startAutoUpdate();
+            }
+        });
+
+        // Ročno osvežitev s klikom na naslov
+        document.querySelector('h1').addEventListener('click', function() {
+            this.classList.add('updating');
+            fetchStatus().finally(() => {
+                this.classList.remove('updating');
+            });
+        });
+    </script>
+</body>
+</html>

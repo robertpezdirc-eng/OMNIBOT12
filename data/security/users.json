@@ -1,0 +1,37 @@
+{
+  "admin": {
+    "password_hash": "fb0c1efbdb98de3407b4cfcee032f158:0aaa71231b8b5ea4261da0dc2fb3791ffd0a2830665bf4eca3f1ddf9f97f3e96",
+    "role": "admin",
+    "permissions": [
+      "read",
+      "write",
+      "control",
+      "admin"
+    ],
+    "created_at": "2025-09-22T11:13:21.412708",
+    "last_login": null,
+    "active": true
+  },
+  "operator": {
+    "password_hash": "156a9588cd1e8ae85bfd9a8f29f4c0a1:f6e1c284e86b44386e60810318efd6d0aa89489f274de1c4cea1a5be4ac8a540",
+    "role": "operator",
+    "permissions": [
+      "read",
+      "write",
+      "control"
+    ],
+    "created_at": "2025-09-22T11:13:21.574451",
+    "last_login": null,
+    "active": true
+  },
+  "viewer": {
+    "password_hash": "86533129f0592412b1d4302b8ed3f810:40d3e30028e7fa60137d77210e68222c80993e6ac4f33126062cd880312bd883",
+    "role": "viewer",
+    "permissions": [
+      "read"
+    ],
+    "created_at": "2025-09-22T11:13:21.791300",
+    "last_login": null,
+    "active": true
+  }
+}

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#16213e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Omni IoT">
+    
+    <title>Omni IoT Platform</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/mobile/manifest.json">
+    
+    <!-- Ikone -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/mobile/icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/mobile/icons/icon-16x16.png">
+    <link rel="apple-touch-icon" href="/mobile/icons/icon-180x180.png">
+    
+    <!-- Preload kritičnih virov -->
+    <link rel="preload" href="/mobile/app.css" as="style">
+    <link rel="preload" href="/mobile/app.js" as="script">
+    
+    <style>
+        /* Kritični CSS za hitro nalaganje */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            margin-top: 20px;
+            font-size: 16px;
+            opacity: 0.8;
+        }
+        
+        .app-container {
+            display: none;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <!-- Nalagalni zaslon -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Nalagam Omni IoT...</div>
+    </div>
+
+    <!-- Glavna aplikacija -->
+    <div class="app-container" id="appContainer">
+        <!-- Zgornja navigacijska vrstica -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <button class="menu-btn" id="menuBtn">
+                        <span class="hamburger"></span>
+                    </button>
+                    <h1 class="app-title">Omni IoT</h1>
+                </div>
+                <div class="header-right">
+                    <button class="notification-btn" id="notificationBtn">
+                        <span class="notification-icon">🔔</span>
+                        <span class="notification-badge" id="notificationBadge">0</span>
+                    </button>
+                    <div class="user-avatar" id="userAvatar">
+                        <span class="avatar-text">U</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stranska navigacija -->
+        <nav class="side-nav" id="sideNav">
+            <div class="nav-header">
+                <div class="user-info">
+                    <div class="user-avatar-large">
+                        <span class="avatar-text" id="navUserAvatar">U</span>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name" id="navUserName">Uporabnik</div>
+                        <div class="user-role" id="navUserRole">Vloga</div>
+                    </div>
+                </div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item active" data-page="dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Nadzorna plošča</span>
+                </li>
+                <li class="nav-item" data-page="devices">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-text">Naprave</span>
+                </li>
+                <li class="nav-item" data-page="analytics">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analitika</span>
+                </li>
+                <li class="nav-item" data-page="automation">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">Avtomatizacija</span>
+                </li>
+                <li class="nav-item" data-page="settings">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">Nastavitve</span>
+                </li>
+            </ul>
+            
+            <div class="nav-footer">
+                <button class="logout-btn" id="logoutBtn">
+                    <span class="nav-icon">🚪</span>
+                    <span class="nav-text">Odjava</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Glavna vsebina -->
+        <main class="main-content" id="mainContent">
+            <!-- Nadzorna plošča -->
+            <div class="page active" id="dashboardPage">
+                <div class="page-header">
+                    <h2>Nadzorna plošča</h2>
+                    <div class="status-indicator online" id="connectionStatus">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Povezano</span>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">🏠</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="totalDevices">0</div>
+                            <div class="stat-label">Naprave</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="activeDevices">0</div>
+                            <div class="stat-label">Aktivne</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">⚠️</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="alertsCount">0</div>
+                            <div class="stat-label">Opozorila</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="activeUsers">0</div>
+                            <div class="stat-label">Uporabniki</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="quick-actions">
+                    <h3>Hitre akcije</h3>
+                    <div class="action-grid">
+                        <button class="action-btn" data-action="add-device">
+                            <span class="action-icon">➕</span>
+                            <span class="action-text">Dodaj napravo</span>
+                        </button>
+                        <button class="action-btn" data-action="view-alerts">
+                            <span class="action-icon">🚨</span>
+                            <span class="action-text">Opozorila</span>
+                        </button>
+                        <button class="action-btn" data-action="automation">
+                            <span class="action-icon">🤖</span>
+                            <span class="action-text">Avtomatizacija</span>
+                        </button>
+                        <button class="action-btn" data-action="reports">
+                            <span class="action-icon">📊</span>
+                            <span class="action-text">Poročila</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="recent-activity">
+                    <h3>Nedavna aktivnost</h3>
+                    <div class="activity-list" id="activityList">
+                        <!-- Dinamično naloženo -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Naprave -->
+            <div class="page" id="devicesPage">
+                <div class="page-header">
+                    <h2>Naprave</h2>
+                    <button class="add-btn" id="addDeviceBtn">
+                        <span class="btn-icon">➕</span>
+                        Dodaj
+                    </button>
+                </div>
+                
+                <div class="search-filter">
+                    <input type="text" class="search-input" id="deviceSearch" placeholder="Išči naprave...">
+                    <select class="filter-select" id="deviceFilter">
+                        <option value="">Vse naprave</option>
+                        <option value="sensor">Senzorji</option>
+                        <option value="actuator">Aktuatorji</option>
+                        <option value="controller">Krmilniki</option>
+                    </select>
+                </div>
+                
+                <div class="devices-grid" id="devicesGrid">
+                    <!-- Dinamično naloženo -->
+                </div>
+            </div>
+
+            <!-- Analitika -->
+            <div class="page" id="analyticsPage">
+                <div class="page-header">
+                    <h2>Analitika</h2>
+                    <select class="time-range-select" id="timeRange">
+                        <option value="1h">Zadnja ura</option>
+                        <option value="24h" selected>Zadnjih 24 ur</option>
+                        <option value="7d">Zadnji teden</option>
+                        <option value="30d">Zadnji mesec</option>
+                    </select>
+                </div>
+                
+                <div class="analytics-content">
+                    <div class="chart-container">
+                        <canvas id="deviceActivityChart"></canvas>
+                    </div>
+                    
+                    <div class="analytics-stats">
+                        <div class="analytics-card">
+                            <h4>Povprečna aktivnost</h4>
+                            <div class="analytics-value" id="avgActivity">0%</div>
+                        </div>
+                        <div class="analytics-card">
+                            <h4>Energijska poraba</h4>
+                            <div class="analytics-value" id="energyUsage">0 kWh</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Avtomatizacija -->
+            <div class="page" id="automationPage">
+                <div class="page-header">
+                    <h2>Avtomatizacija</h2>
+                    <button class="add-btn" id="addRuleBtn">
+                        <span class="btn-icon">➕</span>
+                        Novo pravilo
+                    </button>
+                </div>
+                
+                <div class="automation-rules" id="automationRules">
+                    <!-- Dinamično naloženo -->
+                </div>
+            </div>
+
+            <!-- Nastavitve -->
+            <div class="page" id="settingsPage">
+                <div class="page-header">
+                    <h2>Nastavitve</h2>
+                </div>
+                
+                <div class="settings-sections">
+                    <div class="settings-section">
+                        <h3>Obvestila</h3>
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <input type="checkbox" id="pushNotifications" checked>
+                                <span class="checkmark"></span>
+                                Push obvestila
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <input type="checkbox" id="emailNotifications">
+                                <span class="checkmark"></span>
+                                E-poštna obvestila
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h3>Tema</h3>
+                        <div class="setting-item">
+                            <select class="setting-select" id="themeSelect">
+                                <option value="dark">Temna</option>
+                                <option value="light">Svetla</option>
+                                <option value="auto">Avtomatska</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h3>Aplikacija</h3>
+                        <div class="setting-item">
+                            <button class="setting-btn" id="clearCacheBtn">Počisti predpomnilnik</button>
+                        </div>
+                        <div class="setting-item">
+                            <button class="setting-btn" id="exportDataBtn">Izvozi podatke</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Spodnja navigacija (mobilna) -->
+        <nav class="bottom-nav">
+            <button class="bottom-nav-item active" data-page="dashboard">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Domov</span>
+            </button>
+            <button class="bottom-nav-item" data-page="devices">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">Naprave</span>
+            </button>
+            <button class="bottom-nav-item" data-page="analytics">
+                <span class="nav-icon">📈</span>
+                <span class="nav-text">Analitika</span>
+            </button>
+            <button class="bottom-nav-item" data-page="settings">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-text">Nastavitve</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Modali -->
+    <div class="modal" id="deviceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="deviceModalTitle">Dodaj napravo</h3>
+                <button class="modal-close" id="deviceModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="deviceForm">
+                    <div class="form-group">
+                        <label for="deviceName">Ime naprave</label>
+                        <input type="text" id="deviceName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="deviceType">Tip naprave</label>
+                        <select id="deviceType" required>
+                            <option value="">Izberi tip</option>
+                            <option value="sensor">Senzor</option>
+                            <option value="actuator">Aktuator</option>
+                            <option value="controller">Krmilnik</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="deviceLocation">Lokacija</label>
+                        <input type="text" id="deviceLocation" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="deviceModalCancel">Prekliči</button>
+                <button type="submit" class="btn btn-primary" id="deviceModalSave">Shrani</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast obvestila -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Offline indikator -->
+    <div class="offline-indicator" id="offlineIndicator">
+        <span class="offline-icon">📡</span>
+        <span class="offline-text">Aplikacija je v offline načinu</span>
+    </div>
+
+    <!-- Skripta za PWA -->
+    <script>
+        // Registracija Service Worker-ja
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/mobile/service-worker.js')
+                    .then(registration => {
+                        console.log('SW registriran:', registration);
+                    })
+                    .catch(error => {
+                        console.log('SW registracija neuspešna:', error);
+                    });
+            });
+        }
+    </script>
+    
+    <!-- Glavna aplikacijska skripta -->
+    <script src="/mobile/app.js"></script>
+</body>
+</html>

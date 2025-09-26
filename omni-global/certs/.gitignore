@@ -1,0 +1,11 @@
+# SSL Certifikati - ne commitaj v git
+*.pem
+*.key
+*.crt
+*.cert
+*.p12
+*.pfx
+
+# Dovoli samo README in .gitignore
+!README.md
+!.gitignore

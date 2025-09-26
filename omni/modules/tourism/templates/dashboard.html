@@ -1,0 +1,228 @@
+
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Ultimate Tourism System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Dashboard</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-sync-alt"></i> Osveži
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Status Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card metric-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">POS Sistem</h6>
+                        <h3 id="pos-sales">€0</h3>
+                        <small>Danes prodaja</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-cash-register fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Rezervacije</h6>
+                        <h3 id="reservations-count">0</h3>
+                        <small>Danes rezervacije</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-calendar-alt fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Check-in</h6>
+                        <h3 id="checkin-sessions">0</h3>
+                        <small>Aktivne seje</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-key fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">CRM</h6>
+                        <h3 id="crm-customers">0</h3>
+                        <small>Novi kupci</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Status -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Status Sistema</h5>
+            </div>
+            <div class="card-body">
+                <div class="row" id="system-status">
+                    <!-- Dinamično napolnjeno -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Real-time Activity -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Real-time Aktivnost</h5>
+            </div>
+            <div class="card-body">
+                <div id="activity-feed" style="height: 300px; overflow-y: auto;">
+                    <!-- Dinamično napolnjeno -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Hitre Akcije</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" onclick="location.href='/pos'">
+                        <i class="fas fa-cash-register"></i> Nova Prodaja
+                    </button>
+                    <button class="btn btn-success" onclick="location.href='/reservations'">
+                        <i class="fas fa-plus"></i> Nova Rezervacija
+                    </button>
+                    <button class="btn btn-info" onclick="location.href='/checkin'">
+                        <i class="fas fa-key"></i> Check-in Gost
+                    </button>
+                    <button class="btn btn-warning" onclick="location.href='/crm'">
+                        <i class="fas fa-user-plus"></i> Nov Kupec
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Socket.IO povezava
+    const socket = io();
+    
+    socket.on('connect', function() {
+        console.log('Povezan z real-time sistemom');
+        socket.emit('request_dashboard_update');
+    });
+    
+    socket.on('dashboard_update', function(data) {
+        updateDashboard(data);
+    });
+    
+    socket.on('pos_sale', function(data) {
+        addActivityItem('POS', `Nova prodaja: €${data.total}`, 'success');
+    });
+    
+    socket.on('new_reservation', function(data) {
+        addActivityItem('Rezervacije', `Nova rezervacija: ${data.guest_name}`, 'info');
+    });
+    
+    function updateDashboard(data) {
+        // Posodobi metrike
+        if (data.modules.pos) {
+            document.getElementById('pos-sales').textContent = `€${data.modules.pos.today_sales || 0}`;
+        }
+        if (data.modules.reservations) {
+            document.getElementById('reservations-count').textContent = data.modules.reservations.today_reservations || 0;
+        }
+        if (data.modules.checkin) {
+            document.getElementById('checkin-sessions').textContent = data.modules.checkin.active_sessions || 0;
+        }
+        if (data.modules.crm) {
+            document.getElementById('crm-customers').textContent = data.modules.crm.total_customers || 0;
+        }
+        
+        // Posodobi status sistema
+        updateSystemStatus(data.modules);
+    }
+    
+    function updateSystemStatus(modules) {
+        const statusContainer = document.getElementById('system-status');
+        statusContainer.innerHTML = '';
+        
+        Object.keys(modules).forEach(moduleName => {
+            const module = modules[moduleName];
+            const statusClass = module.status === 'active' ? 'status-healthy' : 
+                               module.status === 'error' ? 'status-error' : 'status-warning';
+            
+            const moduleDiv = document.createElement('div');
+            moduleDiv.className = 'col-md-2 text-center mb-3';
+            moduleDiv.innerHTML = `
+                <div class="status-indicator ${statusClass}"></div>
+                <div class="mt-2">
+                    <strong>${moduleName.toUpperCase()}</strong>
+                    <br>
+                    <small class="text-muted">${module.status}</small>
+                </div>
+            `;
+            statusContainer.appendChild(moduleDiv);
+        });
+    }
+    
+    function addActivityItem(module, message, type) {
+        const feed = document.getElementById('activity-feed');
+        const item = document.createElement('div');
+        item.className = `alert alert-${type} alert-dismissible fade show`;
+        item.innerHTML = `
+            <strong>${module}:</strong> ${message}
+            <small class="float-end">${new Date().toLocaleTimeString()}</small>
+        `;
+        feed.insertBefore(item, feed.firstChild);
+        
+        // Odstrani stare elemente
+        while (feed.children.length > 10) {
+            feed.removeChild(feed.lastChild);
+        }
+    }
+    
+    // Osveži podatke vsakih 30 sekund
+    setInterval(() => {
+        socket.emit('request_dashboard_update');
+    }, 30000);
+</script>
+{% endblock %}
+    

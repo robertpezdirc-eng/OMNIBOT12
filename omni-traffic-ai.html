@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMNI Traffic AI - Napredna Prometno-Transportna Platforma</title>
+    <link rel="stylesheet" href="omni-traffic-styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <i class="fas fa-road"></i>
+                <h1>OMNI Traffic AI</h1>
+                <span class="version">v2.0 Enterprise</span>
+            </div>
+            <div class="status-indicators">
+                <div class="status-item active" id="ai-status">
+                    <i class="fas fa-brain"></i>
+                    <span>AI Aktiven</span>
+                </div>
+                <div class="status-item active" id="network-status">
+                    <i class="fas fa-network-wired"></i>
+                    <span>Omrežje</span>
+                </div>
+                <div class="status-item active" id="realtime-status">
+                    <i class="fas fa-clock"></i>
+                    <span>Real-time</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-section="dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                Dashboard
+            </button>
+            <button class="nav-tab" data-section="vehicles">
+                <i class="fas fa-car"></i>
+                Vozila
+            </button>
+            <button class="nav-tab" data-section="traffic">
+                <i class="fas fa-traffic-light"></i>
+                Promet
+            </button>
+            <button class="nav-tab" data-section="infrastructure">
+                <i class="fas fa-road"></i>
+                Infrastruktura
+            </button>
+            <button class="nav-tab" data-section="analytics">
+                <i class="fas fa-chart-line"></i>
+                Analitika
+            </button>
+            <button class="nav-tab" data-section="ai-modules">
+                <i class="fas fa-robot"></i>
+                AI Moduli
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="content-section active">
+            <div class="dashboard-grid">
+                <!-- Real-time Map -->
+                <div class="dashboard-card map-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-map"></i> Real-time Prometni Nadzor</h3>
+                        <div class="card-controls">
+                            <button class="btn-icon" id="map-fullscreen"><i class="fas fa-expand"></i></button>
+                            <button class="btn-icon" id="map-refresh"><i class="fas fa-sync"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div id="traffic-map"></div>
+                        <div class="map-legend">
+                            <div class="legend-item">
+                                <span class="legend-color green"></span>
+                                <span>Tekoč promet</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color yellow"></span>
+                                <span>Zmeren zastoj</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color red"></span>
+                                <span>Hud zastoj</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color blue"></span>
+                                <span>Samovozna vozila</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Detection Module -->
+                <div class="dashboard-card detection-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-eye"></i> AI Zaznavanje Vozil</h3>
+                        <div class="status-badge active">Aktivno</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="detection-stats">
+                            <div class="stat-item">
+                                <div class="stat-number" id="detected-vehicles">1,247</div>
+                                <div class="stat-label">Zaznana vozila</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="unknown-vehicles">23</div>
+                                <div class="stat-label">Neznana vozila</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="connected-systems">156</div>
+                                <div class="stat-label">Povezani sistemi</div>
+                            </div>
+                        </div>
+                        <div class="detection-log">
+                            <div class="log-item">
+                                <span class="timestamp">14:32:15</span>
+                                <span class="message">Novo vozilo zaznano: Tesla Model S</span>
+                                <span class="status success">Povezano</span>
+                            </div>
+                            <div class="log-item">
+                                <span class="timestamp">14:31:42</span>
+                                <span class="message">Neznano vozilo: Tip neidentificiran</span>
+                                <span class="status warning">Analiziranje</span>
+                            </div>
+                            <div class="log-item">
+                                <span class="timestamp">14:30:18</span>
+                                <span class="message">Avtobusni sistem povezan</span>
+                                <span class="status success">Aktivno</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Predictive Maintenance -->
+                <div class="dashboard-card maintenance-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-wrench"></i> Prediktivno Vzdrževanje</h3>
+                        <div class="alert-badge">3 Opozorila</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="maintenance-chart">
+                            <canvas id="maintenanceChart"></canvas>
+                        </div>
+                        <div class="maintenance-alerts">
+                            <div class="alert-item critical">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <div class="alert-content">
+                                    <div class="alert-title">Kritična okvara - Most A1</div>
+                                    <div class="alert-time">Predvideno v 2 dneh</div>
+                                </div>
+                            </div>
+                            <div class="alert-item warning">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <div class="alert-content">
+                                    <div class="alert-title">Semafor potrebuje vzdrževanje</div>
+                                    <div class="alert-time">Predvideno v 1 tednu</div>
+                                </div>
+                            </div>
+                            <div class="alert-item info">
+                                <i class="fas fa-info-circle"></i>
+                                <div class="alert-content">
+                                    <div class="alert-title">Rutinsko čiščenje ceste</div>
+                                    <div class="alert-time">Predvideno v 3 tednih</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Traffic Flow Optimization -->
+                <div class="dashboard-card flow-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-route"></i> Optimizacija Prometnega Toka</h3>
+                        <div class="efficiency-badge">94% Učinkovitost</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="flow-metrics">
+                            <div class="metric-item">
+                                <div class="metric-icon green">
+                                    <i class="fas fa-arrow-up"></i>
+                                </div>
+                                <div class="metric-data">
+                                    <div class="metric-value">+15%</div>
+                                    <div class="metric-label">Hitrost prometa</div>
+                                </div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-icon blue">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="metric-data">
+                                    <div class="metric-value">-8 min</div>
+                                    <div class="metric-label">Povprečni čas</div>
+                                </div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-icon orange">
+                                    <i class="fas fa-leaf"></i>
+                                </div>
+                                <div class="metric-data">
+                                    <div class="metric-value">-22%</div>
+                                    <div class="metric-label">CO₂ emisije</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="optimization-actions">
+                            <button class="action-btn primary">
+                                <i class="fas fa-magic"></i>
+                                Avtomatska optimizacija
+                            </button>
+                            <button class="action-btn secondary">
+                                <i class="fas fa-cog"></i>
+                                Ročne nastavitve
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EV Charging Optimization -->
+                <div class="dashboard-card ev-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-charging-station"></i> EV Polnilnice</h3>
+                        <div class="capacity-badge">78% Kapaciteta</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="ev-stats">
+                            <div class="ev-stat">
+                                <div class="stat-circle">
+                                    <svg viewBox="0 0 36 36" class="circular-chart green">
+                                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <path class="circle" stroke-dasharray="78, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <text x="18" y="20.35" class="percentage">78%</text>
+                                    </svg>
+                                </div>
+                                <div class="stat-label">Aktivne polnilnice</div>
+                            </div>
+                            <div class="ev-info">
+                                <div class="info-item">
+                                    <span class="info-label">Prediktivno polnjenje:</span>
+                                    <span class="info-value">Aktivno</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Optimizacija baterij:</span>
+                                    <span class="info-value">92% učinkovitost</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Čakalna doba:</span>
+                                    <span class="info-value">3.2 min povprečno</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Monetization -->
+                <div class="dashboard-card monetization-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-coins"></i> AI Monetizacija</h3>
+                        <div class="revenue-badge">+€2,340 danes</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="monetization-overview">
+                            <div class="revenue-item">
+                                <div class="revenue-icon premium">
+                                    <i class="fas fa-crown"></i>
+                                </div>
+                                <div class="revenue-data">
+                                    <div class="revenue-amount">€1,890</div>
+                                    <div class="revenue-source">Premium funkcije</div>
+                                </div>
+                            </div>
+                            <div class="revenue-item">
+                                <div class="revenue-icon api">
+                                    <i class="fas fa-plug"></i>
+                                </div>
+                                <div class="revenue-data">
+                                    <div class="revenue-amount">€450</div>
+                                    <div class="revenue-source">API klici</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="feature-controls">
+                            <div class="feature-toggle">
+                                <span>Napredna analitika</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="feature-toggle">
+                                <span>Real-time optimizacija</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vehicles Section -->
+        <section id="vehicles" class="content-section">
+            <div class="vehicles-container">
+                <div class="vehicles-header">
+                    <h2>Upravljanje Vozil</h2>
+                    <div class="vehicles-controls">
+                        <button class="btn primary">
+                            <i class="fas fa-plus"></i>
+                            Dodaj vozilo
+                        </button>
+                        <button class="btn secondary">
+                            <i class="fas fa-download"></i>
+                            Izvozi podatke
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Vehicle Tree Structure -->
+                <div class="vehicle-tree-container">
+                    <div class="tree-controls">
+                        <button class="tree-btn" id="expand-all">
+                            <i class="fas fa-expand-arrows-alt"></i>
+                            Razširi vse
+                        </button>
+                        <button class="tree-btn" id="collapse-all">
+                            <i class="fas fa-compress-arrows-alt"></i>
+                            Skrči vse
+                        </button>
+                        <input type="text" class="tree-search" placeholder="Išči vozila...">
+                    </div>
+                    <div class="vehicle-tree" id="vehicle-tree">
+                        <!-- Dynamic vehicle tree will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Vehicle Details Panel -->
+                <div class="vehicle-details-panel" id="vehicle-details">
+                    <div class="panel-header">
+                        <h3>Podrobnosti vozila</h3>
+                        <button class="close-panel">&times;</button>
+                    </div>
+                    <div class="panel-content">
+                        <p>Izberite vozilo za prikaz podrobnosti</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Traffic Section -->
+        <section id="traffic" class="content-section">
+            <div class="traffic-container">
+                <div class="traffic-header">
+                    <h2>Prometni Nadzor</h2>
+                    <div class="traffic-status">
+                        <div class="status-indicator active">
+                            <i class="fas fa-circle"></i>
+                            Sistem aktiven
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Traffic Lights Control -->
+                <div class="traffic-lights-grid">
+                    <div class="traffic-light-card">
+                        <div class="card-header">
+                            <h4>Križišče A1-B2</h4>
+                            <div class="auto-badge">AUTO</div>
+                        </div>
+                        <div class="traffic-light-visual">
+                            <div class="light red active"></div>
+                            <div class="light yellow"></div>
+                            <div class="light green"></div>
+                        </div>
+                        <div class="traffic-metrics">
+                            <div class="metric">
+                                <span class="label">Čakalna doba:</span>
+                                <span class="value">45s</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Promet/h:</span>
+                                <span class="value">1,240</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="traffic-light-card">
+                        <div class="card-header">
+                            <h4>Križišče C3-D4</h4>
+                            <div class="auto-badge">AUTO</div>
+                        </div>
+                        <div class="traffic-light-visual">
+                            <div class="light red"></div>
+                            <div class="light yellow"></div>
+                            <div class="light green active"></div>
+                        </div>
+                        <div class="traffic-metrics">
+                            <div class="metric">
+                                <span class="label">Čakalna doba:</span>
+                                <span class="value">12s</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Promet/h:</span>
+                                <span class="value">890</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Congestion Analysis -->
+                <div class="congestion-analysis">
+                    <h3>Analiza Zastojev</h3>
+                    <div class="congestion-chart">
+                        <canvas id="congestionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Infrastructure Section -->
+        <section id="infrastructure" class="content-section">
+            <div class="infrastructure-container">
+                <div class="infrastructure-header">
+                    <h2>Prometna Infrastruktura</h2>
+                    <div class="upgrade-status">
+                        <i class="fas fa-sync-alt spinning"></i>
+                        Samodejne nadgradnje aktivne
+                    </div>
+                </div>
+
+                <!-- Infrastructure Grid -->
+                <div class="infrastructure-grid">
+                    <div class="infra-card roads">
+                        <div class="card-icon">
+                            <i class="fas fa-road"></i>
+                        </div>
+                        <div class="card-content">
+                            <h4>Ceste</h4>
+                            <div class="infra-stats">
+                                <div class="stat">
+                                    <span class="value">1,247 km</span>
+                                    <span class="label">Skupna dolžina</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="value">94%</span>
+                                    <span class="label">Stanje</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="infra-card bridges">
+                        <div class="card-icon">
+                            <i class="fas fa-bridge"></i>
+                        </div>
+                        <div class="card-content">
+                            <h4>Mostovi</h4>
+                            <div class="infra-stats">
+                                <div class="stat">
+                                    <span class="value">156</span>
+                                    <span class="label">Število</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="value">87%</span>
+                                    <span class="label">Stanje</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="infra-card sensors">
+                        <div class="card-icon">
+                            <i class="fas fa-satellite-dish"></i>
+                        </div>
+                        <div class="card-content">
+                            <h4>IoT Senzorji</h4>
+                            <div class="infra-stats">
+                                <div class="stat">
+                                    <span class="value">2,847</span>
+                                    <span class="label">Aktivni</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="value">99.2%</span>
+                                    <span class="label">Delovanje</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="infra-card cameras">
+                        <div class="card-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <div class="card-content">
+                            <h4>Prometne Kamere</h4>
+                            <div class="infra-stats">
+                                <div class="stat">
+                                    <span class="value">1,089</span>
+                                    <span class="label">Aktivne</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="value">96.8%</span>
+                                    <span class="label">Delovanje</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Maintenance Schedule -->
+                <div class="maintenance-schedule">
+                    <h3>Načrt Vzdrževanja</h3>
+                    <div class="schedule-timeline">
+                        <div class="timeline-item urgent">
+                            <div class="timeline-date">Danes</div>
+                            <div class="timeline-content">
+                                <h5>Nujno vzdrževanje - Most A1</h5>
+                                <p>Strukturna analiza in popravila</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item scheduled">
+                            <div class="timeline-date">3 dni</div>
+                            <div class="timeline-content">
+                                <h5>Rutinsko vzdrževanje semaforjev</h5>
+                                <p>Sektor B - 15 semaforjev</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item planned">
+                            <div class="timeline-date">1 teden</div>
+                            <div class="timeline-content">
+                                <h5>Nadgradnja IoT senzorjev</h5>
+                                <p>Nova generacija prometnih senzorjev</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analytics Section -->
+        <section id="analytics" class="content-section">
+            <div class="analytics-container">
+                <div class="analytics-header">
+                    <h2>Prometna Analitika</h2>
+                    <div class="time-selector">
+                        <button class="time-btn active" data-period="day">Dan</button>
+                        <button class="time-btn" data-period="week">Teden</button>
+                        <button class="time-btn" data-period="month">Mesec</button>
+                        <button class="time-btn" data-period="year">Leto</button>
+                    </div>
+                </div>
+
+                <!-- Analytics Charts -->
+                <div class="analytics-grid">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h4>Prometni Tok</h4>
+                            <div class="chart-controls">
+                                <button class="chart-btn"><i class="fas fa-download"></i></button>
+                                <button class="chart-btn"><i class="fas fa-expand"></i></button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="trafficFlowChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h4>Emisije CO₂</h4>
+                            <div class="chart-controls">
+                                <button class="chart-btn"><i class="fas fa-download"></i></button>
+                                <button class="chart-btn"><i class="fas fa-expand"></i></button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="emissionsChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h4>Varnostni Dogodki</h4>
+                            <div class="chart-controls">
+                                <button class="chart-btn"><i class="fas fa-download"></i></button>
+                                <button class="chart-btn"><i class="fas fa-expand"></i></button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="safetyChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h4>Učinkovitost Sistema</h4>
+                            <div class="chart-controls">
+                                <button class="chart-btn"><i class="fas fa-download"></i></button>
+                                <button class="chart-btn"><i class="fas fa-expand"></i></button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="efficiencyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Metrics -->
+                <div class="key-metrics">
+                    <h3>Ključne Metrike</h3>
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-icon">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <div class="metric-data">
+                                <div class="metric-value">67.3 km/h</div>
+                                <div class="metric-label">Povprečna hitrost</div>
+                                <div class="metric-change positive">+5.2%</div>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="metric-data">
+                                <div class="metric-value">23.4 min</div>
+                                <div class="metric-label">Povprečni čas potovanja</div>
+                                <div class="metric-change negative">-8.1%</div>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-icon">
+                                <i class="fas fa-leaf"></i>
+                            </div>
+                            <div class="metric-data">
+                                <div class="metric-value">2.1 t</div>
+                                <div class="metric-label">CO₂ prihranek/dan</div>
+                                <div class="metric-change positive">+12.3%</div>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="metric-data">
+                                <div class="metric-value">99.7%</div>
+                                <div class="metric-label">Varnostni indeks</div>
+                                <div class="metric-change positive">+0.3%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Modules Section -->
+        <section id="ai-modules" class="content-section">
+            <div class="ai-modules-container">
+                <div class="modules-header">
+                    <h2>AI Moduli</h2>
+                    <div class="modules-status">
+                        <span class="active-modules">47 aktivnih modulov</span>
+                        <span class="learning-modules">12 se uči</span>
+                    </div>
+                </div>
+
+                <!-- AI Modules Grid -->
+                <div class="ai-modules-grid">
+                    <!-- Vehicle Detection Module -->
+                    <div class="ai-module-card active">
+                        <div class="module-header">
+                            <div class="module-icon">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="module-info">
+                                <h4>Zaznavanje Vozil</h4>
+                                <span class="module-status active">Aktivno</span>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="module-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 94%"></div>
+                                </div>
+                                <span class="progress-text">94% natančnost</span>
+                            </div>
+                            <div class="module-stats">
+                                <div class="stat">
+                                    <span class="value">1,247</span>
+                                    <span class="label">Zaznana vozila</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="value">23</span>
+                                    <span class="label">Neznana vozila</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Predictive Maintenance Module -->
+                    <div class="ai-module-card learning">
+                        <div class="module-header">
+                            <div class="module-icon">
+                                <i class="fas fa-wrench"></i>
+                            </div>
+                            <div class="module-info">
+                                <h4>Prediktivno Vzdrževanje</h4>
+                                <span class="module-status learning">Se uči</span>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="module-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill learning" style="width: 67%"></div>
+                                </div>
+                                <span class="progress-text">67% učenja</span>
+                            </div>
+                            <div class="module-stats">
+                                <div class="stat">
+                                    <span class="value">89%</span>
+                                    <span class="label">Natančnost napovedi</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="value">156</span>
+                                    <span class="label">Analizirani objekti</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Traffic Optimization Module -->
+                    <div class="ai-module-card premium">
+                        <div class="module-header">
+                            <div class="module-icon">
+                                <i class="fas fa-route"></i>
+                            </div>
+                            <div class="module-info">
+                                <h4>Optimizacija Prometa</h4>
+                                <span class="module-status premium">Premium</span>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="module-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill premium" style="width: 96%"></div>
+                                </div>
+                                <span class="progress-text">96% učinkovitost</span>
+                            </div>
+                            <div class="module-stats">
+                                <div class="stat">
+                                    <span class="value">+15%</span>
+                                    <span class="label">Hitrost prometa</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="value">-22%</span>
+                                    <span class="label">CO₂ emisije</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- EV Charging Module -->
+                    <div class="ai-module-card active">
+                        <div class="module-header">
+                            <div class="module-icon">
+                                <i class="fas fa-charging-station"></i>
+                            </div>
+                            <div class="module-info">
+                                <h4>EV Polnjenje</h4>
+                                <span class="module-status active">Aktivno</span>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="module-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 92%"></div>
+                                </div>
+                                <span class="progress-text">92% optimizacija</span>
+                            </div>
+                            <div class="module-stats">
+                                <div class="stat">
+                                    <span class="value">78%</span>
+                                    <span class="label">Kapaciteta</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="value">3.2 min</span>
+                                    <span class="label">Čakalna doba</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Safety Detection Module -->
+                    <div class="ai-module-card active">
+                        <div class="module-header">
+                            <div class="module-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="module-info">
+                                <h4>Varnostno Zaznavanje</h4>
+                                <span class="module-status active">Aktivno</span>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="module-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 99%"></div>
+                                </div>
+                                <span class="progress-text">99% zanesljivost</span>
+                            </div>
+                            <div class="module-stats">
+                                <div class="stat">
+                                    <span class="value">0</span>
+                                    <span class="label">Aktivni alarmi</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="value">247</span>
+                                    <span class="label">Preprečene nesreče</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Weather Integration Module -->
+                    <div class="ai-module-card learning">
+                        <div class="module-header">
+                            <div class="module-icon">
+                                <i class="fas fa-cloud-rain"></i>
+                            </div>
+                            <div class="module-info">
+                                <h4>Vremenska Integracija</h4>
+                                <span class="module-status learning">Se uči</span>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="module-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill learning" style="width: 73%"></div>
+                                </div>
+                                <span class="progress-text">73% učenja</span>
+                            </div>
+                            <div class="module-stats">
+                                <div class="stat">
+                                    <span class="value">85%</span>
+                                    <span class="label">Natančnost napovedi</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="value">24h</span>
+                                    <span class="label">Napoved vnaprej</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Module Controls -->
+                <div class="module-controls">
+                    <button class="control-btn primary">
+                        <i class="fas fa-plus"></i>
+                        Dodaj modul
+                    </button>
+                    <button class="control-btn secondary">
+                        <i class="fas fa-cog"></i>
+                        Konfiguracija
+                    </button>
+                    <button class="control-btn tertiary">
+                        <i class="fas fa-download"></i>
+                        Izvozi podatke
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>OMNI Traffic AI</h4>
+                <p>Napredna prometno-transportna platforma z AI</p>
+            </div>
+            <div class="footer-section">
+                <h4>Sistem</h4>
+                <p>Status: <span class="status-text active">Aktiven</span></p>
+                <p>Verzija: 2.0 Enterprise</p>
+            </div>
+            <div class="footer-section">
+                <h4>Podpora</h4>
+                <p>24/7 tehnična podpora</p>
+                <p>AI samodejno vzdrževanje</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal for Module Details -->
+    <div id="moduleModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Podrobnosti modula</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Dynamic content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="omni-traffic-script.js"></script>
+</body>
+</html>

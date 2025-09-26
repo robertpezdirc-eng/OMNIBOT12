@@ -1,0 +1,155 @@
+[
+  {
+    "id": "PKG_BLED_ROMANTIC",
+    "name": "Romantični vikend na Bledu",
+    "destination_ids": [
+      "DEST_BLED"
+    ],
+    "duration_days": 3,
+    "trip_type": "romantic",
+    "price_per_person": 180.0,
+    "max_participants": 2,
+    "included_services": [
+      "nastanitev",
+      "zajtrk",
+      "veslanje",
+      "obisk gradu"
+    ],
+    "activities": [
+      "romantična večerja",
+      "sprehod okoli jezera",
+      "fotografiranje"
+    ],
+    "accommodation_type": "hotel",
+    "transport_type": "car",
+    "sustainability_rating": 8.0,
+    "available_dates": [
+      "2025-09-22T12:56:38.455331",
+      "2025-10-06T12:56:38.455344",
+      "2025-10-20T12:56:38.455348",
+      "2025-11-03T12:56:38.455350",
+      "2025-11-17T12:56:38.455352",
+      "2025-12-01T12:56:38.455354",
+      "2025-12-15T12:56:38.455355",
+      "2025-12-29T12:56:38.455357",
+      "2026-01-12T12:56:38.455358",
+      "2026-01-26T12:56:38.455360"
+    ]
+  },
+  {
+    "id": "PKG_KOLPA_ADVENTURE",
+    "name": "Adrenalinsko doživetje na Kolpi",
+    "destination_ids": [
+      "DEST_KOLPA"
+    ],
+    "duration_days": 5,
+    "trip_type": "adventure",
+    "price_per_person": 220.0,
+    "max_participants": 8,
+    "included_services": [
+      "kampiranje",
+      "oprema za kanuiranje",
+      "vodnik",
+      "prehrana"
+    ],
+    "activities": [
+      "kanuiranje",
+      "pohodništvo",
+      "ribolov",
+      "taborjenje"
+    ],
+    "accommodation_type": "camping",
+    "transport_type": "bus",
+    "sustainability_rating": 9.5,
+    "available_dates": [
+      "2025-10-20T12:56:38.455348",
+      "2025-11-03T12:56:38.455350",
+      "2025-11-17T12:56:38.455352",
+      "2025-12-01T12:56:38.455354",
+      "2025-12-15T12:56:38.455355",
+      "2025-12-29T12:56:38.455357",
+      "2026-01-12T12:56:38.455358",
+      "2026-01-26T12:56:38.455360",
+      "2026-02-09T12:56:38.455361",
+      "2026-02-23T12:56:38.455363"
+    ]
+  },
+  {
+    "id": "PKG_LJUBLJANA_CULTURAL",
+    "name": "Kulturni izlet po Ljubljani",
+    "destination_ids": [
+      "DEST_LJUBLJANA"
+    ],
+    "duration_days": 2,
+    "trip_type": "cultural",
+    "price_per_person": 120.0,
+    "max_participants": 15,
+    "included_services": [
+      "vodeni ogledi",
+      "vstopnine",
+      "degustacija"
+    ],
+    "activities": [
+      "obisk muzejev",
+      "sprehod po starem mestru",
+      "kulinarična tura"
+    ],
+    "accommodation_type": "hotel",
+    "transport_type": "walking",
+    "sustainability_rating": 7.5,
+    "available_dates": [
+      "2025-09-22T12:56:38.455331",
+      "2025-10-06T12:56:38.455344",
+      "2025-10-20T12:56:38.455348",
+      "2025-11-03T12:56:38.455350",
+      "2025-11-17T12:56:38.455352",
+      "2025-12-01T12:56:38.455354",
+      "2025-12-15T12:56:38.455355",
+      "2025-12-29T12:56:38.455357",
+      "2026-01-12T12:56:38.455358",
+      "2026-01-26T12:56:38.455360",
+      "2026-02-09T12:56:38.455361",
+      "2026-02-23T12:56:38.455363",
+      "2026-03-09T12:56:38.455364"
+    ]
+  },
+  {
+    "id": "PKG_SLOVENIA_GRAND",
+    "name": "Velika tura po Sloveniji",
+    "destination_ids": [
+      "DEST_LJUBLJANA",
+      "DEST_BLED",
+      "DEST_PIRAN",
+      "DEST_KOLPA"
+    ],
+    "duration_days": 10,
+    "trip_type": "cultural",
+    "price_per_person": 850.0,
+    "max_participants": 12,
+    "included_services": [
+      "nastanitev",
+      "transport",
+      "vodnik",
+      "prehrana",
+      "aktivnosti"
+    ],
+    "activities": [
+      "vsi kraji",
+      "lokalne izkušnje",
+      "kulinarika",
+      "narava"
+    ],
+    "accommodation_type": "hotel",
+    "transport_type": "bus",
+    "sustainability_rating": 8.2,
+    "available_dates": [
+      "2025-10-06T12:56:38.455344",
+      "2025-10-20T12:56:38.455348",
+      "2025-11-03T12:56:38.455350",
+      "2025-11-17T12:56:38.455352",
+      "2025-12-01T12:56:38.455354",
+      "2025-12-15T12:56:38.455355",
+      "2025-12-29T12:56:38.455357"
+    ]
+  }
+]

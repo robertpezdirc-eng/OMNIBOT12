@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni-APP Advanced Drag & Drop Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated background particles */
+        .bg-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
+        }
+
+        /* Dashboard container */
+        #dashboard {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+        }
+
+        /* SVG for connections */
+        #connections-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Node styles */
+        .node {
+            position: absolute;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            z-index: 10;
+            user-select: none;
+        }
+
+        .node:active {
+            cursor: grabbing;
+            transform: scale(1.1) rotate(2deg);
+        }
+
+        .node:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Global node */
+        .node.global {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            width: 200px;
+            height: 120px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Module nodes */
+        .node.module {
+            background: linear-gradient(135deg, #4834d4, #686de0);
+            color: white;
+            width: 160px;
+            height: 100px;
+            font-size: 14px;
+        }
+
+        /* Submodule nodes */
+        .node.submodule {
+            background: linear-gradient(135deg, #00d2d3, #54a0ff);
+            color: white;
+            width: 130px;
+            height: 80px;
+            font-size: 12px;
+        }
+
+        /* Status indicators */
+        .status {
+            display: block;
+            margin-top: 8px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status.active {
+            background: #2ed573;
+            color: white;
+        }
+
+        .status.inactive {
+            background: #ff4757;
+            color: white;
+        }
+
+        .status.processing {
+            background: #ffa502;
+            color: white;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Connection lines */
+        .connection-line {
+            stroke: rgba(255, 255, 255, 0.6);
+            stroke-width: 3;
+            fill: none;
+            stroke-dasharray: 10, 5;
+            animation: dash-flow 2s linear infinite;
+        }
+
+        @keyframes dash-flow {
+            to { stroke-dashoffset: -15; }
+        }
+
+        /* Animated dots on connections */
+        .connection-dot {
+            fill: #ffd700;
+            r: 4;
+            animation: dot-travel 3s ease-in-out infinite;
+        }
+
+        @keyframes dot-travel {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* Control panels */
+        #controls {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            width: 280px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+        }
+
+        #info-box {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            width: 300px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+        }
+
+        /* Form elements */
+        input, button, select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* WebSocket status */
+        #ws-status {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 15px;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            z-index: 100;
+        }
+
+        .ws-connected {
+            background: #2ed573;
+        }
+
+        .ws-disconnected {
+            background: #ff4757;
+        }
+
+        .ws-connecting {
+            background: #ffa502;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        /* Statistics panel */
+        #stats {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            z-index: 100;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            #controls, #info-box {
+                width: 250px;
+                font-size: 12px;
+            }
+            
+            .node {
+                transform: scale(0.8);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background particles -->
+    <div class="bg-particles" id="particles"></div>
+
+    <!-- Main dashboard -->
+    <div id="dashboard">
+        <!-- SVG for connections -->
+        <svg id="connections-svg"></svg>
+    </div>
+
+    <!-- Control panel -->
+    <div id="controls">
+        <h3>🎛️ Dashboard Controls</h3>
+        <input type="text" id="module-name" placeholder="Module Name">
+        <select id="module-type">
+            <option value="module">Module</option>
+            <option value="submodule">Submodule</option>
+        </select>
+        <button onclick="addModule()">➕ Add Module</button>
+        <button onclick="removeSelectedModule()">🗑️ Remove Selected</button>
+        <button onclick="resetLayout()">🔄 Reset Layout</button>
+        <button onclick="toggleConnections()">🔗 Toggle Connections</button>
+        <hr style="margin: 15px 0;">
+        <h4>WebSocket Settings</h4>
+        <input type="text" id="ws-url" value="ws://localhost:8080" placeholder="WebSocket URL">
+        <button onclick="connectWebSocket()">🔌 Connect</button>
+        <button onclick="disconnectWebSocket()">🔌 Disconnect</button>
+    </div>
+
+    <!-- Info box -->
+    <div id="info-box">
+        <h3>📊 Module Information</h3>
+        <div id="selected-info">
+            <p>Select a module to view details</p>
+        </div>
+        <hr style="margin: 15px 0;">
+        <div id="module-stats">
+            <p><strong>Total Modules:</strong> <span id="total-modules">0</span></p>
+            <p><strong>Active Modules:</strong> <span id="active-modules">0</span></p>
+            <p><strong>Processing:</strong> <span id="processing-modules">0</span></p>
+        </div>
+    </div>
+
+    <!-- WebSocket status -->
+    <div id="ws-status" class="ws-disconnected">
+        🔴 WebSocket: Disconnected
+    </div>
+
+    <!-- Live statistics -->
+    <div id="stats">
+        <div>FPS: <span id="fps">0</span></div>
+        <div>Nodes: <span id="node-count">0</span></div>
+        <div>Connections: <span id="connection-count">0</span></div>
+        <div>Data Rate: <span id="data-rate">0 KB/s</span></div>
+    </div>
+
+    <script>
+        // Global variables
+        let nodes = [];
+        let connections = [];
+        let selectedNode = null;
+        let draggedNode = null;
+        let dragOffset = { x: 0, y: 0 };
+        let websocket = null;
+        let showConnections = true;
+        let nodeIdCounter = 0;
+        let lastDataTime = Date.now();
+        let dataReceived = 0;
+        let fps = 0;
+        let lastFrameTime = Date.now();
+
+        // Initialize dashboard
+        function initDashboard() {
+            createBackgroundParticles();
+            createInitialNodes();
+            setupEventListeners();
+            startAnimationLoop();
+            updateStats();
+            
+            // Auto-connect to WebSocket
+            setTimeout(() => {
+                connectWebSocket();
+            }, 1000);
+        }
+
+        // Create animated background particles
+        function createBackgroundParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Create initial nodes
+        function createInitialNodes() {
+            // Global node
+            const globalNode = createNode('Omni-APP Global', 'global', window.innerWidth / 2 - 100, 100);
+            
+            // Module nodes
+            const modules = [
+                { name: 'Tourism Module', x: 200, y: 300 },
+                { name: 'Finance Module', x: 500, y: 300 },
+                { name: 'Healthcare Module', x: 800, y: 300 },
+                { name: 'IoT Module', x: 1100, y: 300 }
+            ];
+
+            modules.forEach(module => {
+                const moduleNode = createNode(module.name, 'module', module.x, module.y);
+                connections.push({ from: globalNode.id, to: moduleNode.id });
+                
+                // Add submodules
+                const submodules = [
+                    { name: `${module.name.split(' ')[0]} Analytics`, x: module.x - 80, y: module.y + 150 },
+                    { name: `${module.name.split(' ')[0]} Reports`, x: module.x + 80, y: module.y + 150 }
+                ];
+
+                submodules.forEach(sub => {
+                    const subNode = createNode(sub.name, 'submodule', sub.x, sub.y);
+                    connections.push({ from: moduleNode.id, to: subNode.id });
+                });
+            });
+
+            updateConnections();
+        }
+
+        // Create a new node
+        function createNode(name, type, x, y) {
+            const node = {
+                id: ++nodeIdCounter,
+                name: name,
+                type: type,
+                x: x,
+                y: y,
+                status: Math.random() > 0.7 ? 'processing' : (Math.random() > 0.5 ? 'active' : 'inactive'),
+                element: null
+            };
+
+            const nodeElement = document.createElement('div');
+            nodeElement.className = `node ${type}`;
+            nodeElement.style.left = x + 'px';
+            nodeElement.style.top = y + 'px';
+            nodeElement.innerHTML = `
+                <div>${name}</div>
+                <span class="status ${node.status}">${node.status}</span>
+            `;
+
+            nodeElement.addEventListener('mousedown', startDrag);
+            nodeElement.addEventListener('click', selectNode);
+            
+            node.element = nodeElement;
+            document.getElementById('dashboard').appendChild(nodeElement);
+            nodes.push(node);
+
+            return node;
+        }
+
+        // Drag functionality
+        function startDrag(e) {
+            e.preventDefault();
+            draggedNode = nodes.find(n => n.element === e.target.closest('.node'));
+            if (!draggedNode) return;
+
+            const rect = draggedNode.element.getBoundingClientRect();
+            dragOffset.x = e.clientX - rect.left;
+            dragOffset.y = e.clientY - rect.top;
+
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+        }
+
+        function drag(e) {
+            if (!draggedNode) return;
+            
+            const x = e.clientX - dragOffset.x;
+            const y = e.clientY - dragOffset.y;
+            
+            draggedNode.x = Math.max(0, Math.min(window.innerWidth - 200, x));
+            draggedNode.y = Math.max(0, Math.min(window.innerHeight - 120, y));
+            
+            draggedNode.element.style.left = draggedNode.x + 'px';
+            draggedNode.element.style.top = draggedNode.y + 'px';
+            
+            updateConnections();
+        }
+
+        function stopDrag() {
+            draggedNode = null;
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', stopDrag);
+        }
+
+        // Node selection
+        function selectNode(e) {
+            e.stopPropagation();
+            const node = nodes.find(n => n.element === e.target.closest('.node'));
+            if (!node) return;
+
+            // Remove previous selection
+            if (selectedNode) {
+                selectedNode.element.style.border = '2px solid rgba(255, 255, 255, 0.2)';
+            }
+
+            selectedNode = node;
+            node.element.style.border = '3px solid #ffd700';
+            
+            updateInfoBox();
+        }
+
+        // Update info box
+        function updateInfoBox() {
+            const infoDiv = document.getElementById('selected-info');
+            if (!selectedNode) {
+                infoDiv.innerHTML = '<p>Select a module to view details</p>';
+                return;
+            }
+
+            infoDiv.innerHTML = `
+                <h4>${selectedNode.name}</h4>
+                <p><strong>Type:</strong> ${selectedNode.type}</p>
+                <p><strong>Status:</strong> ${selectedNode.status}</p>
+                <p><strong>Position:</strong> (${Math.round(selectedNode.x)}, ${Math.round(selectedNode.y)})</p>
+                <p><strong>ID:</strong> ${selectedNode.id}</p>
+                <p><strong>Connections:</strong> ${getNodeConnections(selectedNode.id)}</p>
+            `;
+        }
+
+        // Get node connections count
+        function getNodeConnections(nodeId) {
+            return connections.filter(c => c.from === nodeId || c.to === nodeId).length;
+        }
+
+        // Update connections visualization
+        function updateConnections() {
+            const svg = document.getElementById('connections-svg');
+            svg.innerHTML = '';
+
+            if (!showConnections) return;
+
+            connections.forEach((conn, index) => {
+                const fromNode = nodes.find(n => n.id === conn.from);
+                const toNode = nodes.find(n => n.id === conn.to);
+                
+                if (!fromNode || !toNode) return;
+
+                const fromX = fromNode.x + (fromNode.element.offsetWidth / 2);
+                const fromY = fromNode.y + (fromNode.element.offsetHeight / 2);
+                const toX = toNode.x + (toNode.element.offsetWidth / 2);
+                const toY = toNode.y + (toNode.element.offsetHeight / 2);
+
+                // Create curved path
+                const midX = (fromX + toX) / 2;
+                const midY = (fromY + toY) / 2 - 50;
+
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', `M ${fromX} ${fromY} Q ${midX} ${midY} ${toX} ${toY}`);
+                path.setAttribute('class', 'connection-line');
+                svg.appendChild(path);
+
+                // Add animated dot
+                const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                dot.setAttribute('class', 'connection-dot');
+                dot.setAttribute('r', '4');
+                dot.style.animationDelay = (index * 0.5) + 's';
+                
+                const animateMotion = document.createElementNS('http://www.w3.org/2000/svg', 'animateMotion');
+                animateMotion.setAttribute('dur', '3s');
+                animateMotion.setAttribute('repeatCount', 'indefinite');
+                animateMotion.setAttribute('path', `M ${fromX} ${fromY} Q ${midX} ${midY} ${toX} ${toY}`);
+                
+                dot.appendChild(animateMotion);
+                svg.appendChild(dot);
+            });
+        }
+
+        // WebSocket functionality
+        function connectWebSocket() {
+            const url = document.getElementById('ws-url').value;
+            const statusDiv = document.getElementById('ws-status');
+            
+            statusDiv.className = 'ws-connecting';
+            statusDiv.innerHTML = '🟡 WebSocket: Connecting...';
+
+            try {
+                websocket = new WebSocket(url);
+                
+                websocket.onopen = function() {
+                    statusDiv.className = 'ws-connected';
+                    statusDiv.innerHTML = '🟢 WebSocket: Connected';
+                    console.log('WebSocket connected');
+                };
+
+                websocket.onmessage = function(event) {
+                    try {
+                        const data = JSON.parse(event.data);
+                        handleWebSocketData(data);
+                        dataReceived += event.data.length;
+                    } catch (e) {
+                        console.error('Error parsing WebSocket data:', e);
+                    }
+                };
+
+                websocket.onclose = function() {
+                    statusDiv.className = 'ws-disconnected';
+                    statusDiv.innerHTML = '🔴 WebSocket: Disconnected';
+                    console.log('WebSocket disconnected');
+                };
+
+                websocket.onerror = function(error) {
+                    statusDiv.className = 'ws-disconnected';
+                    statusDiv.innerHTML = '🔴 WebSocket: Error';
+                    console.error('WebSocket error:', error);
+                };
+
+            } catch (error) {
+                statusDiv.className = 'ws-disconnected';
+                statusDiv.innerHTML = '🔴 WebSocket: Error';
+                console.error('WebSocket connection error:', error);
+            }
+        }
+
+        function disconnectWebSocket() {
+            if (websocket) {
+                websocket.close();
+                websocket = null;
+            }
+        }
+
+        // Handle WebSocket data
+        function handleWebSocketData(data) {
+            if (data.type === 'module_status') {
+                updateNodeStatus(data.module_id, data.status);
+            } else if (data.type === 'system_alert') {
+                showSystemAlert(data.message);
+            } else if (data.type === 'performance_data') {
+                updatePerformanceData(data);
+            }
+        }
+
+        // Update node status
+        function updateNodeStatus(moduleId, status) {
+            const node = nodes.find(n => n.id === moduleId || n.name.toLowerCase().includes(moduleId.toLowerCase()));
+            if (node) {
+                node.status = status;
+                const statusElement = node.element.querySelector('.status');
+                statusElement.className = `status ${status}`;
+                statusElement.textContent = status;
+            }
+        }
+
+        // Show system alert
+        function showSystemAlert(message) {
+            const alert = document.createElement('div');
+            alert.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(255, 77, 87, 0.95);
+                color: white;
+                padding: 20px;
+                border-radius: 10px;
+                z-index: 1000;
+                animation: fadeInOut 3s ease-in-out;
+            `;
+            alert.innerHTML = `<strong>System Alert:</strong> ${message}`;
+            document.body.appendChild(alert);
+
+            setTimeout(() => {
+                document.body.removeChild(alert);
+            }, 3000);
+        }
+
+        // Module management functions
+        function addModule() {
+            const name = document.getElementById('module-name').value;
+            const type = document.getElementById('module-type').value;
+            
+            if (!name) {
+                alert('Please enter a module name');
+                return;
+            }
+
+            const x = Math.random() * (window.innerWidth - 200);
+            const y = Math.random() * (window.innerHeight - 200) + 100;
+            
+            const newNode = createNode(name, type, x, y);
+            
+            // Connect to global node if it's a module
+            if (type === 'module') {
+                const globalNode = nodes.find(n => n.type === 'global');
+                if (globalNode) {
+                    connections.push({ from: globalNode.id, to: newNode.id });
+                }
+            }
+            
+            updateConnections();
+            updateStats();
+            document.getElementById('module-name').value = '';
+        }
+
+        function removeSelectedModule() {
+            if (!selectedNode) {
+                alert('Please select a module to remove');
+                return;
+            }
+
+            if (selectedNode.type === 'global') {
+                alert('Cannot remove the global node');
+                return;
+            }
+
+            // Remove connections
+            connections = connections.filter(c => c.from !== selectedNode.id && c.to !== selectedNode.id);
+            
+            // Remove node
+            document.getElementById('dashboard').removeChild(selectedNode.element);
+            nodes = nodes.filter(n => n.id !== selectedNode.id);
+            
+            selectedNode = null;
+            updateConnections();
+            updateInfoBox();
+            updateStats();
+        }
+
+        function resetLayout() {
+            nodes.forEach(node => {
+                document.getElementById('dashboard').removeChild(node.element);
+            });
+            
+            nodes = [];
+            connections = [];
+            selectedNode = null;
+            nodeIdCounter = 0;
+            
+            createInitialNodes();
+            updateStats();
+        }
+
+        function toggleConnections() {
+            showConnections = !showConnections;
+            updateConnections();
+        }
+
+        // Statistics and performance monitoring
+        function updateStats() {
+            document.getElementById('total-modules').textContent = nodes.length;
+            document.getElementById('active-modules').textContent = nodes.filter(n => n.status === 'active').length;
+            document.getElementById('processing-modules').textContent = nodes.filter(n => n.status === 'processing').length;
+            document.getElementById('node-count').textContent = nodes.length;
+            document.getElementById('connection-count').textContent = connections.length;
+        }
+
+        function updateDataRate() {
+            const now = Date.now();
+            const timeDiff = (now - lastDataTime) / 1000;
+            const rate = timeDiff > 0 ? (dataReceived / timeDiff / 1024).toFixed(2) : 0;
+            document.getElementById('data-rate').textContent = rate + ' KB/s';
+            
+            lastDataTime = now;
+            dataReceived = 0;
+        }
+
+        function updateFPS() {
+            const now = Date.now();
+            fps = Math.round(1000 / (now - lastFrameTime));
+            document.getElementById('fps').textContent = fps;
+            lastFrameTime = now;
+        }
+
+        // Animation loop
+        function startAnimationLoop() {
+            function animate() {
+                updateFPS();
+                
+                // Random status changes for demo
+                if (Math.random() < 0.01) {
+                    const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
+                    const statuses = ['active', 'inactive', 'processing'];
+                    const newStatus = statuses[Math.floor(Math.random() * statuses.length)];
+                    updateNodeStatus(randomNode.id, newStatus);
+                    updateStats();
+                }
+                
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        // Event listeners
+        function setupEventListeners() {
+            // Deselect node when clicking empty space
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.node') && !e.target.closest('#controls') && !e.target.closest('#info-box')) {
+                    if (selectedNode) {
+                        selectedNode.element.style.border = '2px solid rgba(255, 255, 255, 0.2)';
+                        selectedNode = null;
+                        updateInfoBox();
+                    }
+                }
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Delete' && selectedNode) {
+                    removeSelectedModule();
+                } else if (e.key === 'Escape') {
+                    if (selectedNode) {
+                        selectedNode.element.style.border = '2px solid rgba(255, 255, 255, 0.2)';
+                        selectedNode = null;
+                        updateInfoBox();
+                    }
+                }
+            });
+
+            // Window resize
+            window.addEventListener('resize', function() {
+                updateConnections();
+            });
+
+            // Update data rate every second
+            setInterval(updateDataRate, 1000);
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initDashboard);
+
+        // Add CSS animation for fadeInOut
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInOut {
+                0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+                20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

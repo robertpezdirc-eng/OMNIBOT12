@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌐 OMNI-APP - Interaktivna Vizualna Shema</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: auto;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .schema-container {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .schema-svg {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+        
+        .module-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .module-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+        
+        .module-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .module-icon {
+            font-size: 2.5em;
+            margin-right: 15px;
+        }
+        
+        .module-title {
+            font-size: 1.4em;
+            font-weight: bold;
+        }
+        
+        .module-description {
+            font-size: 1em;
+            line-height: 1.6;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+        
+        .module-features {
+            list-style: none;
+        }
+        
+        .module-features li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .module-features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #00ff88;
+            font-weight: bold;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ff88;
+            margin-left: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .system-info {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 40px;
+            text-align: center;
+        }
+        
+        .system-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 1em;
+            opacity: 0.8;
+        }
+        
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.history.back()">← Nazaj na Dashboard</button>
+    
+    <div class="header">
+        <h1>🌐 OMNI-APP</h1>
+        <p>Interaktivna Vizualna Shema Univerzalnega AI Sistema</p>
+    </div>
+    
+    <div class="container">
+        <div class="schema-container">
+            <h2 style="text-align: center; margin-bottom: 30px; font-size: 2em;">📊 Popolna Vizualna Shema Modulov</h2>
+            <iframe src="omni_visual_schema_complete.svg" class="schema-svg" height="600"></iframe>
+        </div>
+        
+        <div class="system-info">
+            <h2 style="font-size: 2.5em; margin-bottom: 20px;">🚀 Sistemske Informacije</h2>
+            <p style="font-size: 1.2em; opacity: 0.9;">Omni-APP je popolnoma univerzalen AI sistem, ki pokriva vse panoge in funkcije</p>
+            
+            <div class="system-stats">
+                <div class="stat-card">
+                    <div class="stat-value">17</div>
+                    <div class="stat-label">Aktivnih Modulov</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">Univerzalna Pokritost</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">3x</div>
+                    <div class="stat-label">Redundanca</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">24/7</div>
+                    <div class="stat-label">Avtomatsko Delovanje</div>
+                </div>
+            </div>
+        </div>
+        
+        <h2 style="text-align: center; font-size: 2.5em; margin: 40px 0;">🔧 Podrobni Opisi Modulov</h2>
+        
+        <div class="modules-grid">
+            <div class="module-card" onclick="highlightModule('finance')">
+                <div class="module-header">
+                    <div class="module-icon">💰</div>
+                    <div>
+                        <div class="module-title">Finance Optimizer <span class="status-indicator"></span></div>
+                    </div>
+                </div>
+                <div class="module-description">
+                    Napredni finančni sistem za upravljanje prihodkov, odhodkov in bilančnih analiz z AI optimizacijo.
+                </div>
+                <ul class="module-features">
+                    <li>Avtomatsko sledenje prihodkov in odhodkov</li>
+                    <li>Napredne bilančne analize</li>
+                    <li>Napovedovanje finančnih trendov</li>
+                    <li>Optimizacija investicijskih strategij</li>
+                </ul>
+            </div>
+            
+            <div class="module-card" onclick="highlightModule('tourism')">
+                <div class="module-header">
+                    <div class="module-icon">🏖️</div>
+                    <div>
+                        <div class="module-title">Tourism Optimizer <span class="status-indicator"></span></div>
+                    </div>
+                </div>
+                <div class="module-description">
+                    Inteligentno upravljanje turističnih destinacij, rezervacij in personaliziranih itinerarjev.
+                </div>
+                <ul class="module-features">
+                    <li>Personalizirani itinerarji</li>
+                    <li>Avtomatske rezervacije</li>
+                    <li>Analiza turističnih trendov</li>
+                    <li>Optimizacija cen in razpoložljivosti</li>
+                </ul>
+            </div>
+            
+            <div class="module-card" onclick="highlightModule('healthcare')">
+                <div class="module-header">
+                    <div class="module-icon">🏥</div>
+                    <div>
+                        <div class="module-title">Healthcare Optimizer <span class="status-indicator"></span></div>
+                    </div>
+                </div>
+                <div class="module-description">
+                    Napredni zdravstveni sistem za nadzor pacientov, diagnostiko in samoučeče analize.
+                </div>
+                <ul class="module-features">
+                    <li>Kontinuiran nadzor pacientov</li>
+                    <li>AI diagnostične analize</li>
+                    <li>Preventivno zdravstveno svetovanje</li>
+                    <li>Optimizacija zdravstvenih protokolov</li>
+                </ul>
+            </div>
+            
+            <div class="module-card" onclick="highlightModule('logistics')">
+                <div class="module-header">
+                    <div class="module-icon">📦</div>
+                    <div>
+                        <div class="module-title">Logistics Optimizer <span class="status-indicator"></span></div>
+                    </div>
+                </div>
+                <div class="module-description">
+                    Inteligentno upravljanje zalog, dostav in optimizacija logističnih procesov.
+                </div>
+                <ul class="module-features">
+                    <li>Avtomatsko upravljanje zalog</li>
+                    <li>Optimizacija dostav in poti</li>
+                    <li>Napovedovanje povpraševanja</li>
+                    <li>Realno-časovno sledenje pošiljk</li>
+                </ul>
+            </div>
+            
+            <div class="module-card" onclick="highlightModule('agriculture')">
+                <div class="module-header">
+                    <div class="module-icon">🌾</div>
+                    <div>
+                        <div class="module-title">Agriculture Optimizer <span class="status-indicator"></span></div>
+                    </div>
+                </div>
+                <div class="module-description">
+                    Pametno kmetijstvo z optimizacijo pridelkov, nadzor živali in ekološko pridelavo.
+                </div>
+                <ul class="module-features">
+                    <li>Optimizacija pridelkov in setev</li>
+                    <li>Nadzor zdravja živali</li>
+                    <li>Ekološko kmetovanje</li>
+                    <li>Vremenska napoved za kmetijstvo</li>
+                </ul>
+            </div>
+            
+            <div class="module-card" onclick="highlightModule('industry')">
+                <div class="module-header">
+                    <div class="module-icon">🏭</div>
+                    <div>
+                        <div class="module-title">Industry Optimizer <span class="status-indicator"></span></div>
+                    </div>
+                </div>
+                <div class="module-description">
+                    Industrijska avtomatizacija z optimizacijo strojev, proizvodnje in kakovosti.
+                </div>
+                <ul class="module-features">
+                    <li>Avtomatizacija proizvodnih linij</li>
+                    <li>Nadzor kakovosti izdelkov</li>
+                    <li>Optimizacija energijske porabe</li>
+                    <li>Preventivno vzdrževanje strojev</li>
+                </ul>
+            </div>
+            
+            <div class="module-card" onclick="highlightModule('energy')">
+                <div class="module-header">
+                    <div class="module-icon">⚡</div>
+                    <div>
+                        <div class="module-title">Energy Optimizer <span class="status-indicator"></span></div>
+                    </div>
+                </div>
+                <div class="module-description">
+                    Pametno upravljanje energije z optimizacijo porabe in obnovljivimi viri.
+                </div>
+                <ul class="module-features">
+                    <li>Optimizacija energijske porabe</li>
+                    <li>Upravljanje obnovljivih virov</li>
+                    <li>Napovedovanje energijskih potreb</li>
+                    <li>Avtomatsko preklapljanje virov</li>
+                </ul>
+            </div>
+            
+            <div class="module-card" onclick="highlightModule('smarthome')">
+                <div class="module-header">
+                    <div class="module-icon">🏠</div>
+                    <div>
+                        <div class="module-title">Smart Home Optimizer <span class="status-indicator"></span></div>
+                    </div>
+                </div>
+                <div class="module-description">
+                    Inteligentni dom z IoT napravami, avtomatizacijo in pametnim nadzorom.
+                </div>
+                <ul class="module-features">
+                    <li>Avtomatizacija domačih naprav</li>
+                    <li>Pametno upravljanje temperature</li>
+                    <li>Varnostni nadzor doma</li>
+                    <li>Optimizacija porabe energije</li>
+                </ul>
+            </div>
+            
+            <div class="module-card" onclick="highlightModule('communications')">
+                <div class="module-header">
+                    <div class="module-icon">📡</div>
+                    <div>
+                        <div class="module-title">Communications Optimizer <span class="status-indicator"></span></div>
+                    </div>
+                </div>
+                <div class="module-description">
+                    Napredni komunikacijski sistem za optimizacijo omrežij in podatkovnih tokov.
+                </div>
+                <ul class="module-features">
+                    <li>Optimizacija omrežnih povezav</li>
+                    <li>Nadzor podatkovnih tokov</li>
+                    <li>Avtomatska diagnostika omrežij</li>
+                    <li>Varnostno filtriranje prometa</li>
+                </ul>
+            </div>
+            
+            <div class="module-card" onclick="highlightModule('autonomous')">
+                <div class="module-header">
+                    <div class="module-icon">🚗</div>
+                    <div>
+                        <div class="module-title">Autonomous Vehicles <span class="status-indicator"></span></div>
+                    </div>
+                </div>
+                <div class="module-description">
+                    Sistem za avtonomna vozila z naprednim nadzorom in optimizacijo poti.
+                </div>
+                <ul class="module-features">
+                    <li>Avtonomna navigacija</li>
+                    <li>Optimizacija poti in prometa</li>
+                    <li>Varnostni nadzor vozil</li>
+                    <li>Koordinacija voznih parkov</li>
+                </ul>
+            </div>
+            
+            <div class="module-card" onclick="highlightModule('robotics')">
+                <div class="module-header">
+                    <div class="module-icon">🤖</div>
+                    <div>
+                        <div class="module-title">Robotics Optimizer <span class="status-indicator"></span></div>
+                    </div>
+                </div>
+                <div class="module-description">
+                    Upravljanje robotskih sistemov za industrijsko in domačo uporabo.
+                </div>
+                <ul class="module-features">
+                    <li>Koordinacija industrijskih robotov</li>
+                    <li>Domači pomočniki roboti</li>
+                    <li>Avtomatizacija opravil</li>
+                    <li>Učenje robotskih nalog</li>
+                </ul>
+            </div>
+            
+            <div class="module-card" onclick="highlightModule('science')">
+                <div class="module-header">
+                    <div class="module-icon">🔬</div>
+                    <div>
+                        <div class="module-title">Science Optimizer <span class="status-indicator"></span></div>
+                    </div>
+                </div>
+                <div class="module-description">
+                    Znanstveni raziskovalni sistem za projekte, analize in odkritja.
+                </div>
+                <ul class="module-features">
+                    <li>Upravljanje raziskovalnih projektov</li>
+                    <li>Analiza znanstvenih podatkov</li>
+                    <li>Simulacije in modeliranje</li>
+                    <li>Avtomatizacija eksperimentov</li>
+                </ul>
+            </div>
+            
+            <div class="module-card" onclick="highlightModule('security')">
+                <div class="module-header">
+                    <div class="module-icon">🔒</div>
+                    <div>
+                        <div class="module-title">Security Optimizer <span class="status-indicator"></span></div>
+                    </div>
+                </div>
+                <div class="module-description">
+                    Napredni varnostni sistem za zaščito, nadzor in preventivno varnost.
+                </div>
+                <ul class="module-features">
+                    <li>Realno-časovni varnostni nadzor</li>
+                    <li>Avtomatska detekcija groženj</li>
+                    <li>Biometrična avtentifikacija</li>
+                    <li>Varnostni protokoli in backup</li>
+                </ul>
+            </div>
+            
+            <div class="module-card" onclick="highlightModule('art')">
+                <div class="module-header">
+                    <div class="module-icon">🎨</div>
+                    <div>
+                        <div class="module-title">Art & Creativity <span class="status-indicator"></span></div>
+                    </div>
+                </div>
+                <div class="module-description">
+                    Kreativni sistem za umetnost, galerije in umetniške projekte.
+                </div>
+                <ul class="module-features">
+                    <li>AI generiranje umetnosti</li>
+                    <li>Upravljanje galerij</li>
+                    <li>Analiza umetniških trendov</li>
+                    <li>Kreativno sodelovanje</li>
+                </ul>
+            </div>
+            
+            <div class="module-card" onclick="highlightModule('devops')">
+                <div class="module-header">
+                    <div class="module-icon">⚙️</div>
+                    <div>
+                        <div class="module-title">DevOps Optimizer <span class="status-indicator"></span></div>
+                    </div>
+                </div>
+                <div class="module-description">
+                    Avtomatizacija razvoja, deployment-a in sistemskega nadzora.
+                </div>
+                <ul class="module-features">
+                    <li>Avtomatski deployment</li>
+                    <li>Kontinuirani nadzor sistemov</li>
+                    <li>Optimizacija performans</li>
+                    <li>Avtomatsko skaliranje</li>
+                </ul>
+            </div>
+            
+            <div class="module-card" onclick="highlightModule('iot')">
+                <div class="module-header">
+                    <div class="module-icon">📱</div>
+                    <div>
+                        <div class="module-title">IoT Optimizer <span class="status-indicator"></span></div>
+                    </div>
+                </div>
+                <div class="module-description">
+                    Upravljanje IoT naprav, senzorjev in pametnih povezav.
+                </div>
+                <ul class="module-features">
+                    <li>Centralizirano upravljanje IoT</li>
+                    <li>Nadzor senzorjev</li>
+                    <li>Avtomatska konfiguracija naprav</li>
+                    <li>Analiza IoT podatkov</li>
+                </ul>
+            </div>
+            
+            <div class="module-card" onclick="highlightModule('global')">
+                <div class="module-header">
+                    <div class="module-icon">🌍</div>
+                    <div>
+                        <div class="module-title">Global Optimizer <span class="status-indicator"></span></div>
+                    </div>
+                </div>
+                <div class="module-description">
+                    Centralni sistem, ki povezuje in optimizira vse module v enotno celoto.
+                </div>
+                <ul class="module-features">
+                    <li>Koordinacija vseh modulov</li>
+                    <li>Globalna optimizacija</li>
+                    <li>Samodejno učenje in prilagajanje</li>
+                    <li>Redundanca in varnostni backup</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function highlightModule(moduleId) {
+            // Animacija za poudarjanje modula
+            event.currentTarget.style.transform = 'scale(1.05)';
+            event.currentTarget.style.background = 'rgba(0,255,136,0.2)';
+            
+            setTimeout(() => {
+                event.currentTarget.style.transform = 'scale(1)';
+                event.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+            }, 1000);
+            
+            // Prikaz dodatnih informacij
+            console.log(`Modul ${moduleId} je bil izbran`);
+        }
+        
+        // Animacija ob nalaganju strani
+        window.addEventListener('load', () => {
+            const cards = document.querySelectorAll('.module-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(50px)';
+                    card.style.transition = 'all 0.6s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

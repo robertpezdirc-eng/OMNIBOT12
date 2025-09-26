@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Simulacije - Omnia App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .simulation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .simulation-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .simulation-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+        }
+
+        .simulation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-right: 15px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .simulation-canvas {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(45deg, #f0f2f5, #e1e8ed);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #e0e6ed;
+        }
+
+        .canvas-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #666;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #e9ecef;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .simulation-active .simulation-canvas {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            animation: pulse 2s infinite;
+        }
+
+        .simulation-active .canvas-content {
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .floating-element {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 6s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100%) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100%) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .simulation-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-btn">← Nazaj na glavno</a>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🌐 3D Simulacije & AR/VR</h1>
+            <p>Napredne simulacije poslovnih procesov z interaktivnimi elementi</p>
+        </div>
+
+        <div class="simulation-grid">
+            <!-- Poslovna analitika -->
+            <div class="simulation-card" id="analytics-sim">
+                <div class="card-header">
+                    <div class="card-icon">📊</div>
+                    <div class="card-title">Poslovna Analitika 3D</div>
+                </div>
+                <div class="simulation-canvas" id="analytics-canvas">
+                    <div class="canvas-content">
+                        <div style="font-size: 2rem;">📈</div>
+                        <div>Kliknite "Zaženi" za 3D vizualizacijo</div>
+                    </div>
+                    <div class="floating-elements" id="analytics-elements"></div>
+                </div>
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="startSimulation('analytics')">🚀 Zaženi simulacijo</button>
+                    <button class="btn btn-secondary" onclick="stopSimulation('analytics')">⏹️ Ustavi</button>
+                    <button class="btn btn-secondary" onclick="resetSimulation('analytics')">🔄 Ponastavi</button>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="analytics-progress" style="width: 0%"></div>
+                </div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="analytics-data">0</div>
+                        <div class="stat-label">Podatkovni tokovi</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="analytics-fps">60</div>
+                        <div class="stat-label">FPS</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="analytics-objects">0</div>
+                        <div class="stat-label">3D objekti</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workflow simulacija -->
+            <div class="simulation-card" id="workflow-sim">
+                <div class="card-header">
+                    <div class="card-icon">⚙️</div>
+                    <div class="card-title">Workflow Simulacija</div>
+                </div>
+                <div class="simulation-canvas" id="workflow-canvas">
+                    <div class="canvas-content">
+                        <div style="font-size: 2rem;">🔄</div>
+                        <div>Simulacija poslovnih procesov</div>
+                    </div>
+                    <div class="floating-elements" id="workflow-elements"></div>
+                </div>
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="startSimulation('workflow')">▶️ Začni proces</button>
+                    <button class="btn btn-secondary" onclick="pauseSimulation('workflow')">⏸️ Premor</button>
+                    <button class="btn btn-secondary" onclick="resetSimulation('workflow')">🔄 Reset</button>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="workflow-progress" style="width: 0%"></div>
+                </div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="workflow-tasks">0</div>
+                        <div class="stat-label">Aktivne naloge</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="workflow-efficiency">100%</div>
+                        <div class="stat-label">Učinkovitost</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="workflow-time">0s</div>
+                        <div class="stat-label">Čas izvajanja</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AR/VR Izkušnja -->
+            <div class="simulation-card" id="arvr-sim">
+                <div class="card-header">
+                    <div class="card-icon">🥽</div>
+                    <div class="card-title">AR/VR Izkušnja</div>
+                </div>
+                <div class="simulation-canvas" id="arvr-canvas">
+                    <div class="canvas-content">
+                        <div style="font-size: 2rem;">🌐</div>
+                        <div>Virtualna realnost za poslovanje</div>
+                    </div>
+                    <div class="floating-elements" id="arvr-elements"></div>
+                </div>
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="startSimulation('arvr')">🥽 Vstopi v VR</button>
+                    <button class="btn btn-secondary" onclick="toggleAR('arvr')">📱 AR način</button>
+                    <button class="btn btn-secondary" onclick="resetSimulation('arvr')">🏠 Izhod</button>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="arvr-progress" style="width: 0%"></div>
+                </div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="arvr-immersion">0%</div>
+                        <div class="stat-label">Potopitev</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="arvr-tracking">✅</div>
+                        <div class="stat-label">Sledenje</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="arvr-quality">HD</div>
+                        <div class="stat-label">Kakovost</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mrežna simulacija -->
+            <div class="simulation-card" id="network-sim">
+                <div class="card-header">
+                    <div class="card-icon">🌐</div>
+                    <div class="card-title">Mrežna Topologija</div>
+                </div>
+                <div class="simulation-canvas" id="network-canvas">
+                    <div class="canvas-content">
+                        <div style="font-size: 2rem;">🔗</div>
+                        <div>3D vizualizacija omrežja</div>
+                    </div>
+                    <div class="floating-elements" id="network-elements"></div>
+                </div>
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="startSimulation('network')">🔗 Prikaži omrežje</button>
+                    <button class="btn btn-secondary" onclick="analyzeNetwork('network')">🔍 Analiziraj</button>
+                    <button class="btn btn-secondary" onclick="resetSimulation('network')">🔄 Ponastavi</button>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="network-progress" style="width: 0%"></div>
+                </div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="network-nodes">0</div>
+                        <div class="stat-label">Vozlišča</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="network-connections">0</div>
+                        <div class="stat-label">Povezave</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="network-latency">0ms</div>
+                        <div class="stat-label">Latenca</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const simulations = {
+            analytics: { active: false, progress: 0, interval: null },
+            workflow: { active: false, progress: 0, interval: null },
+            arvr: { active: false, progress: 0, interval: null },
+            network: { active: false, progress: 0, interval: null }
+        };
+
+        function startSimulation(type) {
+            if (simulations[type].active) return;
+            
+            simulations[type].active = true;
+            const card = document.getElementById(`${type}-sim`);
+            card.classList.add('simulation-active');
+            
+            // Start progress animation
+            simulations[type].interval = setInterval(() => {
+                if (simulations[type].progress < 100) {
+                    simulations[type].progress += Math.random() * 5;
+                    updateProgress(type);
+                    updateStats(type);
+                    createFloatingElements(type);
+                }
+            }, 200);
+            
+            // Update canvas content
+            const canvas = document.getElementById(`${type}-canvas`);
+            const content = canvas.querySelector('.canvas-content');
+            content.innerHTML = getSimulationContent(type);
+        }
+
+        function stopSimulation(type) {
+            simulations[type].active = false;
+            const card = document.getElementById(`${type}-sim`);
+            card.classList.remove('simulation-active');
+            
+            if (simulations[type].interval) {
+                clearInterval(simulations[type].interval);
+                simulations[type].interval = null;
+            }
+        }
+
+        function resetSimulation(type) {
+            stopSimulation(type);
+            simulations[type].progress = 0;
+            updateProgress(type);
+            resetStats(type);
+            
+            const canvas = document.getElementById(`${type}-canvas`);
+            const content = canvas.querySelector('.canvas-content');
+            content.innerHTML = getInitialContent(type);
+            
+            // Clear floating elements
+            const elements = document.getElementById(`${type}-elements`);
+            elements.innerHTML = '';
+        }
+
+        function updateProgress(type) {
+            const progressBar = document.getElementById(`${type}-progress`);
+            progressBar.style.width = Math.min(simulations[type].progress, 100) + '%';
+        }
+
+        function updateStats(type) {
+            const progress = simulations[type].progress;
+            
+            switch(type) {
+                case 'analytics':
+                    document.getElementById('analytics-data').textContent = Math.floor(progress / 10);
+                    document.getElementById('analytics-objects').textContent = Math.floor(progress / 5);
+                    break;
+                case 'workflow':
+                    document.getElementById('workflow-tasks').textContent = Math.floor(progress / 20);
+                    document.getElementById('workflow-time').textContent = Math.floor(progress / 2) + 's';
+                    break;
+                case 'arvr':
+                    document.getElementById('arvr-immersion').textContent = Math.floor(progress) + '%';
+                    break;
+                case 'network':
+                    document.getElementById('network-nodes').textContent = Math.floor(progress / 10);
+                    document.getElementById('network-connections').textContent = Math.floor(progress / 5);
+                    document.getElementById('network-latency').textContent = Math.floor(Math.random() * 50) + 'ms';
+                    break;
+            }
+        }
+
+        function resetStats(type) {
+            switch(type) {
+                case 'analytics':
+                    document.getElementById('analytics-data').textContent = '0';
+                    document.getElementById('analytics-objects').textContent = '0';
+                    break;
+                case 'workflow':
+                    document.getElementById('workflow-tasks').textContent = '0';
+                    document.getElementById('workflow-time').textContent = '0s';
+                    break;
+                case 'arvr':
+                    document.getElementById('arvr-immersion').textContent = '0%';
+                    break;
+                case 'network':
+                    document.getElementById('network-nodes').textContent = '0';
+                    document.getElementById('network-connections').textContent = '0';
+                    document.getElementById('network-latency').textContent = '0ms';
+                    break;
+            }
+        }
+
+        function createFloatingElements(type) {
+            const container = document.getElementById(`${type}-elements`);
+            
+            // Limit number of floating elements
+            if (container.children.length > 10) {
+                container.removeChild(container.firstChild);
+            }
+            
+            const element = document.createElement('div');
+            element.className = 'floating-element';
+            element.style.left = Math.random() * 100 + '%';
+            element.style.animationDelay = Math.random() * 2 + 's';
+            element.style.animationDuration = (4 + Math.random() * 4) + 's';
+            
+            container.appendChild(element);
+            
+            // Remove element after animation
+            setTimeout(() => {
+                if (element.parentNode) {
+                    element.parentNode.removeChild(element);
+                }
+            }, 8000);
+        }
+
+        function getSimulationContent(type) {
+            const contents = {
+                analytics: '<div style="font-size: 2rem;">📊</div><div>Analiziram podatke...</div><div style="font-size: 0.8rem; margin-top: 10px;">3D vizualizacija v teku</div>',
+                workflow: '<div style="font-size: 2rem;">⚙️</div><div>Procesiranje nalog...</div><div style="font-size: 0.8rem; margin-top: 10px;">Optimiziram workflow</div>',
+                arvr: '<div style="font-size: 2rem;">🥽</div><div>VR okolje aktivno</div><div style="font-size: 0.8rem; margin-top: 10px;">Potapljanje v virtualno realnost</div>',
+                network: '<div style="font-size: 2rem;">🌐</div><div>Mapiranje omrežja...</div><div style="font-size: 0.8rem; margin-top: 10px;">3D topologija se gradi</div>'
+            };
+            return contents[type];
+        }
+
+        function getInitialContent(type) {
+            const contents = {
+                analytics: '<div style="font-size: 2rem;">📈</div><div>Kliknite "Zaženi" za 3D vizualizacijo</div>',
+                workflow: '<div style="font-size: 2rem;">🔄</div><div>Simulacija poslovnih procesov</div>',
+                arvr: '<div style="font-size: 2rem;">🌐</div><div>Virtualna realnost za poslovanje</div>',
+                network: '<div style="font-size: 2rem;">🔗</div><div>3D vizualizacija omrežja</div>'
+            };
+            return contents[type];
+        }
+
+        function pauseSimulation(type) {
+            if (simulations[type].interval) {
+                clearInterval(simulations[type].interval);
+                simulations[type].interval = null;
+            }
+        }
+
+        function toggleAR(type) {
+            const canvas = document.getElementById(`${type}-canvas`);
+            const content = canvas.querySelector('.canvas-content');
+            
+            if (content.innerHTML.includes('AR način aktiven')) {
+                content.innerHTML = '<div style="font-size: 2rem;">🥽</div><div>VR način aktiven</div>';
+            } else {
+                content.innerHTML = '<div style="font-size: 2rem;">📱</div><div>AR način aktiven</div>';
+            }
+        }
+
+        function analyzeNetwork(type) {
+            const canvas = document.getElementById(`${type}-canvas`);
+            const content = canvas.querySelector('.canvas-content');
+            content.innerHTML = '<div style="font-size: 2rem;">🔍</div><div>Analiziram omrežje...</div>';
+            
+            setTimeout(() => {
+                content.innerHTML = '<div style="font-size: 2rem;">✅</div><div>Analiza končana</div><div style="font-size: 0.8rem; margin-top: 10px;">Omrežje je optimalno</div>';
+            }, 2000);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🌐 3D Simulacije naložene - Omnia App');
+        });
+    </script>
+</body>
+</html>
