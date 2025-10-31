@@ -33,9 +33,10 @@ Celoten sistem za migracijo repozitorijev v monorepo je **POPOLNOMA PRIPRAVLJEN*
 ✅ docs/QUICK_START.md               (7.6K) - Hitra navodila
 ✅ docs/MERGE_GUIDE.md               (13K) - Podrobna navodila za združevanje
 ✅ docs/MIGRATION_REPORT_TEMPLATE.md (7K)   - Predloga poročila
+✅ docs/OMNI_PLATFORM_VISION.md      (10K)  - Vizija Omni Platform arhitekture
 ```
 
-**Skupaj: ~90K dokumentacije in kode**
+**Skupaj: ~100K dokumentacije in kode**
 
 ---
 
@@ -429,6 +430,29 @@ Vsi zahtevani elementi so implementirani:
 **Verzija**: 1.0.0  
 **Datum**: 2025-10-31  
 **Repository**: https://github.com/robertpezdirc-eng/OMNIBOT12
+
+---
+
+## 🌟 Prihodnja Vizija - Omni Platform
+
+Ta PR implementira **monorepo migration sistem**. Za prihodnji razvoj platforme glej:
+
+👉 **[docs/OMNI_PLATFORM_VISION.md](docs/OMNI_PLATFORM_VISION.md)**
+
+**Omni Platform** bo celovit sistem z:
+- 🤖 **AI Agenti** - Inteligentna avtomatizacija
+- 📊 **Real-time Analitika** - Dashboard in monitoring
+- 💳 **Plačilni Sistem** - Stripe/PayPal integracija
+- ☁️ **Cloud Run Deployment** - Auto-scaling, serverless
+- 🔐 **Enterprise Security** - IAM, VPC, Secret Manager
+
+**Stack:**
+- Backend: FastAPI (Python)
+- Frontend: React + TypeScript
+- Deployment: Google Cloud Run
+- CI/CD: GitHub Actions
+
+Vizija je pripravljena za implementacijo v prihodnjih fazah! 🚀
 
 ---
 
