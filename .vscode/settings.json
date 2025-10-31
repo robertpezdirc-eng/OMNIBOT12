@@ -53,10 +53,10 @@
   "python.linting.enabled": true,
   "python.linting.pylintEnabled": true,
   "python.linting.flake8Enabled": false,
-  "python.formatting.provider": "autopep8",
   "python.analysis.typeCheckingMode": "basic",
   "python.analysis.autoImportCompletions": true,
   "[python]": {
+    "editor.defaultFormatter": "ms-python.autopep8",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.organizeImports": "explicit"
