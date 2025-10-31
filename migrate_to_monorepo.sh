@@ -217,7 +217,12 @@ clone_and_prepare_repo() {
     # Convert to regular repo for processing
     git config --bool core.bare false
     git config --unset core.bare
-    git checkout main 2>/dev/null || git checkout master 2>/dev/null || git checkout "$(git branch -r | grep -v HEAD | head -1 | sed 's/.*\///')"
+    
+    # Checkout main branch (try different common names)
+    git checkout main 2>/dev/null || \
+        git checkout master 2>/dev/null || \
+        git checkout "$(git branch -r | grep -v HEAD | head -1 | sed 's/.*\///')" 2>/dev/null || \
+        log_warning "Could not checkout default branch"
 }
 
 # Apply git-filter-repo to move content to subdirectory
@@ -230,14 +235,18 @@ filter_repo_to_subdirectory() {
     
     cd "$repo_path"
     
-    # Prefix tags with repo name
-    git tag | while read -r tag; do
-        git tag "${repo_name}/${tag}" "$tag" 2>/dev/null || true
-        git tag -d "$tag" 2>/dev/null || true
-    done
-    
     # Use git-filter-repo to move everything to subdirectory
-    git filter-repo --force --to-subdirectory-filter "$target_subdir/" --tag-rename "":"${repo_name}/"
+    # Note: git-filter-repo will handle tag renaming if needed
+    git filter-repo --force --to-subdirectory-filter "$target_subdir/"
+    
+    # Prefix tags with repo name after filtering
+    git tag | while read -r tag; do
+        # Skip if already prefixed
+        if [[ ! "$tag" =~ ^${repo_name}/ ]]; then
+            git tag "${repo_name}/${tag}" "$tag" 2>/dev/null || true
+            git tag -d "$tag" 2>/dev/null || true
+        fi
+    done
     
     log_success "Filtered $repo_name successfully"
 }
@@ -294,13 +303,13 @@ initialize_monorepo() {
 generate_report() {
     log_info "Generating migration report..."
     
-    cat > "$WORK_DIR/MIGRATION_REPORT.md" << 'EOF'
+    cat > "$WORK_DIR/MIGRATION_REPORT.md" << EOF
 # Monorepo Migration Report
 
 ## Summary
 
 Migration completed: $(date)
-Target repository: $(GITHUB_USER)/$(TARGET_REPO)
+Target repository: ${GITHUB_USER}/${TARGET_REPO}
 
 ## Processed Repositories
 
