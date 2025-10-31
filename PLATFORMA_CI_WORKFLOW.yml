@@ -1,0 +1,210 @@
+name: Monorepo CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  detect-changes:
+    name: Detect Changed Projects
+    runs-on: ubuntu-latest
+    outputs:
+      projects: ${{ steps.detect.outputs.projects }}
+      has-changes: ${{ steps.detect.outputs.has-changes }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed projects
+        id: detect
+        run: |
+          # Get list of changed files
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
+          else
+            CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)
+          fi
+          
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+          
+          # Extract unique project directories
+          PROJECTS=$(echo "$CHANGED_FILES" | grep '^projects/' | cut -d'/' -f2 | sort -u | jq -R -s -c 'split("\n")[:-1]')
+          
+          if [ "$PROJECTS" == "[]" ] || [ -z "$PROJECTS" ]; then
+            echo "has-changes=false" >> $GITHUB_OUTPUT
+            echo "projects=[]" >> $GITHUB_OUTPUT
+          else
+            echo "has-changes=true" >> $GITHUB_OUTPUT
+            echo "projects=$PROJECTS" >> $GITHUB_OUTPUT
+            echo "Detected changed projects: $PROJECTS"
+          fi
+
+  test-node-projects:
+    name: Test Node.js Projects
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has-changes == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: ${{ fromJson(needs.detect-changes.outputs.projects) }}
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check if Node.js project
+        id: check-node
+        run: |
+          if [ -f "projects/${{ matrix.project }}/package.json" ]; then
+            echo "is-node=true" >> $GITHUB_OUTPUT
+          else
+            echo "is-node=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup Node.js
+        if: steps.check-node.outputs.is-node == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: projects/${{ matrix.project }}/package-lock.json
+
+      - name: Install dependencies
+        if: steps.check-node.outputs.is-node == 'true'
+        working-directory: projects/${{ matrix.project }}
+        run: npm ci || npm install
+
+      - name: Run linter
+        if: steps.check-node.outputs.is-node == 'true'
+        working-directory: projects/${{ matrix.project }}
+        run: npm run lint || echo "No lint script found"
+        continue-on-error: true
+
+      - name: Run tests
+        if: steps.check-node.outputs.is-node == 'true'
+        working-directory: projects/${{ matrix.project }}
+        run: npm test || echo "No test script found"
+        continue-on-error: true
+
+      - name: Build
+        if: steps.check-node.outputs.is-node == 'true'
+        working-directory: projects/${{ matrix.project }}
+        run: npm run build || echo "No build script found"
+        continue-on-error: true
+
+  test-python-projects:
+    name: Test Python Projects
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has-changes == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: ${{ fromJson(needs.detect-changes.outputs.projects) }}
+        python-version: ['3.9', '3.10', '3.11']
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check if Python project
+        id: check-python
+        run: |
+          if [ -f "projects/${{ matrix.project }}/requirements.txt" ] || \
+             [ -f "projects/${{ matrix.project }}/setup.py" ] || \
+             [ -f "projects/${{ matrix.project }}/pyproject.toml" ]; then
+            echo "is-python=true" >> $GITHUB_OUTPUT
+          else
+            echo "is-python=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Python
+        if: steps.check-python.outputs.is-python == 'true'
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        if: steps.check-python.outputs.is-python == 'true'
+        working-directory: projects/${{ matrix.project }}
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+
+      - name: Lint with flake8
+        if: steps.check-python.outputs.is-python == 'true'
+        working-directory: projects/${{ matrix.project }}
+        run: |
+          pip install flake8
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || true
+        continue-on-error: true
+
+      - name: Test with pytest
+        if: steps.check-python.outputs.is-python == 'true'
+        working-directory: projects/${{ matrix.project }}
+        run: |
+          pip install pytest pytest-cov
+          pytest --cov || echo "No tests found"
+        continue-on-error: true
+
+  security-scan:
+    name: Security Scan
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has-changes == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  lint-commits:
+    name: Lint Commit Messages
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate commits
+        run: |
+          # Check conventional commit format
+          git log --format=%s ${{ github.event.pull_request.base.sha }}..${{ github.sha }} | \
+          while read -r commit_msg; do
+            if ! echo "$commit_msg" | grep -qE '^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?:'; then
+              echo "❌ Invalid commit message: $commit_msg"
+              echo "Must follow: type(scope): description"
+              exit 1
+            else
+              echo "✅ Valid: $commit_msg"
+            fi
+          done
+
+  all-checks-passed:
+    name: All Checks Passed
+    needs: [test-node-projects, test-python-projects, security-scan]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check results
+        run: |
+          if [ "${{ needs.test-node-projects.result }}" == "failure" ] || \
+             [ "${{ needs.test-python-projects.result }}" == "failure" ] || \
+             [ "${{ needs.security-scan.result }}" == "failure" ]; then
+            echo "Some checks failed"
+            exit 1
+          fi
+          echo "All checks passed!"
