@@ -6,6 +6,12 @@
 
 **Popolnoma avtomatiziran licenčni sistem z real-time funkcionalnostjo in naprednimi varnostnimi funkcijami.**
 
+## 📚 Dokumentacija
+
+> **🎯 NOVO!** Za celotno projektno funkcionalnost in hitri pregled:
+> - **[PROJECT_FUNCTIONALITY.md](./PROJECT_FUNCTIONALITY.md)** - Celotna dokumentacija vseh funkcionalnosti projekta (955 vrstic)
+> - **[QUICK_REFERENCE.md](./QUICK_REFERENCE.md)** - Hitri pregled in quick start vodič
+
 ## 📋 Kazalo
 
 - [🎯 Pregled Sistema](#-pregled-sistema)
