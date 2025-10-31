@@ -1,0 +1,110 @@
+{
+  "migration": {
+    "version": "1.0.0",
+    "github_user": "robertpezdirc-eng",
+    "target_repo": "platforma",
+    "mode": "PR-only",
+    "settings": {
+      "auto_fetch_with_gh": true,
+      "archive_after_import": false,
+      "preserve_tags": true,
+      "prefix_tags": true,
+      "detect_lfs": true,
+      "scan_secrets": true,
+      "check_large_files": true,
+      "large_file_threshold_mb": 10
+    },
+    "directory_structure": {
+      "projects": "Main production projects",
+      "archive": "Archived/experimental projects",
+      "libs": "Shared libraries and packages",
+      "infra": "Infrastructure configuration (terraform, k8s, etc)",
+      "tools": "Development tools and scripts",
+      "docs": "Documentation and guides"
+    },
+    "archive_criteria": {
+      "keywords": [
+        "test",
+        "demo",
+        "experiment",
+        "scratch",
+        "temp",
+        "old",
+        "deprecated",
+        "archive",
+        "backup",
+        "example",
+        "sample",
+        "prototype"
+      ],
+      "name_patterns": [
+        "test-*",
+        "demo-*",
+        "*-test",
+        "*-demo",
+        "tmp-*",
+        "old-*",
+        "*-old",
+        "backup-*",
+        "*-backup"
+      ],
+      "min_size_kb": 100,
+      "max_commits": 5
+    },
+    "exclude_repos": [
+      ".github",
+      "platforma"
+    ],
+    "license_detection": {
+      "enabled": true,
+      "conflict_strategy": "preserve_individual",
+      "default_license": "MIT"
+    },
+    "ci_config": {
+      "enable_per_project_ci": true,
+      "detect_changed_projects": true,
+      "parallel_testing": true,
+      "supported_languages": [
+        "node",
+        "python",
+        "go",
+        "rust",
+        "java",
+        "csharp"
+      ]
+    }
+  },
+  "security": {
+    "sensitive_file_patterns": [
+      "*.pem",
+      "*.key",
+      "*.p12",
+      "*.pfx",
+      "*id_rsa*",
+      "*id_dsa*",
+      "*.env",
+      "*secret*",
+      "*password*",
+      "*credentials*",
+      "*.crt",
+      "*.cert",
+      "*.keystore",
+      "*.jks"
+    ],
+    "exclude_from_migration": true,
+    "report_findings": true
+  },
+  "performance": {
+    "parallel_processing": true,
+    "max_parallel_repos": 3,
+    "use_shallow_clone_for_analysis": false,
+    "cleanup_temp_files": true
+  },
+  "reporting": {
+    "generate_html_report": false,
+    "generate_markdown_report": true,
+    "generate_json_report": true,
+    "include_statistics": true,
+    "include_commit_graph": false
+  }
+}
