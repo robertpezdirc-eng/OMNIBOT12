@@ -1,0 +1,163 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "npm: Install Dependencies",
+      "type": "npm",
+      "script": "install",
+      "problemMatcher": [],
+      "detail": "Install Node.js dependencies"
+    },
+    {
+      "label": "npm: Start Development Server",
+      "type": "npm",
+      "script": "dev",
+      "problemMatcher": [],
+      "isBackground": true,
+      "detail": "Start the development server with nodemon"
+    },
+    {
+      "label": "npm: Start Production Server",
+      "type": "npm",
+      "script": "start",
+      "problemMatcher": [],
+      "isBackground": true,
+      "detail": "Start the production server"
+    },
+    {
+      "label": "npm: Run Tests",
+      "type": "npm",
+      "script": "test",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": [],
+      "detail": "Run Jest tests"
+    },
+    {
+      "label": "npm: Lint Code",
+      "type": "npm",
+      "script": "lint",
+      "problemMatcher": [
+        "$eslint-stylish"
+      ],
+      "detail": "Run ESLint to check code quality"
+    },
+    {
+      "label": "npm: Lint and Fix",
+      "type": "npm",
+      "script": "lint:fix",
+      "problemMatcher": [
+        "$eslint-stylish"
+      ],
+      "detail": "Run ESLint and automatically fix issues"
+    },
+    {
+      "label": "npm: Build Project",
+      "type": "npm",
+      "script": "build",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [],
+      "detail": "Build the project"
+    },
+    {
+      "label": "npm: Clean Project",
+      "type": "npm",
+      "script": "clean",
+      "problemMatcher": [],
+      "detail": "Remove node_modules, dist, and other generated files"
+    },
+    {
+      "label": "Python: Install Requirements",
+      "type": "shell",
+      "command": "pip install -r requirements.txt",
+      "problemMatcher": [],
+      "detail": "Install Python dependencies",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Python: Run OMNI Main",
+      "type": "shell",
+      "command": "python omni.py",
+      "problemMatcher": [],
+      "isBackground": true,
+      "detail": "Run the main OMNI Python application"
+    },
+    {
+      "label": "Python: Run Tests",
+      "type": "shell",
+      "command": "pytest -v",
+      "problemMatcher": [],
+      "group": "test",
+      "detail": "Run Python tests with pytest"
+    },
+    {
+      "label": "Docker: Build Image",
+      "type": "shell",
+      "command": "docker-compose build",
+      "problemMatcher": [],
+      "detail": "Build Docker images"
+    },
+    {
+      "label": "Docker: Start Services",
+      "type": "shell",
+      "command": "docker-compose up -d",
+      "problemMatcher": [],
+      "isBackground": true,
+      "detail": "Start Docker services in detached mode"
+    },
+    {
+      "label": "Docker: Stop Services",
+      "type": "shell",
+      "command": "docker-compose down",
+      "problemMatcher": [],
+      "detail": "Stop and remove Docker services"
+    },
+    {
+      "label": "Docker: View Logs",
+      "type": "shell",
+      "command": "docker-compose logs -f",
+      "problemMatcher": [],
+      "isBackground": true,
+      "detail": "View Docker service logs"
+    },
+    {
+      "label": "Git: Pull Latest",
+      "type": "shell",
+      "command": "git pull",
+      "problemMatcher": [],
+      "detail": "Pull latest changes from repository"
+    },
+    {
+      "label": "Setup: Complete Environment",
+      "dependsOn": [
+        "npm: Install Dependencies",
+        "Python: Install Requirements"
+      ],
+      "dependsOrder": "sequence",
+      "problemMatcher": [],
+      "detail": "Install all dependencies (Node.js and Python)"
+    },
+    {
+      "label": "Full Build and Test",
+      "dependsOn": [
+        "npm: Build Project",
+        "npm: Lint Code",
+        "npm: Run Tests",
+        "Python: Run Tests"
+      ],
+      "dependsOrder": "sequence",
+      "problemMatcher": [],
+      "detail": "Build project and run all tests"
+    }
+  ]
+}

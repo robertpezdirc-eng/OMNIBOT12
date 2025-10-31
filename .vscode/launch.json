@@ -1,0 +1,112 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Node.js: Launch Main App",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/omni-ultra-main.js",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "name": "Node.js: Launch Server",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/server.js",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "name": "Node.js: Debug Current File",
+      "type": "node",
+      "request": "launch",
+      "program": "${file}",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Node.js: Attach to Process",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "restart": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    },
+    {
+      "name": "Python: OMNI Main",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/omni.py",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/.env",
+      "justMyCode": true
+    },
+    {
+      "name": "Python: Current File",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Python: IoT Dashboard",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/start_iot_dashboard.py",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/.env.iot_real_template"
+    },
+    {
+      "name": "Python: Thea Queue System",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/thea_queue_system.py",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "name": "Python: Debug Tests",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "-v",
+        "${file}"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Docker: Attach to Node",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "/app",
+      "protocol": "inspector"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack: Node.js + Python",
+      "configurations": [
+        "Node.js: Launch Main App",
+        "Python: OMNI Main"
+      ],
+      "stopAll": true
+    }
+  ]
+}

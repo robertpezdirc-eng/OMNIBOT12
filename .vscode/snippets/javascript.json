@@ -1,0 +1,126 @@
+{
+  "Express Route": {
+    "prefix": "omni-route",
+    "body": [
+      "router.${1|get,post,put,delete,patch|}('/${2:path}', async (req, res) => {",
+      "  try {",
+      "    $0",
+      "    res.json({ success: true, data: null });",
+      "  } catch (error) {",
+      "    console.error('Error:', error);",
+      "    res.status(500).json({ success: false, error: error.message });",
+      "  }",
+      "});"
+    ],
+    "description": "Create an Express route handler with error handling"
+  },
+  "Socket.IO Event Handler": {
+    "prefix": "omni-socket",
+    "body": [
+      "socket.on('${1:event}', async (data) => {",
+      "  try {",
+      "    console.log('${1:event} received:', data);",
+      "    $0",
+      "    socket.emit('${1:event}-response', { success: true });",
+      "  } catch (error) {",
+      "    console.error('Error in ${1:event}:', error);",
+      "    socket.emit('error', { message: error.message });",
+      "  }",
+      "});"
+    ],
+    "description": "Create a Socket.IO event handler"
+  },
+  "Async Function": {
+    "prefix": "omni-async",
+    "body": [
+      "async function ${1:functionName}(${2:params}) {",
+      "  try {",
+      "    $0",
+      "  } catch (error) {",
+      "    console.error('Error in ${1:functionName}:', error);",
+      "    throw error;",
+      "  }",
+      "}"
+    ],
+    "description": "Create an async function with error handling"
+  },
+  "MongoDB Query": {
+    "prefix": "omni-mongo",
+    "body": [
+      "const ${1:result} = await ${2:Model}.${3|findOne,find,findById,updateOne,deleteOne|}(${4:query});",
+      "if (!${1:result}) {",
+      "  throw new Error('${2:Model} not found');",
+      "}",
+      "$0"
+    ],
+    "description": "Create a MongoDB query with error handling"
+  },
+  "OMNI Module": {
+    "prefix": "omni-module",
+    "body": [
+      "/**",
+      " * ${1:Module Name}",
+      " * @description ${2:Module description}",
+      " * @author OMNI-BRAIN Team",
+      " */",
+      "",
+      "class ${1:ModuleName} {",
+      "  constructor(config = {}) {",
+      "    this.config = config;",
+      "    this.initialized = false;",
+      "  }",
+      "",
+      "  async initialize() {",
+      "    try {",
+      "      console.log('Initializing ${1:ModuleName}...');",
+      "      $0",
+      "      this.initialized = true;",
+      "      console.log('${1:ModuleName} initialized successfully');",
+      "    } catch (error) {",
+      "      console.error('Failed to initialize ${1:ModuleName}:', error);",
+      "      throw error;",
+      "    }",
+      "  }",
+      "",
+      "  async shutdown() {",
+      "    console.log('Shutting down ${1:ModuleName}...');",
+      "    this.initialized = false;",
+      "  }",
+      "}",
+      "",
+      "module.exports = ${1:ModuleName};"
+    ],
+    "description": "Create an OMNI module class structure"
+  },
+  "API Endpoint Test": {
+    "prefix": "omni-test-api",
+    "body": [
+      "describe('${1:Endpoint Name}', () => {",
+      "  test('should ${2:test description}', async () => {",
+      "    const response = await request(app)",
+      "      .${3|get,post,put,delete,patch|}('${4:/api/path}')",
+      "      .send(${5:data})",
+      "      .expect(${6:200});",
+      "",
+      "    expect(response.body).toHaveProperty('success', true);",
+      "    $0",
+      "  });",
+      "});"
+    ],
+    "description": "Create an API endpoint test"
+  },
+  "Logger": {
+    "prefix": "omni-log",
+    "body": [
+      "console.${1|log,info,warn,error,debug|}('[${2:MODULE}]', $0);"
+    ],
+    "description": "Create a formatted log message"
+  },
+  "Environment Variable": {
+    "prefix": "omni-env",
+    "body": [
+      "const ${1:varName} = process.env.${2:ENV_VAR} || '${3:defaultValue}';"
+    ],
+    "description": "Get environment variable with default"
+  }
+}
