@@ -1,0 +1,65 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/.git": true,
+      "**/.DS_Store": true,
+      "**/node_modules": true,
+      "**/__pycache__": true,
+      "**/*.pyc": true,
+      "**/.pytest_cache": true,
+      "**/dist": true,
+      "**/build": true,
+      "**/*.db": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "ms-python.python",
+      "ms-python.vscode-pylance",
+      "ms-azuretools.vscode-docker",
+      "mongodb.mongodb-vscode",
+      "github.copilot",
+      "github.copilot-chat"
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Node.js: Launch Main App",
+        "type": "node",
+        "request": "launch",
+        "program": "${workspaceFolder}/omni-ultra-main.js",
+        "skipFiles": ["<node_internals>/**"],
+        "console": "integratedTerminal",
+        "envFile": "${workspaceFolder}/.env"
+      },
+      {
+        "name": "Python: OMNI Main",
+        "type": "python",
+        "request": "launch",
+        "program": "${workspaceFolder}/omni.py",
+        "console": "integratedTerminal",
+        "envFile": "${workspaceFolder}/.env"
+      }
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Setup: Complete Environment",
+        "type": "shell",
+        "command": "npm install && pip install -r requirements.txt",
+        "problemMatcher": []
+      }
+    ]
+  }
+}

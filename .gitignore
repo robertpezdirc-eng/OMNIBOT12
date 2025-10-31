@@ -111,7 +111,9 @@ tmp/
 temp/
 
 # Editor directories and files
-.vscode/
+# Keep .vscode/ configuration but exclude user-specific files
+.vscode/*.log
+.vscode/settings.json.backup
 .idea/
 *.swp
 *.swo

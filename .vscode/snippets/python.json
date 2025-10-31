@@ -1,0 +1,151 @@
+{
+  "OMNI Python Module": {
+    "prefix": "omni-pymodule",
+    "body": [
+      "\"\"\"",
+      "${1:Module Name}",
+      "",
+      "Description: ${2:Module description}",
+      "Author: OMNI-BRAIN Team",
+      "\"\"\"",
+      "",
+      "import logging",
+      "from typing import Optional, Dict, Any",
+      "",
+      "logger = logging.getLogger(__name__)",
+      "",
+      "",
+      "class ${1:ModuleName}:",
+      "    \"\"\"${2:Module description}\"\"\"",
+      "",
+      "    def __init__(self, config: Optional[Dict[str, Any]] = None):",
+      "        \"\"\"Initialize the module\"\"\"",
+      "        self.config = config or {}",
+      "        self.initialized = False",
+      "        logger.info(f\"Initializing {self.__class__.__name__}\")",
+      "",
+      "    async def initialize(self) -> None:",
+      "        \"\"\"Initialize the module\"\"\"",
+      "        try:",
+      "            logger.info(f\"Initializing {self.__class__.__name__}...\")",
+      "            $0",
+      "            self.initialized = True",
+      "            logger.info(f\"{self.__class__.__name__} initialized successfully\")",
+      "        except Exception as e:",
+      "            logger.error(f\"Failed to initialize {self.__class__.__name__}: {e}\")",
+      "            raise",
+      "",
+      "    async def shutdown(self) -> None:",
+      "        \"\"\"Shutdown the module\"\"\"",
+      "        logger.info(f\"Shutting down {self.__class__.__name__}...\")",
+      "        self.initialized = False"
+    ],
+    "description": "Create an OMNI Python module class"
+  },
+  "Async Function": {
+    "prefix": "omni-async",
+    "body": [
+      "async def ${1:function_name}(${2:params}) -> ${3:None}:",
+      "    \"\"\"${4:Function description}\"\"\"",
+      "    try:",
+      "        $0",
+      "    except Exception as e:",
+      "        logger.error(f\"Error in ${1:function_name}: {e}\")",
+      "        raise"
+    ],
+    "description": "Create an async function with error handling"
+  },
+  "Flask Route": {
+    "prefix": "omni-route",
+    "body": [
+      "@app.route('/${1:path}', methods=['${2|GET,POST,PUT,DELETE,PATCH|}'])",
+      "async def ${3:function_name}():",
+      "    \"\"\"${4:Route description}\"\"\"",
+      "    try:",
+      "        $0",
+      "        return jsonify({'success': True, 'data': None})",
+      "    except Exception as e:",
+      "        logger.error(f'Error in ${3:function_name}: {e}')",
+      "        return jsonify({'success': False, 'error': str(e)}), 500"
+    ],
+    "description": "Create a Flask route with error handling"
+  },
+  "Logger": {
+    "prefix": "omni-log",
+    "body": [
+      "logger.${1|debug,info,warning,error,critical|}('$0')"
+    ],
+    "description": "Create a log statement"
+  },
+  "Environment Variable": {
+    "prefix": "omni-env",
+    "body": [
+      "${1:var_name} = os.getenv('${2:ENV_VAR}', '${3:default_value}')"
+    ],
+    "description": "Get environment variable with default"
+  },
+  "Try-Except Block": {
+    "prefix": "omni-try",
+    "body": [
+      "try:",
+      "    $0",
+      "except ${1:Exception} as e:",
+      "    logger.error(f'${2:Error description}: {e}')",
+      "    raise"
+    ],
+    "description": "Create a try-except block with logging"
+  },
+  "Database Query": {
+    "prefix": "omni-db",
+    "body": [
+      "async with ${1:db}.cursor() as cursor:",
+      "    await cursor.execute('''",
+      "        ${2:SQL_QUERY}",
+      "    ''', ${3:params})",
+      "    ${4:result} = await cursor.fetchall()",
+      "    $0"
+    ],
+    "description": "Create a database query"
+  },
+  "Class with Init": {
+    "prefix": "omni-class",
+    "body": [
+      "class ${1:ClassName}:",
+      "    \"\"\"${2:Class description}\"\"\"",
+      "",
+      "    def __init__(self, ${3:params}):",
+      "        \"\"\"Initialize ${1:ClassName}\"\"\"",
+      "        $0"
+    ],
+    "description": "Create a Python class"
+  },
+  "OMNI API Handler": {
+    "prefix": "omni-api",
+    "body": [
+      "async def handle_${1:action}(request_data: Dict[str, Any]) -> Dict[str, Any]:",
+      "    \"\"\"",
+      "    Handle ${1:action} request",
+      "",
+      "    Args:",
+      "        request_data: Request payload",
+      "",
+      "    Returns:",
+      "        Response dictionary",
+      "    \"\"\"",
+      "    try:",
+      "        logger.info(f'Processing ${1:action} request')",
+      "        $0",
+      "        return {",
+      "            'success': True,",
+      "            'data': None",
+      "        }",
+      "    except Exception as e:",
+      "        logger.error(f'Error in handle_${1:action}: {e}')",
+      "        return {",
+      "            'success': False,",
+      "            'error': str(e)",
+      "        }"
+    ],
+    "description": "Create an OMNI API handler function"
+  }
+}
