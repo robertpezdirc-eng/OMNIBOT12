@@ -37,9 +37,12 @@ print_error() {
 
 # Datum za backup / Date for backup
 BACKUP_DATE=$(date +%Y%m%d_%H%M%S)
-BACKUP_DIR="./omnibot12-backup-${BACKUP_DATE}"
 
-print_header "OMNIBOT12 Varnostna Kopija / Backup"
+# Pridobi ime projekta iz trenutnega direktorija / Get project name from current directory
+PROJECT_NAME=$(basename "$PWD" | tr '[:upper:]' '[:lower:]')
+BACKUP_DIR="./${PROJECT_NAME}-backup-${BACKUP_DATE}"
+
+print_header "${PROJECT_NAME^^} Varnostna Kopija / Backup"
 echo "Datum / Date: $(date)"
 echo "Direktorij / Directory: ${BACKUP_DIR}"
 echo ""
@@ -51,11 +54,11 @@ print_success "Ustvarjen backup direktorij / Created backup directory"
 # 1. Git repozitorij / Git repository
 print_header "1. Varnostna kopija Git repozitorija / Git Repository Backup"
 if [ -d ".git" ]; then
-    git bundle create "${BACKUP_DIR}/omnibot12-repo.bundle" --all
+    git bundle create "${BACKUP_DIR}/${PROJECT_NAME}-repo.bundle" --all
     print_success "Git repozitorij shranjen / Git repository saved"
     
     # Shrani tudi trenutno stanje / Save current state too
-    git archive -o "${BACKUP_DIR}/omnibot12-current-state.tar.gz" HEAD
+    git archive -o "${BACKUP_DIR}/${PROJECT_NAME}-current-state.tar.gz" HEAD
     print_success "Trenutno stanje shranjeno / Current state saved"
     
     # Shrani git log / Save git log
@@ -105,10 +108,22 @@ print_header "4. MongoDB izvoz / MongoDB Export"
 mkdir -p "${BACKUP_DIR}/mongodb"
 
 if command -v mongodump &> /dev/null; then
-    # Seznam baz iz projekta / List of databases from project
-    DBS=("omni_analytics" "omni_multitenant" "devops" "finance" "tourism")
+    # Poskusi odkriti MongoDB baze / Try to discover MongoDB databases
+    if command -v mongo &> /dev/null; then
+        print_warning "Poskušam avtomatsko odkriti MongoDB baze / Trying to auto-discover MongoDB databases"
+        # Poskusi dobiti seznam baz / Try to get list of databases
+        DBS=$(mongo --quiet --eval "db.adminCommand('listDatabases').databases.map(d => d.name).join(' ')" 2>/dev/null | grep -v 'admin\|config\|local' || echo "")
+        if [ -z "$DBS" ]; then
+            # Uporabi privzete baze za OMNIBOT12 / Use default databases for OMNIBOT12
+            print_warning "Ni mogoče avtomatsko odkriti baz, uporabljam privzete / Cannot auto-discover, using defaults"
+            DBS="omni_analytics omni_multitenant devops finance tourism"
+        fi
+    else
+        # Uporabi privzete baze za OMNIBOT12 / Use default databases for OMNIBOT12
+        DBS="omni_analytics omni_multitenant devops finance tourism"
+    fi
     
-    for db in "${DBS[@]}"; do
+    for db in $DBS; do
         if mongodump --db "$db" --out "${BACKUP_DIR}/mongodb" 2>/dev/null; then
             print_success "MongoDB baza izvožena: $db / MongoDB database exported: $db"
         else
@@ -235,7 +250,7 @@ print_success "Manifest ustvarjen / Manifest created"
 
 # 10. Kompresija / Compression
 print_header "10. Kompresija varnostne kopije / Compressing Backup"
-ARCHIVE_NAME="omnibot12-backup-${BACKUP_DATE}.tar.gz"
+ARCHIVE_NAME="${PROJECT_NAME}-backup-${BACKUP_DATE}.tar.gz"
 
 tar -czf "${ARCHIVE_NAME}" "${BACKUP_DIR}"
 ARCHIVE_SIZE=$(du -h "${ARCHIVE_NAME}" | cut -f1)
@@ -269,6 +284,6 @@ echo "Za obnovo / To restore:"
 echo "   tar -xzf ${ARCHIVE_NAME}"
 echo ""
 echo "Za obnovo Git repozitorija / To restore Git repository:"
-echo "   git clone ${ARCHIVE_NAME%.tar.gz}/omnibot12-repo.bundle omnibot12-restored"
+echo "   git clone ${BACKUP_DIR}/${PROJECT_NAME}-repo.bundle ${PROJECT_NAME}-restored"
 echo ""
 print_success "✓ Projekt je pripravljen za arhiviranje / Project ready for archiving"

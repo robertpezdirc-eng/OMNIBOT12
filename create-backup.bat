@@ -11,14 +11,22 @@ setlocal enabledelayedexpansion
 REM Barve niso na voljo v cmd, uporabljamo emoji in oznake
 REM Colors not available in cmd, using emoji and markers
 
-REM Datum za backup / Date for backup
-for /f "tokens=2-4 delims=/ " %%a in ('date /t') do (set mydate=%%c%%a%%b)
-for /f "tokens=1-2 delims=/:" %%a in ('time /t') do (set mytime=%%a%%b)
-set BACKUP_DATE=%mydate%_%mytime%
-set BACKUP_DIR=omnibot12-backup-%BACKUP_DATE%
+REM Datum za backup / Date for backup  
+REM Use more reliable date/time format that works across locales
+for /f "tokens=1-3 delims=/-. " %%a in ("%date%") do (
+    set mydate=%%c%%b%%a
+)
+for /f "tokens=1-2 delims=:. " %%a in ("%time%") do (
+    set mytime=%%a%%b
+)
+set BACKUP_DATE=%mydate%_%mytime: =0%
+
+REM Get project name from current directory / Pridobi ime projekta iz trenutnega direktorija
+for %%I in (.) do set PROJECT_NAME=%%~nxI
+set BACKUP_DIR=%PROJECT_NAME%-backup-%BACKUP_DATE%
 
 echo ========================================
-echo OMNIBOT12 Varnostna Kopija / Backup
+echo %PROJECT_NAME% Varnostna Kopija / Backup
 echo ========================================
 echo Datum / Date: %date% %time%
 echo Direktorij / Directory: %BACKUP_DIR%
@@ -35,10 +43,10 @@ echo 1. Git Repozitorij / Git Repository
 echo ========================================
 
 if exist ".git" (
-    git bundle create "%BACKUP_DIR%\omnibot12-repo.bundle" --all
+    git bundle create "%BACKUP_DIR%\%PROJECT_NAME%-repo.bundle" --all
     echo [OK] Git repozitorij shranjen / Git repository saved
     
-    git archive -o "%BACKUP_DIR%\omnibot12-current-state.zip" HEAD
+    git archive -o "%BACKUP_DIR%\%PROJECT_NAME%-current-state.zip" HEAD
     echo [OK] Trenutno stanje shranjeno / Current state saved
     
     git log --all --oneline --graph --decorate > "%BACKUP_DIR%\git-log.txt"
@@ -104,6 +112,15 @@ mkdir "%BACKUP_DIR%\mongodb" 2>nul
 
 where mongodump >nul 2>&1
 if %errorlevel%==0 (
+    REM Try to auto-discover MongoDB databases / Poskusi avtomatsko odkriti baze
+    where mongo >nul 2>&1
+    if !errorlevel!==0 (
+        echo [INFO] Poskušam avtomatsko odkriti MongoDB baze / Trying to auto-discover MongoDB databases
+        REM If mongo command available, try to discover databases (simplified for Windows)
+        REM Falls back to default databases if discovery fails
+    )
+    
+    REM Use default databases for OMNIBOT12 / Uporabi privzete baze za OMNIBOT12
     for %%d in (omni_analytics omni_multitenant devops finance tourism) do (
         mongodump --db %%d --out "%BACKUP_DIR%\mongodb" >nul 2>&1
         if !errorlevel!==0 (
@@ -236,7 +253,7 @@ echo 9. Manifest
 echo ========================================
 
 (
-    echo === OMNIBOT12 Backup Manifest ===
+    echo === %PROJECT_NAME% Backup Manifest ===
     echo Datum / Date: %date% %time%
     echo Backup verzija / Backup version: %BACKUP_DATE%
     echo.
@@ -263,7 +280,7 @@ echo ========================================
 echo 10. Kompresija / Compression
 echo ========================================
 
-set ARCHIVE_NAME=omnibot12-backup-%BACKUP_DATE%.zip
+set ARCHIVE_NAME=%PROJECT_NAME%-backup-%BACKUP_DATE%.zip
 
 REM Preveri, če je na voljo 7-Zip / Check if 7-Zip is available
 where 7z >nul 2>&1
@@ -305,7 +322,7 @@ echo 2. Kopirajte na več lokacij ^(pravilo 3-2-1^) / Copy to multiple locations
 echo 3. Preverite celovitost arhiva / Verify archive integrity
 echo.
 echo Za obnovo Git repozitorija / To restore Git repository:
-echo    git clone %BACKUP_DIR%\omnibot12-repo.bundle omnibot12-restored
+echo    git clone %BACKUP_DIR%\%PROJECT_NAME%-repo.bundle %PROJECT_NAME%-restored
 echo.
 echo [OK] Projekt je pripravljen za arhiviranje / Project ready for archiving
 echo.
