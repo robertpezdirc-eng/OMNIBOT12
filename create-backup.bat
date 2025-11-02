@@ -12,18 +12,14 @@ REM Barve niso na voljo v cmd, uporabljamo emoji in oznake
 REM Colors not available in cmd, using emoji and markers
 
 REM Datum za backup / Date for backup  
-REM Use more reliable date/time format that works across locales
-for /f "tokens=1-3 delims=/-. " %%a in ("%date%") do (
-    set mydate=%%c%%b%%a
-)
-for /f "tokens=1-2 delims=:. " %%a in ("%time%") do (
-    set mytime=%%a%%b
-)
-set BACKUP_DATE=%mydate%_%mytime: =0%
+REM Use PowerShell for cross-locale compatible date formatting
+for /f "delims=" %%i in ('powershell -command "Get-Date -Format 'yyyyMMdd_HHmmss'"') do set BACKUP_DATE=%%i
 
 REM Get project name from current directory / Pridobi ime projekta iz trenutnega direktorija
 for %%I in (.) do set PROJECT_NAME=%%~nxI
-set BACKUP_DIR=%PROJECT_NAME%-backup-%BACKUP_DATE%
+REM Convert to lowercase for directory name (keep original for display)
+for /f "delims=" %%i in ('powershell -command "'%PROJECT_NAME%'.ToLower()"') do set PROJECT_NAME_LOWER=%%i
+set BACKUP_DIR=%PROJECT_NAME_LOWER%-backup-%BACKUP_DATE%
 
 echo ========================================
 echo %PROJECT_NAME% Varnostna Kopija / Backup
@@ -43,10 +39,10 @@ echo 1. Git Repozitorij / Git Repository
 echo ========================================
 
 if exist ".git" (
-    git bundle create "%BACKUP_DIR%\%PROJECT_NAME%-repo.bundle" --all
+    git bundle create "%BACKUP_DIR%\%PROJECT_NAME_LOWER%-repo.bundle" --all
     echo [OK] Git repozitorij shranjen / Git repository saved
     
-    git archive -o "%BACKUP_DIR%\%PROJECT_NAME%-current-state.zip" HEAD
+    git archive -o "%BACKUP_DIR%\%PROJECT_NAME_LOWER%-current-state.zip" HEAD
     echo [OK] Trenutno stanje shranjeno / Current state saved
     
     git log --all --oneline --graph --decorate > "%BACKUP_DIR%\git-log.txt"
@@ -280,7 +276,7 @@ echo ========================================
 echo 10. Kompresija / Compression
 echo ========================================
 
-set ARCHIVE_NAME=%PROJECT_NAME%-backup-%BACKUP_DATE%.zip
+set ARCHIVE_NAME=%PROJECT_NAME_LOWER%-backup-%BACKUP_DATE%.zip
 
 REM Preveri, če je na voljo 7-Zip / Check if 7-Zip is available
 where 7z >nul 2>&1
@@ -321,8 +317,13 @@ echo 1. Shranite arhiv na varno lokacijo / Store the archive in a safe location
 echo 2. Kopirajte na več lokacij ^(pravilo 3-2-1^) / Copy to multiple locations ^(3-2-1 rule^)
 echo 3. Preverite celovitost arhiva / Verify archive integrity
 echo.
-echo Za obnovo Git repozitorija / To restore Git repository:
-echo    git clone %BACKUP_DIR%\%PROJECT_NAME%-repo.bundle %PROJECT_NAME%-restored
+echo Za obnovo iz arhiva / To restore from archive:
+echo    1. Razpakirajte: unzip %ARCHIVE_NAME% ^(ali 7z x %ARCHIVE_NAME%^)
+echo    2. Pojdite v direktorij: cd %BACKUP_DIR%
+echo.
+echo Za obnovo Git repozitorija iz arhiva / To restore Git repository from archive:
+echo    unzip %ARCHIVE_NAME%
+echo    git clone %BACKUP_DIR%\%PROJECT_NAME_LOWER%-repo.bundle %PROJECT_NAME%-restored
 echo.
 echo [OK] Projekt je pripravljen za arhiviranje / Project ready for archiving
 echo.

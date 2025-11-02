@@ -39,10 +39,12 @@ print_error() {
 BACKUP_DATE=$(date +%Y%m%d_%H%M%S)
 
 # Pridobi ime projekta iz trenutnega direktorija / Get project name from current directory
-PROJECT_NAME=$(basename "$PWD" | tr '[:upper:]' '[:lower:]')
-BACKUP_DIR="./${PROJECT_NAME}-backup-${BACKUP_DATE}"
+# Keep original case for proper identification
+PROJECT_NAME=$(basename "$PWD")
+PROJECT_NAME_LOWER=$(echo "$PROJECT_NAME" | tr '[:upper:]' '[:lower:]')
+BACKUP_DIR="./${PROJECT_NAME_LOWER}-backup-${BACKUP_DATE}"
 
-print_header "${PROJECT_NAME^^} Varnostna Kopija / Backup"
+print_header "${PROJECT_NAME} Varnostna Kopija / Backup"
 echo "Datum / Date: $(date)"
 echo "Direktorij / Directory: ${BACKUP_DIR}"
 echo ""
@@ -54,11 +56,11 @@ print_success "Ustvarjen backup direktorij / Created backup directory"
 # 1. Git repozitorij / Git repository
 print_header "1. Varnostna kopija Git repozitorija / Git Repository Backup"
 if [ -d ".git" ]; then
-    git bundle create "${BACKUP_DIR}/${PROJECT_NAME}-repo.bundle" --all
+    git bundle create "${BACKUP_DIR}/${PROJECT_NAME_LOWER}-repo.bundle" --all
     print_success "Git repozitorij shranjen / Git repository saved"
     
     # Shrani tudi trenutno stanje / Save current state too
-    git archive -o "${BACKUP_DIR}/${PROJECT_NAME}-current-state.tar.gz" HEAD
+    git archive -o "${BACKUP_DIR}/${PROJECT_NAME_LOWER}-current-state.tar.gz" HEAD
     print_success "Trenutno stanje shranjeno / Current state saved"
     
     # Shrani git log / Save git log
@@ -250,7 +252,7 @@ print_success "Manifest ustvarjen / Manifest created"
 
 # 10. Kompresija / Compression
 print_header "10. Kompresija varnostne kopije / Compressing Backup"
-ARCHIVE_NAME="${PROJECT_NAME}-backup-${BACKUP_DATE}.tar.gz"
+ARCHIVE_NAME="${PROJECT_NAME_LOWER}-backup-${BACKUP_DATE}.tar.gz"
 
 tar -czf "${ARCHIVE_NAME}" "${BACKUP_DIR}"
 ARCHIVE_SIZE=$(du -h "${ARCHIVE_NAME}" | cut -f1)
@@ -282,8 +284,10 @@ echo "   tar -tzf ${ARCHIVE_NAME} > /dev/null && echo 'OK'"
 echo ""
 echo "Za obnovo / To restore:"
 echo "   tar -xzf ${ARCHIVE_NAME}"
+echo "   cd ${BACKUP_DIR}"
 echo ""
-echo "Za obnovo Git repozitorija / To restore Git repository:"
-echo "   git clone ${BACKUP_DIR}/${PROJECT_NAME}-repo.bundle ${PROJECT_NAME}-restored"
+echo "Za obnovo Git repozitorija iz arhiva / To restore Git repository from archive:"
+echo "   tar -xzf ${ARCHIVE_NAME}"
+echo "   git clone ${BACKUP_DIR}/${PROJECT_NAME_LOWER}-repo.bundle ${PROJECT_NAME}-restored"
 echo ""
 print_success "✓ Projekt je pripravljen za arhiviranje / Project ready for archiving"
