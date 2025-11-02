@@ -6,6 +6,15 @@
 
 **Popolnoma avtomatiziran licenčni sistem z real-time funkcionalnostjo in naprednimi varnostnimi funkcijami.**
 
+---
+
+> 📦 **Arhiviranje Projekta / Project Archiving**
+> 
+> Če želite arhivirati ta projekt, sledite navodilom v [ARCHIVING.md](ARCHIVING.md).  
+> If you want to archive this project, follow the instructions in [ARCHIVING.md](ARCHIVING.md).
+
+---
+
 ## 📋 Kazalo
 
 - [🎯 Pregled Sistema](#-pregled-sistema)
